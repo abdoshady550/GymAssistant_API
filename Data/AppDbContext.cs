@@ -1,5 +1,6 @@
 using GymAssistant_API.Model.Entities.Exercise;
 using GymAssistant_API.Model.Entities.User;
+using GymAssistant_API.Model.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,7 @@ namespace GymAssistant_API.Data
         public DbSet<UserExercise> UserExercises => Set<UserExercise>();
         public DbSet<Section> Sections => Set<Section>();
         public DbSet<PersonalRecord> PersonalRecords => Set<PersonalRecord>();
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
