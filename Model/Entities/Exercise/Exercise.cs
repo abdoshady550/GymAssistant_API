@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace GymAssistant_API.Model.Entities.Exercise
 {
-    public class Exercise : Entity
+    public sealed class Exercise : Entity
     {
         public Guid SectionId { get; private set; }
         public Section Section { get; private set; } = default!;

@@ -2,7 +2,7 @@
 
 namespace GymAssistant_API.Model.Entities.Exercise
 {
-    public class ExerciseSet : Entity
+    public sealed class ExerciseSet : Entity
     {
 
         public Guid WorkoutExerciseId { get; private set; }

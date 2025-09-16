@@ -3,7 +3,7 @@ using GymAssistant_API.Model.Results;
 
 namespace GymAssistant_API.Model.Entities.User
 {
-    public class TrainerTrainee : Entity
+    public sealed class TrainerTrainee : Entity
     {
 
         public Guid TrainerId { get; private set; }

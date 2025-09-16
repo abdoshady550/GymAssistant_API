@@ -4,7 +4,7 @@ using GymAssistant_API.Model.Results;
 
 namespace GymAssistant_API.Model.Entities.User
 {
-    public class BodyMeasurement : Entity
+    public sealed class BodyMeasurement : Entity
     {
 
         public string UserId { get; private set; }

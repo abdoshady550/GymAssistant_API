@@ -81,7 +81,7 @@ namespace GymAssistant_API.Model.Entities.User
             {
                 return UserErrors.LastNameRequired;
             }
-            if (BirthDate is null)
+            if (birthDate is null)
             {
                 return UserErrors.BirthDayRequired;
             }

@@ -3,7 +3,7 @@ using GymAssistant_API.Model.Results;
 
 namespace GymAssistant_API.Model.Entities.Exercise
 {
-    public class WorkoutExercise : Entity
+    public sealed class WorkoutExercise : Entity
     {
         private readonly List<ExerciseSet> _sets = new();
 

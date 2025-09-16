@@ -3,25 +3,34 @@ using GymAssistant_API.Model.Results;
 
 namespace GymAssistant_API.Model.Entities.Exercise
 {
-    public class UserExercise : Entity
+    public sealed class UserExercise : Entity
     {
         public string UserId { get; private set; }
         public string Name { get; private set; }
         public string? Description { get; private set; }
+        public string? Instructions { get; private set; }
+        public string? ImageUrl { get; private set; }
+        public string? Equipment { get; private set; }
 
         public Guid ClientProfileId { get; private set; }
         public ClientProfile User { get; private set; } = default!;
 
         private UserExercise() { }
 
-        private UserExercise(Guid id, string userId, string name, string? description = null) : base(id)
+        private UserExercise(Guid id, string userId, string name, string? description = null, string? Instructions = null, string? Equipment = null, string? ImageUrl = null) : base(id)
         {
             UserId = userId;
             Name = name;
             Description = description;
             CreatedAtUtc = DateTimeOffset.UtcNow;
         }
-        public static Result<UserExercise> Create(Guid id, string userId, string name, string? description = null)
+        public static Result<UserExercise> Create(Guid id,
+                                                  string userId,
+                                                  string name,
+                                                  string? description = null,
+                                                  string? Instructions = null,
+                                                  string? Equipment = null,
+                                                  string? ImageUrl = null)
         {
             if (userId == null)
             {
@@ -32,7 +41,7 @@ namespace GymAssistant_API.Model.Entities.Exercise
             {
                 return UserErrors.NameRequired;
             }
-            return new UserExercise(id, userId, name, description);
+            return new UserExercise(id, userId, name, description, Instructions, Equipment, ImageUrl);
         }
     }
 }

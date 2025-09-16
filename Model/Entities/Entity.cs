@@ -5,7 +5,7 @@ namespace GymAssistant_API.Model.Entities;
 
 public abstract class Entity
 {
-    public Guid Id { get; }
+    public Guid Id { get; private set; }
     public DateTimeOffset CreatedAtUtc { get; set; }
 
     private readonly List<DomainEvent> _domainEvents = [];
