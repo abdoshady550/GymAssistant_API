@@ -423,6 +423,41 @@ namespace GymAssistant_API.Data.Migrations
                     b.ToTable("ClientProfiles", (string)null);
                 });
 
+            modelBuilder.Entity("GymAssistant_API.Model.Entities.User.PasswordResetToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("Email", "Token");
+
+                    b.ToTable("PasswordResetTokens");
+                });
+
             modelBuilder.Entity("GymAssistant_API.Model.Entities.User.TrainerTrainee", b =>
                 {
                     b.Property<Guid>("Id")
