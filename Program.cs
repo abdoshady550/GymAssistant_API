@@ -1,5 +1,6 @@
 ﻿using GymAssistant_API.Data;
 using GymAssistant_API.Handeler.Identity;
+using GymAssistant_API.Infrastructure;
 using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Identity;
 using GymAssistant_API.Repository.Interfaces.Identity;
@@ -9,9 +10,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 using System.Text;
 using System.Text.Json.Serialization;
-using Scalar.AspNetCore;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,15 +25,23 @@ builder.Services.AddControllers()
             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
             options.JsonSerializerOptions.WriteIndented = true;
         });
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddDbContext<AppDbContext>
 (option => option.UseSqlServer((builder.Configuration.GetConnectionString("DefaultConnection"))));
 builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(
     options => { options.Password.RequireNonAlphanumeric = false; }
-    ).AddEntityFrameworkStores<AppDbContext>();
+    ).AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
+    opt.TokenLifespan = TimeSpan.FromHours(2));
+
 
 builder.Services.Configure<JWT>(
     builder.Configuration.GetSection("JWT")
@@ -67,6 +76,8 @@ builder.Services.AddScoped<GenerateTokenQueryHandler>(); // Handler
 builder.Services.AddScoped<RefreshTokenQueryHandler>(); // Handler
 builder.Services.AddScoped<GetUserByIdQueryHanlder>(); // Handler
 builder.Services.AddScoped<RegisterHandler>(); // Handler
+builder.Services.AddScoped<ResetPasswordHandler>(); // Handler
+builder.Services.AddScoped<ForgotPasswordHandler>(); // Handler
 
 
 builder.Services.AddScoped<IIdentityService, IdentityService>(); // Service
@@ -80,6 +91,21 @@ builder.Services.AddOpenApi(options =>
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
     options.AddOperationTransformer<BearerSecuritySchemeTransformer>();
 });
+
+
+
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowClient", policy =>
+    {
+        policy.WithOrigins("https://fitrixapp.runasp.net")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 await app.InitialiseDatabaseAsync();
@@ -95,13 +121,15 @@ app.UseSwaggerUI(options =>
     options.DisplayRequestDuration();
     options.EnableFilter();
 });
+// تفعيل Exception Handler
+app.UseExceptionHandler();
 
 app.MapScalarApiReference();
-
 
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();
