@@ -18,15 +18,20 @@ namespace GymAssistant_API.Controllers
     public sealed class AuthController(GenerateTokenQueryHandler GenerateToken,
                                        RefreshTokenQueryHandler RefreshToken,
                                        GetUserByIdQueryHanlder GetUserById,
-                                       RegisterHandler registerHandler) : ApiController
+                                       RegisterHandler registerHandler,
+                                       ForgotPasswordHandler forgotPassword,
+                                       ResetPasswordHandler resetPassword) : ApiController
     {
         private readonly GenerateTokenQueryHandler _generateToken = GenerateToken;
         private readonly RefreshTokenQueryHandler _refreshToken = RefreshToken;
         private readonly GetUserByIdQueryHanlder _getUserById = GetUserById;
         private readonly RegisterHandler _registerHandler = registerHandler;
+        private readonly ForgotPasswordHandler _forgotPassword = forgotPassword;
+        private readonly ResetPasswordHandler _resetPassword = resetPassword;
 
 
-        [HttpPost("SignUP")]
+
+        [HttpPost("register")]
         [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -43,7 +48,7 @@ namespace GymAssistant_API.Controllers
                 Problem);
 
         }
-        [HttpPost("SignIn")]
+        [HttpPost("login")]
         [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -60,7 +65,7 @@ namespace GymAssistant_API.Controllers
                 Problem);
 
         }
-        [HttpPost("RefreshToken")]
+        [HttpPost("refresh-token")]
         [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -89,6 +94,39 @@ namespace GymAssistant_API.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var result = await _getUserById.Handle(new GetUserByIdQuery(userId), ct);
+
+            return result.Match(
+                response => Ok(response),
+                Problem);
+        }
+
+        [HttpPost("forgot-password")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [EndpointSummary("Sends a password reset link to the user.")]
+        [EndpointDescription("Accepts an email address, verifies the user exists, and sends a password reset link if successful.")]
+        [EndpointName("ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto request,
+                              CancellationToken ct = default)
+        {
+            var result = await _forgotPassword.Handle(request, ct);
+            return result.Match(
+                response => Ok(response),
+                Problem);
+
+        }
+        [HttpPost("reset-password")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [EndpointSummary("Resets the user's password using a reset token.")]
+        [EndpointDescription("Accepts a reset token, email, and new password to reset the user's password. Typically used after clicking the link sent by Forgot Password.")]
+        [EndpointName("ResetPassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto request,
+                               CancellationToken ct = default)
+        {
+            var result = await _resetPassword.Handle(request, ct);
 
             return result.Match(
                 response => Ok(response),
