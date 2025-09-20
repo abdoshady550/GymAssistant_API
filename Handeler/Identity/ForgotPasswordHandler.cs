@@ -24,7 +24,7 @@ namespace GymAssistant_API.Handeler.Identity
             {
                 _logger.LogError("User with Email { Email }{ErrorDetails}", request.Email, result.TopError.Description);
 
-                return Error.NotFound("Invalid email", result.TopError.Description);
+                return Error.NotFound("Invalid_email", result.TopError.Description ?? "Email not found");
             }
             return result.Value;
         }
