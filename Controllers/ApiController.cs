@@ -14,34 +14,77 @@ public class ApiController : ControllerBase
             return Problem();
         }
 
-        if (errors.All(error => error.Type == ErrorKind.Validation))
-        {
-            return ValidationProblem(errors);
-        }
-
-        return Problem(errors[0]);
-    }
-
-    private ObjectResult Problem(Error error)
-    {
-        var statusCode = error.Type switch
-        {
-            ErrorKind.Conflict => StatusCodes.Status409Conflict,
-            ErrorKind.Validation => StatusCodes.Status400BadRequest,
-            ErrorKind.NotFound => StatusCodes.Status404NotFound,
-            ErrorKind.Unauthorized => StatusCodes.Status403Forbidden,
-            _ => StatusCodes.Status500InternalServerError,
-        };
-
-        return Problem(statusCode: statusCode, title: error.Description);
+        // Always return validation problem format for consistency
+        return ValidationProblem(errors);
     }
 
     private ActionResult ValidationProblem(List<Error> errors)
     {
         var modelStateDictionary = new ModelStateDictionary();
+        var statusCode = StatusCodes.Status400BadRequest;
 
-        errors.ForEach(error => modelStateDictionary.AddModelError(error.Code, error.Description));
+        // Determine status code based on error types
+        if (errors.Any(e => e.Type == ErrorKind.NotFound))
+        {
+            statusCode = StatusCodes.Status404NotFound;
+        }
+        else if (errors.Any(e => e.Type == ErrorKind.Unauthorized))
+        {
+            statusCode = StatusCodes.Status401Unauthorized;
+        }
+        else if (errors.Any(e => e.Type == ErrorKind.Conflict))
+        {
+            statusCode = StatusCodes.Status409Conflict;
+        }
+        else if (errors.Any(e => e.Type == ErrorKind.Failure))
+        {
+            statusCode = StatusCodes.Status500InternalServerError;
+        }
 
-        return ValidationProblem(modelStateDictionary);
+        // Add all errors to model state
+        foreach (var error in errors)
+        {
+            modelStateDictionary.AddModelError(error.Code, error.Description);
+        }
+
+        // Create custom problem details to match your desired format
+        var problemDetails = new ValidationProblemDetails(modelStateDictionary)
+        {
+            Type = GetRfcUri(statusCode),
+            Title = GetDefaultTitle(statusCode),
+            Status = statusCode,
+        };
+
+        return new ObjectResult(problemDetails)
+        {
+            StatusCode = statusCode
+        };
     }
+
+    private static string GetRfcUri(int statusCode)
+    {
+        return statusCode switch
+        {
+            400 => "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+            401 => "https://tools.ietf.org/html/rfc9110#section-15.5.2",
+            404 => "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+            409 => "https://tools.ietf.org/html/rfc9110#section-15.5.10",
+            500 => "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+            _ => "https://tools.ietf.org/html/rfc9110#section-15.5.1"
+        };
+    }
+
+    private static string GetDefaultTitle(int statusCode)
+    {
+        return statusCode switch
+        {
+            400 => "One or more validation errors occurred.",
+            401 => "Unauthorized access.",
+            404 => "Resource not found.",
+            409 => "Conflict occurred.",
+            500 => "An internal server error occurred.",
+            _ => "One or more validation errors occurred."
+        };
+    }
+
 }
