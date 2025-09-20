@@ -104,7 +104,7 @@ public class IdentityService(AppDbContext context,
             if (user == null)
             {
                 _logger.LogWarning("Password reset requested for non-existent email: {Email}", email);
-                throw new ValidationException("Email not found ");
+                return Error.NotFound("Invalid_Email ", "Email not exist ");
             }
             // Invalidate any existing tokens for this email
             var existingTokens = await _context.PasswordResetTokens
@@ -237,9 +237,12 @@ public class IdentityService(AppDbContext context,
             var removeResult = await _userManager.RemovePasswordAsync(user);
             if (!removeResult.Succeeded)
             {
-                var removeErrors = removeResult.Errors.Select(e => e.Description);
-                _logger.LogError("Failed to remove password for {Email}: {Errors}", dto.Email, string.Join(", ", removeErrors));
-                return Error.Failure("Remove_Password_Failed", string.Join(", ", removeErrors));
+                var errors = removeResult.Errors.Select(e =>
+                  Error.Validation(e.Code, e.Description)).ToList();
+
+
+                _logger.LogError("Failed to remove password for {Email}: {Errors}", dto.Email, errors);
+                return errors;
             }
 
             _logger.LogInformation("Old password removed, adding new password...");
@@ -247,9 +250,11 @@ public class IdentityService(AppDbContext context,
             var addResult = await _userManager.AddPasswordAsync(user, dto.NewPassword);
             if (!addResult.Succeeded)
             {
-                var addErrors = addResult.Errors.Select(e => e.Description);
-                _logger.LogError("Failed to add new password for {Email}: {Errors}", dto.Email, string.Join(", ", addErrors));
-                return Error.Failure("Add_Password_Failed", string.Join(", ", addErrors));
+                var errors = addResult.Errors.Select(e =>
+                  Error.Validation(e.Code, e.Description)).ToList();
+
+                _logger.LogError("Failed to add new password for {Email}: {Errors}", dto.Email, errors);
+                return errors;
             }
 
             _logger.LogInformation("New password added, updating security stamp...");
