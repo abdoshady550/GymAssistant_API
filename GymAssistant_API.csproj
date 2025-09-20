@@ -35,4 +35,8 @@
 		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="9.0.4" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Model\Entities\User\Dto\" />
+	</ItemGroup>
+
 </Project>
