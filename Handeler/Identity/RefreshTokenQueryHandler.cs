@@ -3,6 +3,7 @@ using GymAssistant_API.Model.Identity.Dtos;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Identity;
 using GymAssistant_API.Req_Res.Reqeust;
+using GymAssistant_API.Req_Res.Request;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
