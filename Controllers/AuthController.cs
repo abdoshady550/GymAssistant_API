@@ -1,12 +1,8 @@
 ﻿using Asp.Versioning;
-using Azure.Core;
 using GymAssistant_API.Handeler.Identity;
 using GymAssistant_API.Model.Identity.Dtos;
-using GymAssistant_API.Repository.Interfaces.Identity;
-using GymAssistant_API.Repository.Services.Identity;
 using GymAssistant_API.Req_Res.Reqeust;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
