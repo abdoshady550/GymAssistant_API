@@ -68,7 +68,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Refreshes access token using a valid refresh token.")]
         [EndpointDescription("Exchanges an expired access token and a valid refresh token for a new token pair.")]
         [EndpointName("RefreshToken")]
-        [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
+
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenQuery request, CancellationToken ct)
         {
             var result = await _refreshToken.Handle(request, ct);
