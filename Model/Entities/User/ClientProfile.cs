@@ -34,14 +34,16 @@ namespace GymAssistant_API.Model.Entities.User
 
         private ClientProfile() { }
 
-        private ClientProfile(Guid id, string firstName, string lastName, Gender gender, UserRole role)
-            : base(id)
+        private ClientProfile(Guid id, string appUserId, string firstName, string lastName, Gender gender, UserRole role)
+    : base(id)
         {
+            AppUserId = appUserId ?? throw new ArgumentNullException(nameof(appUserId));
             FirstName = firstName;
             LastName = lastName;
             Gender = gender;
             Role = role;
             CreatedAtUtc = DateTimeOffset.UtcNow;
+
         }
         public void AddPersonalRecord(PersonalRecord record) => _personalRecords.Add(record); // New
 
@@ -49,7 +51,7 @@ namespace GymAssistant_API.Model.Entities.User
         public decimal? CurrentWeight => _measurements
             .OrderByDescending(m => m.CreatedAtUtc)
             .FirstOrDefault()?.WeightKg;
-        public static Result<ClientProfile> CreateProfile(Guid id, string firstName, string lastName, Gender gender, UserRole role)
+        public static Result<ClientProfile> CreateProfile(Guid id, string appUserId, string firstName, string lastName, Gender gender, UserRole role)
         {
             if (string.IsNullOrWhiteSpace(firstName))
             {
@@ -63,15 +65,15 @@ namespace GymAssistant_API.Model.Entities.User
             {
                 return UserErrors.GenderInvalid;
             }
-            if (role != UserRole.User && role != UserRole.Trainer)
+            if (role != UserRole.User && role != UserRole.Trainer && role != UserRole.Admin)
             {
                 return UserErrors.RoleInvalid;
             }
-            return new ClientProfile(id, firstName, lastName, gender, role);
+            return new ClientProfile(id, appUserId, firstName, lastName, gender, role);
 
 
         }
-        public Result<Updated> UpdateProfile(string firstName, string lastName, DateTime? birthDate, int? heightCm)
+        public Result<Updated> UpdateProfile(string firstName, string lastName, Gender gender, DateTime? birthDate, int? heightCm)
         {
             if (string.IsNullOrWhiteSpace(firstName))
             {
@@ -94,10 +96,15 @@ namespace GymAssistant_API.Model.Entities.User
             {
                 return UserErrors.HeightInvalid;
             }
+            if (gender != Gender.Female && gender != Gender.Male)
+            {
+                return UserErrors.GenderInvalid;
+            }
             FirstName = firstName;
             LastName = lastName;
             BirthDate = birthDate;
             HeightCm = heightCm;
+            Gender = gender;
             return Result.Updated;
 
         }
@@ -131,7 +138,8 @@ namespace GymAssistant_API.Model.Entities.User
     public enum UserRole
     {
         User = 1,
-        Trainer = 2
+        Trainer = 2,
+        Admin = 3
     }
 
 }
