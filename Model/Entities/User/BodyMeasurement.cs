@@ -36,11 +36,35 @@ namespace GymAssistant_API.Model.Entities.User
             {
                 return UserErrors.IdRequired;
             }
-            if (weightKg < 0)
+            if (weightKg < 20 || weightKg > 400)
             {
                 return UserErrors.WeightKgInvalid;
             }
             return new BodyMeasurement(id, userId, weightKg, bodyFatPercent, muscleMassKg);
+
+        }
+        public Result<Updated> Update(decimal weightKg,
+                                      decimal? bodyFatPercent = null,
+                                      decimal? muscleMassKg = null)
+        {
+            if (weightKg < 20 || weightKg > 400)
+            {
+                return UserErrors.WeightKgInvalid;
+            }
+            if (bodyFatPercent < 0 || bodyFatPercent > 100)
+            {
+                return UserErrors.BodyFatPercentInvalid;
+            }
+            if (muscleMassKg < 10 || muscleMassKg > 200)
+            {
+                return UserErrors.MuscleMassKgInvalid;
+            }
+            WeightKg = weightKg;
+            BodyFatPercent = bodyFatPercent;
+            MuscleMassKg = muscleMassKg;
+
+
+            return Result.Updated;
 
         }
     }
