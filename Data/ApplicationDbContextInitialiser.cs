@@ -233,6 +233,7 @@ public class ApplicationDbContextInitialiser(
             // Admin profile
             var adminProfile = ClientProfile.CreateProfile(
                 AdminProfileId,
+                AdminUserId.ToString(),
                 "John",
                 "Administrator",
                 Gender.Male,
@@ -242,7 +243,7 @@ public class ApplicationDbContextInitialiser(
             {
                 var profile = adminProfile.Value;
                 profile.AppUserId = AdminUserId.ToString();
-                var updateResult = profile.UpdateProfile("John", "Administrator", new DateTime(1985, 5, 15), 180);
+                var updateResult = profile.UpdateProfile("John", "Administrator", Gender.Male, new DateTime(1985, 5, 15), 180);
                 if (updateResult.IsSuccess)
                 {
                     profiles.Add(profile);
@@ -252,6 +253,7 @@ public class ApplicationDbContextInitialiser(
             // Trainer profile
             var trainerProfile = ClientProfile.CreateProfile(
                 TrainerProfileId,
+                TrainerUserId.ToString(),
                 "Sarah",
                 "Johnson",
                 Gender.Female,
@@ -261,7 +263,7 @@ public class ApplicationDbContextInitialiser(
             {
                 var profile = trainerProfile.Value;
                 profile.AppUserId = TrainerUserId.ToString();
-                var updateResult = profile.UpdateProfile("Sarah", "Johnson", new DateTime(1990, 8, 22), 165);
+                var updateResult = profile.UpdateProfile("Sarah", "Johnson", Gender.Female, new DateTime(1990, 8, 22), 165);
                 if (updateResult.IsSuccess)
                 {
                     profiles.Add(profile);
@@ -271,6 +273,7 @@ public class ApplicationDbContextInitialiser(
             // First client profile
             var clientProfile = ClientProfile.CreateProfile(
                 ClientProfileId,
+                ClientUserId.ToString(),
                 "Michael",
                 "Smith",
                 Gender.Male,
@@ -280,7 +283,7 @@ public class ApplicationDbContextInitialiser(
             {
                 var profile = clientProfile.Value;
                 profile.AppUserId = ClientUserId.ToString();
-                var updateResult = profile.UpdateProfile("Michael", "Smith", new DateTime(1995, 3, 10), 175);
+                var updateResult = profile.UpdateProfile("Michael", "Smith", Gender.Male, new DateTime(1995, 3, 10), 175);
                 if (updateResult.IsSuccess)
                 {
                     profiles.Add(profile);
@@ -290,6 +293,7 @@ public class ApplicationDbContextInitialiser(
             // Second client profile
             var client2Profile = ClientProfile.CreateProfile(
                 Client2ProfileId,
+                Client2UserId.ToString(),
                 "Emma",
                 "Davis",
                 Gender.Female,
@@ -299,7 +303,7 @@ public class ApplicationDbContextInitialiser(
             {
                 var profile = client2Profile.Value;
                 profile.AppUserId = Client2UserId.ToString();
-                var updateResult = profile.UpdateProfile("Emma", "Davis", new DateTime(1992, 12, 5), 160);
+                var updateResult = profile.UpdateProfile("Emma", "Davis", Gender.Female, new DateTime(1992, 12, 5), 160);
                 if (updateResult.IsSuccess)
                 {
                     profiles.Add(profile);
