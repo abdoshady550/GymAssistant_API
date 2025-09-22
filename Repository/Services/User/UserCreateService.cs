@@ -2,12 +2,12 @@
 using GymAssistant_API.Model.Identity;
 using GymAssistant_API.Model.Identity.Dtos;
 using GymAssistant_API.Model.Results;
-using GymAssistant_API.Repository.Interfaces.Identity;
+using GymAssistant_API.Repository.Interfaces.User;
 using GymAssistant_API.Req_Res.Reqeust;
 using Microsoft.AspNetCore.Identity;
 using System.Text.RegularExpressions;
 
-namespace GymAssistant_API.Repository.Services.Identity
+namespace GymAssistant_API.Repository.Services.User
 {
     public class UserCreateService(UserManager<AppUser> userManager,
             RoleManager<IdentityRole> roleManager) : IUserCreate
@@ -62,7 +62,7 @@ namespace GymAssistant_API.Repository.Services.Identity
                 }
 
 
-                var role = (request.Role).ToString();
+                var role = request.Role.ToString();
 
                 if (role == null)
                 {
