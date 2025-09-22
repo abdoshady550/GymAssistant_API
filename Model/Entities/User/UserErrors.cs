@@ -22,7 +22,11 @@ namespace GymAssistant_API.Model.Entities.User
         public static Error RoleInvalid =>
             Error.Validation("User.Role.Invalid", "Invalid role assigned to User.");
         public static Error WeightKgInvalid =>
-            Error.Validation("WeightKg.Invalid", "WeightKg must be a non-negative number.");
+            Error.Validation("WeightKg.Invalid", "Weight must be between 20 and 400 kg");
+        public static Error BodyFatPercentInvalid =>
+           Error.Validation("BodyFatPercent_Invalid", "Body fat percentage must be between 0 and 100.");
+        public static Error MuscleMassKgInvalid =>
+         Error.Validation("MuscleMassKg_Invalid", "Muscle mass must be between 10 and 200 kg.");
 
         public static Error NameRequired =>
             Error.Validation("User.Name.Required", " name is required.");
