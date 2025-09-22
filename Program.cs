@@ -1,10 +1,13 @@
 ﻿using GymAssistant_API.Data;
 using GymAssistant_API.Handeler.Identity;
+using GymAssistant_API.Handeler.User;
 using GymAssistant_API.Infrastructure;
 using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Identity;
 using GymAssistant_API.Repository.Interfaces.Identity;
+using GymAssistant_API.Repository.Interfaces.User;
 using GymAssistant_API.Repository.Services.Identity;
+using GymAssistant_API.Repository.Services.User;
 using MechanicShop.Api.OpenApi.Transformers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -72,17 +75,22 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 // Add services to the container
-builder.Services.AddScoped<GenerateTokenQueryHandler>(); // Handler
-builder.Services.AddScoped<RefreshTokenQueryHandler>(); // Handler
-builder.Services.AddScoped<GetUserByIdQueryHanlder>(); // Handler
-builder.Services.AddScoped<RegisterHandler>(); // Handler
-builder.Services.AddScoped<ResetPasswordHandler>(); // Handler
-builder.Services.AddScoped<ForgotPasswordHandler>(); // Handler
+builder.Services.AddScoped<GenerateTokenQueryHandler>();          // Handler
+builder.Services.AddScoped<RefreshTokenQueryHandler>();          // Handler
+builder.Services.AddScoped<GetUserByIdQueryHanlder>();          // Handler
+builder.Services.AddScoped<RegisterHandler>();                 // Handler
+builder.Services.AddScoped<ResetPasswordHandler>();           // Handler
+builder.Services.AddScoped<ForgotPasswordHandler>();         // Handler
+builder.Services.AddScoped<CreateProfileHandler>();         // Handler
+builder.Services.AddScoped<UpdateProfileHandler>();        // Handler
+builder.Services.AddScoped<GetProfileHandler>();        // Handler
 
 
-builder.Services.AddScoped<IIdentityService, IdentityService>(); // Service
-builder.Services.AddScoped<ITokenProvider, TokenProvider>(); // Service
-builder.Services.AddScoped<IUserCreate, UserCreateService>();// Service
+
+builder.Services.AddScoped<IIdentityService, IdentityService>();  // Service
+builder.Services.AddScoped<ITokenProvider, TokenProvider>();     // Service
+builder.Services.AddScoped<IUserCreate, UserCreateService>();   // Service
+builder.Services.AddScoped<IProfile, ProfileService>();        // Service
 
 
 builder.Services.AddOpenApi(options =>
@@ -121,7 +129,7 @@ app.UseSwaggerUI(options =>
     options.DisplayRequestDuration();
     options.EnableFilter();
 });
-// تفعيل Exception Handler
+
 app.UseExceptionHandler();
 
 app.MapScalarApiReference();
