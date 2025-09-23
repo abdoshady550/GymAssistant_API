@@ -1,6 +1,4 @@
-﻿using GymAssistant_API.Data;
-using GymAssistant_API.Model.Entities;
-using GymAssistant_API.Model.Entities.Exercise;
+﻿using GymAssistant_API.Model.Entities.Exercise;
 using GymAssistant_API.Model.Entities.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
