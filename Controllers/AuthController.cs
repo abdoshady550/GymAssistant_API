@@ -87,15 +87,12 @@ namespace GymAssistant_API.Controllers
         [EndpointName("GetCurrentUserClaims")]
         public async Task<IActionResult> GetCurrentUserInfo(CancellationToken ct)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            var result = await _getUserById.Handle(new GetUserByIdQuery(userId), ct);
+            var result = await _getUserById.Handle(new GetUserByIdQuery(GetCurrentUserId()), ct);
 
             return result.Match(
                 response => Ok(response),
                 Problem);
         }
-
         [HttpPost("forgot-password")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -128,7 +125,7 @@ namespace GymAssistant_API.Controllers
                 response => Ok(response),
                 Problem);
         }
-
+        private string GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
     }
 
 }
