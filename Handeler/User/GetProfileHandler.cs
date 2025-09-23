@@ -1,6 +1,7 @@
 ﻿using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.User;
 using GymAssistant_API.Req_Res.Response;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace GymAssistant_API.Handeler.User
 {
@@ -9,9 +10,9 @@ namespace GymAssistant_API.Handeler.User
     {
         private readonly ILogger<GetProfileHandler> logger = logger;
         private readonly IProfile profile = profile;
-        public async Task<Result<ProfileResponse>> Handle(string Id, CancellationToken ct = default)
+        public async Task<Result<ProfileResponse>> Handle(string Id, int pageSize, int page, CancellationToken ct = default)
         {
-            var getProfile = await profile.GetProfileAsync(Id, ct);
+            var getProfile = await profile.GetProfileAsync(Id, pageSize, page, ct);
             if (getProfile.IsError)
             {
                 logger.LogError("Failed to get profile for user {UserId}: {Error}", Id, getProfile.Errors);
