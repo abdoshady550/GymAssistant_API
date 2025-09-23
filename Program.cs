@@ -4,8 +4,10 @@ using GymAssistant_API.Handeler.User;
 using GymAssistant_API.Infrastructure;
 using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Identity;
+using GymAssistant_API.Repository.Interfaces.ExerciseExercise;
 using GymAssistant_API.Repository.Interfaces.Identity;
 using GymAssistant_API.Repository.Interfaces.User;
+using GymAssistant_API.Repository.Services.Exercises;
 using GymAssistant_API.Repository.Services.Identity;
 using GymAssistant_API.Repository.Services.User;
 using MechanicShop.Api.OpenApi.Transformers;
@@ -25,7 +27,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
         .AddJsonOptions(options =>
         {
-            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+            options.JsonSerializerOptions.ReferenceHandler = null;
             options.JsonSerializerOptions.WriteIndented = true;
         });
 builder.Services.AddProblemDetails();
@@ -83,7 +85,8 @@ builder.Services.AddScoped<ResetPasswordHandler>();           // Handler
 builder.Services.AddScoped<ForgotPasswordHandler>();         // Handler
 builder.Services.AddScoped<CreateProfileHandler>();         // Handler
 builder.Services.AddScoped<UpdateProfileHandler>();        // Handler
-builder.Services.AddScoped<GetProfileHandler>();        // Handler
+builder.Services.AddScoped<GetProfileHandler>();          // Handler
+builder.Services.AddScoped<GetMeasurementHandler>();          // Handler
 
 
 
@@ -91,6 +94,7 @@ builder.Services.AddScoped<IIdentityService, IdentityService>();  // Service
 builder.Services.AddScoped<ITokenProvider, TokenProvider>();     // Service
 builder.Services.AddScoped<IUserCreate, UserCreateService>();   // Service
 builder.Services.AddScoped<IProfile, ProfileService>();        // Service
+builder.Services.AddScoped<IExercise, ExerciseService>();     // Service
 
 
 builder.Services.AddOpenApi(options =>
