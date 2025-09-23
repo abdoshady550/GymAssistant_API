@@ -13,10 +13,10 @@ namespace GymAssistant_API.Handeler.User
         private readonly IProfile _profile = profile;
         public async Task<Result<ProfileResponse>> Handle(string Id,
                                                           CreateProfileRequest request,
-                                                          MeasurementRequest measurementRequest)
+                                                          MeasurementRequest measurementRequest, CancellationToken ct = default)
         {
             var createProfile = await _profile
-                .CreateProfileAsync(Id, request.FirstName, request.LastName, request.Gender);
+                .CreateProfileAsync(Id, request.FirstName, request.LastName, request.Gender, ct);
             if (createProfile.IsError)
             {
                 _logger.LogError("Failed to create profile for user {UserId}: {Error}", Id, createProfile.Errors);
@@ -27,7 +27,7 @@ namespace GymAssistant_API.Handeler.User
                 .AddBodyMeasurementAsync(Id,
                                          measurementRequest.WeightKg,
                                          measurementRequest.MuscleMassKg,
-                                         measurementRequest.BodyFatPercent);
+                                         measurementRequest.BodyFatPercent, ct);
             if (addMeasurements.IsError)
             {
                 _logger.LogError("Failed to add measurements for user {UserId}: {Error}", Id, addMeasurements.Errors);
@@ -35,16 +35,16 @@ namespace GymAssistant_API.Handeler.User
             }
             var profile = createProfile.Value;
             var measurements = addMeasurements.Value;
+
             var response = new ProfileResponse
             {
                 FirstName = profile.FirstName,
                 LastName = profile.LastName,
                 Gender = profile.Gender,
                 Role = profile.Role,
-                WeightKg = measurements.WeightKg,
-                MuscleMassKgdecimal = measurements.MuscleMassKg,
-                BodyFatPercent = measurements.BodyFatPercent
-
+                LastWeightKg = measurements.WeightKg,
+                LastMuscleMassKgdecimal = measurements.MuscleMassKg,
+                LastBodyFatPercent = measurements.BodyFatPercent
             };
             return response;
         }
