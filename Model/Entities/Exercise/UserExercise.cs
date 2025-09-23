@@ -12,8 +12,8 @@ namespace GymAssistant_API.Model.Entities.Exercise
         public string? ImageUrl { get; private set; }
         public string? Equipment { get; private set; }
 
-        public Guid ClientProfileId { get; private set; }
-        public ClientProfile User { get; private set; } = default!;
+        public Guid ClientProfileId { get; set; }
+        public ClientProfile User { get; set; } = default!;
 
         private UserExercise() { }
 
@@ -43,5 +43,21 @@ namespace GymAssistant_API.Model.Entities.Exercise
             }
             return new UserExercise(id, userId, name, description, Instructions, Equipment, ImageUrl);
         }
+        public Result<Updated> Update(
+                                                  string name,
+                                                  string? description = null,
+                                                  string? Instructions = null,
+                                                  string? Equipment = null,
+                                                  string? ImageUrl = null)
+        {
+            Name = name;
+            Description = description;
+            Instructions = Instructions;
+            Equipment = Equipment;
+            ImageUrl = ImageUrl;
+
+            return Result.Updated;
+        }
+
     }
 }
