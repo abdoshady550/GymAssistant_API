@@ -41,23 +41,15 @@ namespace GymAssistant_API.Handeler.User
 
             }
 
-
-            var updateMeasurements = await _context.BodyMeasurements
-                .FirstOrDefaultAsync(m => m.ClientProfileId == updateProfile.Id, ct);
-            if (updateMeasurements == null)
+            var addMeasurements = await _profile
+          .AddBodyMeasurementAsync(id,
+                                   request.WeightKg,
+                                   request.MuscleMassKg,
+                                   request.BodyFatPercent, ct);
+            if (addMeasurements.IsError)
             {
-                _logger.LogError("No measurements found for profile {ProfileId}", id);
-                return Error.NotFound("Measurements_NotFound", "No measurements found for profile");
-            }
-            var measurementsResult = await _profile.UpdateBodyMeasurementAsync(updateMeasurements.Id,
-                                                                         request.WeightKg,
-                                                                         request.BodyFatPercent,
-                                                                         request.MuscleMassKg, ct);
-            if (measurementsResult.IsError)
-            {
-                _logger.LogError("Failed to update measurements for user: {profileId}: {Error}", id, measurementsResult.Errors);
-                return measurementsResult.Errors;
-
+                _logger.LogError("Failed to add measurements for user {UserId}: {Error}", id, addMeasurements.Errors);
+                return addMeasurements.Errors;
             }
             return Result.Updated;
 
