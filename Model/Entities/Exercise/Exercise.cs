@@ -63,6 +63,34 @@ namespace GymAssistant_API.Model.Entities.Exercise
                                         equipment, difficultyLevel, defaultSets, defaultReps);
             return exercise;
         }
+        public Result<Updated> Update(Guid? sectionId, string? name, string? description,
+                                     string? instructions, string? imageUrl,
+                                     string? equipment, DifficultyLevel? difficultyLevel,
+                                     int? defaultSets, int? defaultReps)
+        {
+
+
+            if (defaultSets != null && defaultSets <= 0)
+            {
+                return ExerciseErrors.DefaultSetsInvalid;
+            }
+            if (defaultReps != null && defaultReps <= 0)
+            {
+                return ExerciseErrors.DefaultRepsInvalid;
+            }
+            if (sectionId.HasValue)
+                SectionId = sectionId.Value;
+            Name = name;
+            Description = description;
+            Instructions = instructions;
+            ImageUrl = imageUrl;
+            Equipment = equipment;
+            DifficultyLevel = difficultyLevel;
+            DefaultSets = defaultSets;
+            DefaultReps = defaultReps;
+            return Result.Updated;
+        }
+
     }
     public enum DifficultyLevel
     {
