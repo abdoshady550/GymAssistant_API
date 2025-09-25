@@ -17,7 +17,11 @@ namespace GymAssistant_API.Model.Entities.User
 
         private BodyMeasurement() { }
 
-        private BodyMeasurement(Guid id, string userId, decimal weightKg, decimal? bodyFatPercent = null, decimal? muscleMassKg = null)
+        private BodyMeasurement(Guid id,
+                                string userId,
+                                decimal weightKg,
+                                decimal? bodyFatPercent = null,
+                                decimal? muscleMassKg = null)
        : base(id)
         {
             UserId = userId;
