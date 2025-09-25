@@ -1,4 +1,5 @@
 ﻿using GymAssistant_API.Data;
+using GymAssistant_API.Handeler.Exercise;
 using GymAssistant_API.Handeler.Identity;
 using GymAssistant_API.Handeler.User;
 using GymAssistant_API.Infrastructure;
@@ -77,16 +78,19 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 // Add services to the container
-builder.Services.AddScoped<GenerateTokenQueryHandler>();          // Handler
-builder.Services.AddScoped<RefreshTokenQueryHandler>();          // Handler
-builder.Services.AddScoped<GetUserByIdQueryHanlder>();          // Handler
-builder.Services.AddScoped<RegisterHandler>();                 // Handler
-builder.Services.AddScoped<ResetPasswordHandler>();           // Handler
-builder.Services.AddScoped<ForgotPasswordHandler>();         // Handler
-builder.Services.AddScoped<CreateProfileHandler>();         // Handler
-builder.Services.AddScoped<UpdateProfileHandler>();        // Handler
-builder.Services.AddScoped<GetProfileHandler>();          // Handler
-builder.Services.AddScoped<GetMeasurementHandler>();          // Handler
+builder.Services.AddScoped<GenerateTokenQueryHandler>();                // Handler
+builder.Services.AddScoped<RefreshTokenQueryHandler>();                // Handler
+builder.Services.AddScoped<GetUserByIdQueryHanlder>();                // Handler
+builder.Services.AddScoped<RegisterHandler>();                       // Handler
+builder.Services.AddScoped<ResetPasswordHandler>();                 // Handler
+builder.Services.AddScoped<ForgotPasswordHandler>();               // Handler
+builder.Services.AddScoped<CreateProfileHandler>();               // Handler
+builder.Services.AddScoped<UpdateProfileHandler>();              // Handler
+builder.Services.AddScoped<GetProfileHandler>();                // Handler
+builder.Services.AddScoped<GetMeasurementHandler>();           // Handler
+builder.Services.AddScoped<CustomExerciseHandler>();          // Handler
+builder.Services.AddScoped<ExerciseHandler>();               // Handler
+
 
 
 
