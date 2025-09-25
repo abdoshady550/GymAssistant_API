@@ -10,7 +10,6 @@ namespace GymAssistant_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiVersionNeutral]
-
     public sealed class AuthController(GenerateTokenQueryHandler GenerateToken,
                                        RefreshTokenQueryHandler RefreshToken,
                                        GetUserByIdQueryHanlder GetUserById,
