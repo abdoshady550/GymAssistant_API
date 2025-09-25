@@ -25,6 +25,7 @@ namespace GymAssistant_API.Controllers
         private readonly GetMeasurementHandler _getMeasurement = getMeasurement;
 
         [HttpPost("create-profile")]
+        [Consumes("multipart/form-data")]
         [Authorize]
         [ProducesResponseType(typeof(ProfileResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -44,6 +45,7 @@ namespace GymAssistant_API.Controllers
                 Problem);
         }
         [HttpPut("update-profile")]
+        [Consumes("multipart/form-data")]
         [Authorize]
         [ProducesResponseType(typeof(Result<Updated>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
