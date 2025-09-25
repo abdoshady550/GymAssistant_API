@@ -17,7 +17,13 @@ namespace GymAssistant_API.Model.Entities.Exercise
 
         private UserExercise() { }
 
-        private UserExercise(Guid id, string userId, string name, string? description = null, string? Instructions = null, string? Equipment = null, string? ImageUrl = null) : base(id)
+        private UserExercise(Guid id,
+                             string userId,
+                             string name,
+                             string? description = null,
+                             string? Instructions = null,
+                             string? Equipment = null,
+                             string? ImageUrl = null) : base(id)
         {
             UserId = userId;
             Name = name;
@@ -46,15 +52,15 @@ namespace GymAssistant_API.Model.Entities.Exercise
         public Result<Updated> Update(
                                                   string name,
                                                   string? description = null,
-                                                  string? Instructions = null,
-                                                  string? Equipment = null,
-                                                  string? ImageUrl = null)
+                                                  string? instructions = null,
+                                                  string? equipment = null,
+                                                  string? imageUrl = null)
         {
             Name = name;
             Description = description;
-            Instructions = Instructions;
-            Equipment = Equipment;
-            ImageUrl = ImageUrl;
+            Instructions = instructions;
+            Equipment = equipment;
+            ImageUrl = imageUrl;
 
             return Result.Updated;
         }
