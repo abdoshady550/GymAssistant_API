@@ -16,6 +16,10 @@ namespace GymAssistant_API.Data.Configurations
                    .WithMany()
                    .HasForeignKey(we => we.ClientProfileId)
                    .OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(we => we.Exercise)
+                  .WithMany()
+                  .HasForeignKey(we => we.ExerciseId)
+                  .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }
