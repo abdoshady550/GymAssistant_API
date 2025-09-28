@@ -1,6 +1,6 @@
 ﻿using GymAssistant_API.Model.Entities.Exercise;
 
-namespace GymAssistant_API.Req_Res.Reqeust.Exercise
+namespace GymAssistant_API.Req_Res.Reqeust.Exercises
 {
     public record ExerciseReq(
       string Name,

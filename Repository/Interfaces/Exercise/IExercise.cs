@@ -3,7 +3,7 @@ using GymAssistant_API.Model.Results;
 using GymAssistant_API.Req_Res.Response;
 using GymAssistant_API.Req_Res.Response.Exercise;
 
-namespace GymAssistant_API.Repository.Interfaces.ExerciseExercise
+namespace GymAssistant_API.Repository.Interfaces.ExerciseExercises
 {
     public interface IExercise
     {

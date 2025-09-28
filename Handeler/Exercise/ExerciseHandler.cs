@@ -1,7 +1,7 @@
 ﻿using GymAssistant_API.Model.Entities.Exercise;
 using GymAssistant_API.Model.Results;
-using GymAssistant_API.Repository.Interfaces.ExerciseExercise;
-using GymAssistant_API.Req_Res.Reqeust.Exercise;
+using GymAssistant_API.Repository.Interfaces.ExerciseExercises;
+using GymAssistant_API.Req_Res.Reqeust.Exercises;
 using GymAssistant_API.Req_Res.Response;
 using GymAssistant_API.Req_Res.Response.Exercise;
 using System;

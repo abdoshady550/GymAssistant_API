@@ -1,7 +1,7 @@
 ﻿using Asp.Versioning;
 using GymAssistant_API.Handeler.Exercise;
 using GymAssistant_API.Model.Results;
-using GymAssistant_API.Req_Res.Reqeust.Exercise;
+using GymAssistant_API.Req_Res.Reqeust.Exercises;
 using GymAssistant_API.Req_Res.Response;
 using GymAssistant_API.Req_Res.Response.Exercise;
 using Microsoft.AspNetCore.Authorization;
@@ -12,6 +12,7 @@ namespace GymAssistant_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiVersionNeutral]
+    [Authorize]
     public sealed class ExercisesController(CustomExerciseHandler customExercise,
                                             ExerciseHandler exercise) : ApiController
     {

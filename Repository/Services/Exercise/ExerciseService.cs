@@ -1,7 +1,9 @@
 ﻿using GymAssistant_API.Data;
 using GymAssistant_API.Model.Entities.Exercise;
+using ExerciseEntity = GymAssistant_API.Model.Entities.Exercise.Exercise;
+
 using GymAssistant_API.Model.Results;
-using GymAssistant_API.Repository.Interfaces.ExerciseExercise;
+using GymAssistant_API.Repository.Interfaces.ExerciseExercises;
 using GymAssistant_API.Req_Res.Response;
 using GymAssistant_API.Req_Res.Response.Exercise;
 using Microsoft.EntityFrameworkCore;
@@ -241,7 +243,7 @@ namespace GymAssistant_API.Repository.Services.Exercises
                 const string baseUrl = "https://gymassistantapi.runasp.net";
                 imageUrl = $"{baseUrl}/images/custom-exercises/{uniqueFileName}";
             }
-            var exerciseResult = Exercise.Create(Guid.NewGuid(),
+            var exerciseResult = ExerciseEntity.Create(Guid.NewGuid(),
                                                  sectionId,
                                                  name,
                                                  description,

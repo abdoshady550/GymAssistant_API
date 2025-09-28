@@ -1,4 +1,4 @@
-﻿namespace GymAssistant_API.Req_Res.Reqeust.Exercise
+﻿namespace GymAssistant_API.Req_Res.Reqeust.Exercises
 {
     public record class CustomExerciseReq(
         string Name,
