@@ -62,6 +62,8 @@ namespace GymAssistant_API.Model.Entities.Exercise
         }
 
         public void MarkAsPersonalRecord() => IsPersonalRecord = true;
+        public void UnMarkedAsPersonalRecord() => IsPersonalRecord = false;
+
         public void MarkAsIncomplete() => IsCompleted = false;
     }
 }
