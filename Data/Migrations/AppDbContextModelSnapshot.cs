@@ -455,7 +455,7 @@ namespace GymAssistant_API.Data.Migrations
 
                     b.HasIndex("Email", "Token");
 
-                    b.ToTable("PasswordResetTokens");
+                    b.ToTable("PasswordResetTokens", (string)null);
                 });
 
             modelBuilder.Entity("GymAssistant_API.Model.Entities.User.TrainerTrainee", b =>
