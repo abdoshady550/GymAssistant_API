@@ -1,13 +1,18 @@
 ﻿using GymAssistant_API.Data;
+using GymAssistant_API.Extensions;
 using GymAssistant_API.Handeler.Exercise;
+using GymAssistant_API.Handeler.Exercise.Workout;
 using GymAssistant_API.Handeler.Identity;
 using GymAssistant_API.Handeler.User;
 using GymAssistant_API.Infrastructure;
 using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Identity;
-using GymAssistant_API.Repository.Interfaces.ExerciseExercise;
+using GymAssistant_API.Repository.Interfaces.Exercise;
+using GymAssistant_API.Repository.Interfaces.ExerciseExercises;
+using GymAssistant_API.Repository.Interfaces.Exercises;
 using GymAssistant_API.Repository.Interfaces.Identity;
 using GymAssistant_API.Repository.Interfaces.User;
+using GymAssistant_API.Repository.Services.Exercise;
 using GymAssistant_API.Repository.Services.Exercises;
 using GymAssistant_API.Repository.Services.Identity;
 using GymAssistant_API.Repository.Services.User;
@@ -30,7 +35,9 @@ builder.Services.AddControllers()
         {
             options.JsonSerializerOptions.ReferenceHandler = null;
             options.JsonSerializerOptions.WriteIndented = true;
+            options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
         });
+
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
@@ -90,15 +97,18 @@ builder.Services.AddScoped<GetProfileHandler>();                // Handler
 builder.Services.AddScoped<GetMeasurementHandler>();           // Handler
 builder.Services.AddScoped<CustomExerciseHandler>();          // Handler
 builder.Services.AddScoped<ExerciseHandler>();               // Handler
+builder.Services.AddScoped<WorkoutHandler>();               // Handler
 
 
 
 
-builder.Services.AddScoped<IIdentityService, IdentityService>();  // Service
-builder.Services.AddScoped<ITokenProvider, TokenProvider>();     // Service
-builder.Services.AddScoped<IUserCreate, UserCreateService>();   // Service
-builder.Services.AddScoped<IProfile, ProfileService>();        // Service
-builder.Services.AddScoped<IExercise, ExerciseService>();     // Service
+builder.Services.AddScoped<IIdentityService, IdentityService>();                      // Service
+builder.Services.AddScoped<ITokenProvider, TokenProvider>();                         // Service
+builder.Services.AddScoped<IUserCreate, UserCreateService>();                       // Service
+builder.Services.AddScoped<IProfile, ProfileService>();                            // Service
+builder.Services.AddScoped<IExercise, ExerciseService>();                         // Service
+builder.Services.AddScoped<IWorkoutService, WorkoutService>();                   // Service
+builder.Services.AddScoped<IPersonalRecordService, PersonalRecordService>();    // Service
 
 
 builder.Services.AddOpenApi(options =>
