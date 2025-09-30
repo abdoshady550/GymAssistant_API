@@ -3,6 +3,8 @@ using GymAssistant_API.Extensions;
 using GymAssistant_API.Handeler.Exercise;
 using GymAssistant_API.Handeler.Exercise.Workout;
 using GymAssistant_API.Handeler.Identity;
+using GymAssistant_API.Handeler.Identity.Trainer;
+using GymAssistant_API.Handeler.Progress;
 using GymAssistant_API.Handeler.User;
 using GymAssistant_API.Infrastructure;
 using GymAssistant_API.Model.Entities.User;
@@ -12,10 +14,13 @@ using GymAssistant_API.Repository.Interfaces.ExerciseExercises;
 using GymAssistant_API.Repository.Interfaces.Exercises;
 using GymAssistant_API.Repository.Interfaces.Identity;
 using GymAssistant_API.Repository.Interfaces.User;
+using GymAssistant_API.Repository.Interfaces.User.Trainer;
 using GymAssistant_API.Repository.Services.Exercise;
 using GymAssistant_API.Repository.Services.Exercises;
 using GymAssistant_API.Repository.Services.Identity;
+using GymAssistant_API.Repository.Services.Progress;
 using GymAssistant_API.Repository.Services.User;
+using GymAssistant_API.Repository.Services.User.Trainer;
 using MechanicShop.Api.OpenApi.Transformers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -23,8 +28,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
-using System.Text.Json.Serialization;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -98,6 +101,9 @@ builder.Services.AddScoped<GetMeasurementHandler>();           // Handler
 builder.Services.AddScoped<CustomExerciseHandler>();          // Handler
 builder.Services.AddScoped<ExerciseHandler>();               // Handler
 builder.Services.AddScoped<WorkoutHandler>();               // Handler
+builder.Services.AddScoped<ProgressHandler>();             // Handler
+builder.Services.AddScoped<RecordsHandler>();             // Handler
+builder.Services.AddScoped<TrainerHandler>();            // Handler
 
 
 
@@ -109,6 +115,10 @@ builder.Services.AddScoped<IProfile, ProfileService>();                         
 builder.Services.AddScoped<IExercise, ExerciseService>();                         // Service
 builder.Services.AddScoped<IWorkoutService, WorkoutService>();                   // Service
 builder.Services.AddScoped<IPersonalRecordService, PersonalRecordService>();    // Service
+builder.Services.AddScoped<IProgressService, ProgressService>();               // Repository
+builder.Services.AddScoped<IRecordsService, RecordsService>();                // Repository
+builder.Services.AddScoped<ITrainerService, TrainerService>();                // Repository
+
 
 
 builder.Services.AddOpenApi(options =>
