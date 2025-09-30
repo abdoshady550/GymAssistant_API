@@ -6,7 +6,7 @@ using GymAssistant_API.Req_Res.Response.Exercise;
 
 namespace GymAssistant_API.Handeler.Exercise.Workout
 {
-    public class WorkoutHandler(ILogger<WorkoutHandler> logger,
+    public sealed class WorkoutHandler(ILogger<WorkoutHandler> logger,
                                 IWorkoutService workoutService)
     {
         private readonly ILogger<WorkoutHandler> _logger = logger;
