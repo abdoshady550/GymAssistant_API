@@ -236,6 +236,10 @@ namespace GymAssistant_API.Data.Migrations
 
                     b.HasIndex("ClientProfileId");
 
+                    b.HasIndex("ExerciseId");
+
+                    b.HasIndex("UserExerciseId");
+
                     b.HasIndex("WorkoutSessionId");
 
                     b.ToTable("WorkoutExercises", (string)null);
@@ -455,7 +459,7 @@ namespace GymAssistant_API.Data.Migrations
 
                     b.HasIndex("Email", "Token");
 
-                    b.ToTable("PasswordResetTokens", (string)null);
+                    b.ToTable("PasswordResetTokens");
                 });
 
             modelBuilder.Entity("GymAssistant_API.Model.Entities.User.TrainerTrainee", b =>
@@ -720,13 +724,28 @@ namespace GymAssistant_API.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("GymAssistant_API.Model.Entities.Exercise.WorkoutSession", null)
+                    b.HasOne("GymAssistant_API.Model.Entities.Exercise.Exercise", "Exercise")
+                        .WithMany()
+                        .HasForeignKey("ExerciseId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("GymAssistant_API.Model.Entities.Exercise.UserExercise", "UserExercise")
+                        .WithMany()
+                        .HasForeignKey("UserExerciseId");
+
+                    b.HasOne("GymAssistant_API.Model.Entities.Exercise.WorkoutSession", "WorkoutSession")
                         .WithMany("WorkoutExercises")
                         .HasForeignKey("WorkoutSessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Exercise");
+
                     b.Navigation("User");
+
+                    b.Navigation("UserExercise");
+
+                    b.Navigation("WorkoutSession");
                 });
 
             modelBuilder.Entity("GymAssistant_API.Model.Entities.Exercise.WorkoutSession", b =>
