@@ -12,7 +12,7 @@ namespace GymAssistant_API.Controllers
     [Route("api/[controller]")]
     [ApiVersionNeutral]
     [Authorize]
-    public class WorkoutsController(WorkoutHandler workout) : ApiController
+    public sealed class WorkoutsController(WorkoutHandler workout) : ApiController
     {
         private readonly WorkoutHandler _workout = workout;
 
