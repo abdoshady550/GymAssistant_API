@@ -1,0 +1,222 @@
+﻿using GymAssistant_API.Data;
+using GymAssistant_API.Model.Entities.Exercise;
+using GymAssistant_API.Model.Results;
+using GymAssistant_API.Repository.Interfaces.Exercise;
+using GymAssistant_API.Req_Res.Response.Records;
+using Microsoft.EntityFrameworkCore;
+
+namespace GymAssistant_API.Repository.Services.Progress
+{
+    public sealed class RecordsService : IRecordsService
+    {
+        private readonly AppDbContext _context;
+
+        public RecordsService(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<Result<List<PersonalRecordResponse>>> GetPersonalRecordsAsync(string userId,
+                                                                        RecordType? recordType = null,
+                                                                        CancellationToken ct = default)
+        {
+            var profile = await _context.ClientProfiles
+                .FirstOrDefaultAsync(p => p.AppUserId == userId, ct);
+
+            if (profile == null)
+            {
+                return Error.NotFound("Profile_NotFound", "User profile not found.");
+            }
+
+            var query = _context.PersonalRecords
+                .Where(pr => pr.ClientProfileId == profile.Id);
+
+            if (recordType.HasValue)
+            {
+                query = query.Where(pr => pr.RecordType == recordType);
+            }
+            var records = await query
+                .Include(pr => pr.Exercise)
+                    .ThenInclude(e => e.Section)
+                .Include(pr => pr.UserExercise)
+                .Include(pr => pr.WorkoutSession)
+                .OrderByDescending(pr => pr.CreatedAtUtc)
+                .ToListAsync(ct);
+            var response = records.Select(r => r.ToResponse()).ToList();
+            return response;
+        }
+
+        public async Task<Result<List<PersonalRecordResponse>>> GetExerciseRecordsAsync(string userId,
+                                                                                Guid exerciseId,
+                                                                                CancellationToken ct = default)
+        {
+            var profile = await _context.ClientProfiles
+                .FirstOrDefaultAsync(p => p.AppUserId == userId, ct);
+
+            if (profile == null)
+            {
+                return Error.NotFound("Profile_NotFound", "User profile not found.");
+            }
+            var results = await _context.PersonalRecords
+                .Where(pr => pr.ClientProfileId == profile.Id && pr.ExerciseId == exerciseId)
+                .Include(pr => pr.Exercise)
+                    .ThenInclude(e => e.Section)
+                .Include(pr => pr.WorkoutSession)
+                .OrderByDescending(pr => pr.CreatedAtUtc)
+                .ToListAsync(ct);
+            var response = results.Select(r => r.ToResponse()).ToList();
+            return response;
+        }
+
+        public async Task<Result<List<PersonalRecordResponse>>> GetCustomExerciseRecordsAsync(string userId,
+                                                                                      Guid userExerciseId,
+                                                                                      CancellationToken ct = default)
+        {
+            var profile = await _context.ClientProfiles
+                .FirstOrDefaultAsync(p => p.AppUserId == userId, ct);
+
+            if (profile == null)
+            {
+                return Error.NotFound("Profile_NotFound", "User profile not found.");
+            }
+            var results = await _context.PersonalRecords
+                .Where(pr => pr.ClientProfileId == profile.Id && pr.UserExerciseId == userExerciseId)
+                .Include(pr => pr.UserExercise)
+                .Include(pr => pr.WorkoutSession)
+                .OrderByDescending(pr => pr.CreatedAtUtc)
+                .ToListAsync(ct);
+            var response = results.Select(r => r.ToResponse()).ToList();
+            return response;
+        }
+
+        public async Task<Result<List<PersonalRecordResponse>>> GetRecentRecordsAsync(string userId,
+                                                                              int count,
+                                                                              CancellationToken ct = default)
+        {
+            var profile = await _context.ClientProfiles
+                .FirstOrDefaultAsync(p => p.AppUserId == userId, ct);
+
+            if (profile == null)
+            {
+                return Error.NotFound("Profile_NotFound", "User profile not found.");
+            }
+            var results = await _context.PersonalRecords
+                .Where(pr => pr.ClientProfileId == profile.Id)
+                .Include(pr => pr.Exercise)
+                    .ThenInclude(e => e.Section)
+                .Include(pr => pr.UserExercise)
+                .Include(pr => pr.WorkoutSession)
+                .OrderByDescending(pr => pr.CreatedAtUtc)
+                .Take(count)
+                .ToListAsync(ct);
+            var response = results.Select(r => r.ToResponse()).ToList();
+            return response;
+        }
+
+        public async Task<Result<AchievementsData>> GetAchievementsAsync(string userId,
+                                                                         DateTime? fromDate = null,
+                                                                         DateTime? toDate = null,
+                                                                         CancellationToken ct = default)
+        {
+            var profile = await _context.ClientProfiles
+                .FirstOrDefaultAsync(p => p.AppUserId == userId, ct);
+
+            if (profile == null)
+            {
+                return Error.NotFound("Profile_NotFound", "User profile not found.");
+            }
+
+            var query = _context.PersonalRecords
+                .Where(pr => pr.ClientProfileId == profile.Id);
+
+            if (fromDate.HasValue)
+            {
+                query = query.Where(pr => pr.CreatedAtUtc >= fromDate.Value);
+            }
+
+            if (toDate.HasValue)
+            {
+                query = query.Where(pr => pr.CreatedAtUtc <= toDate.Value);
+            }
+
+            var records = await query
+                .Include(pr => pr.Exercise)
+                    .ThenInclude(e => e.Section)
+                .Include(pr => pr.UserExercise)
+                .Include(pr => pr.WorkoutSession)
+                .ToListAsync(ct);
+
+            var achievements = new AchievementsData
+            {
+                TotalRecords = records.Count,
+                WeightRecords = records.Count(r => r.RecordType == RecordType.MaxWeight),
+                RepsRecords = records.Count(r => r.RecordType == RecordType.MaxReps),
+                VolumeRecords = records.Count(r => r.RecordType == RecordType.MaxVolume),
+                RecentRecords = records.OrderByDescending(r => r.CreatedAtUtc).Take(5).Select(r => r.ToResponse()).ToList(),
+                RecordsBySection = records.Where(r => r.Exercise != null)
+                                        .GroupBy(r => r.Exercise.Section.Name)
+                                        .Select(g => new SectionAchievement
+                                        {
+                                            SectionName = g.Key,
+                                            RecordCount = g.Count(),
+                                            LatestRecord = g.Max(r => r.CreatedAtUtc)
+                                        })
+                                        .OrderByDescending(sa => sa.RecordCount)
+                                        .ToList(),
+                Milestones = CalculateMilestones(records)
+            };
+
+            return achievements;
+        }
+
+        private List<Milestone> CalculateMilestones(List<PersonalRecord> records)
+        {
+            var milestones = new List<Milestone>();
+
+            // Weight milestones (every 10kg increment)
+            var maxWeight = records.Where(r => r.RecordType == RecordType.MaxWeight)
+                                  .Max(r => r.Value);
+            if (maxWeight >= 100)
+            {
+                milestones.Add(new Milestone
+                {
+                    Title = "Century Club",
+                    Description = $"Lifted {maxWeight}kg - your first 100kg milestone!",
+                    Icon = "💪",
+                    Date = records.Where(r => r.RecordType == RecordType.MaxWeight && r.Value >= 100)
+                                 .Min(r => r.CreatedAtUtc)
+                });
+            }
+
+            // Volume milestones
+            var maxVolume = records.Where(r => r.RecordType == RecordType.MaxVolume)
+                                  .Max(r => r.Value);
+            if (maxVolume >= 1000)
+            {
+                milestones.Add(new Milestone
+                {
+                    Title = "Volume Beast",
+                    Description = $"Achieved {maxVolume}kg total volume in a single exercise!",
+                    Icon = "🔥",
+                    Date = records.Where(r => r.RecordType == RecordType.MaxVolume && r.Value >= 1000)
+                                 .Min(r => r.CreatedAtUtc)
+                });
+            }
+
+            // Consistency milestones
+            var recordCount = records.Count;
+            if (recordCount >= 50)
+            {
+                milestones.Add(new Milestone
+                {
+                    Title = "Record Breaker",
+                    Description = $"Set {recordCount} personal records!",
+                    Icon = "🏆",
+                    Date = records.OrderBy(r => r.CreatedAtUtc).Skip(49).First().CreatedAtUtc
+                });
+            }
+
+            return milestones.OrderByDescending(m => m.Date).ToList();
+        }
+    }
+}
