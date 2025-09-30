@@ -77,9 +77,9 @@ namespace GymAssistant_API.Handeler.Exercise
             }
             return getExercise;
         }
-        public async Task<Result<List<ExerciseResponse>>> ExercisesBySection(Guid sectionId, CancellationToken ct = default)
+        public async Task<Result<List<ExerciseResponse>>> ExercisesBySection(Guid sectionId, DifficultyLevel? difficulty = null, CancellationToken ct = default)
         {
-            var getExercises = await exercise.GetExercisesBySectionAsync(sectionId);
+            var getExercises = await exercise.GetExercisesBySectionAsync(sectionId, difficulty, ct);
             if (getExercises.IsError)
             {
                 logger.LogError("Failed to retrieve exercises: {Error}", getExercises.Errors);
