@@ -7,12 +7,14 @@ namespace GymAssistant_API.Model.Entities.Exercise
     {
         private readonly List<ExerciseSet> _sets = new();
 
-
-
         public Guid WorkoutSessionId { get; private set; }
+        public WorkoutSession WorkoutSession { get; private set; } = default!;
+
         public Guid? ExerciseId { get; private set; }
         public Exercise? Exercise { get; private set; }
         public Guid? UserExerciseId { get; private set; }
+        public UserExercise? UserExercise { get; private set; } // وهذا كمان مفقود
+
 
         public Guid ClientProfileId { get; set; }
         public ClientProfile User { get; private set; } = default!;
