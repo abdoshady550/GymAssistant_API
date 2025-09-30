@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using GymAssistant_API.Handeler.Exercise;
+using GymAssistant_API.Model.Entities.Exercise;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Req_Res.Reqeust.Exercises;
 using GymAssistant_API.Req_Res.Response;
@@ -134,11 +135,11 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves exercises by section ID.")]
         [EndpointDescription("Fetches exercises belonging to a specific section, optionally filtered by difficulty level.")]
         [EndpointName("GetExercisesBySection")]
-        public async Task<IActionResult> ExercisesBySection([FromQuery] Guid sectionId,
+        public async Task<IActionResult> ExercisesBySection([FromQuery] Guid sectionId, [FromQuery] DifficultyLevel? difficulty = null,
                                                            CancellationToken ct = default)
         {
 
-            var result = await exercise.ExercisesBySection(sectionId, ct);
+            var result = await exercise.ExercisesBySection(sectionId, difficulty, ct);
             return result.Match(
                response => Ok(response),
                Problem);
