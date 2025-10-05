@@ -51,9 +51,16 @@ builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(
-    options => { options.Password.RequireNonAlphanumeric = false; }
+    options =>
+    {
+        options.Password.RequireNonAlphanumeric = false;
+        options.User.RequireUniqueEmail = true;
+
+    }
     ).AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<SignInManager<AppUser>>();
 
 builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
     opt.TokenLifespan = TimeSpan.FromHours(2));
@@ -84,7 +91,62 @@ builder.Services.AddAuthentication(options =>
             IssuerSigningKey = new SymmetricSecurityKey(key),
         };
     }
-    );
+    ).AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"]
+            ?? throw new InvalidOperationException("Google ClientId not configured");
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]
+            ?? throw new InvalidOperationException("Google ClientSecret not configured");
+        options.CallbackPath = "/signin-google";
+
+        // إضافة Scopes
+        options.Scope.Add("profile");
+        options.Scope.Add("email");
+
+        options.SaveTokens = true;
+
+
+        options.Events.OnCreatingTicket = context =>
+        {
+            // يمكنك إضافة معالجة إضافية هنا
+            return Task.CompletedTask;
+        };
+    })
+    .AddFacebook(options =>
+    {
+        options.AppId = builder.Configuration["Authentication:Facebook:AppId"]
+            ?? throw new InvalidOperationException("Facebook AppId not configured");
+        options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"]
+            ?? throw new InvalidOperationException("Facebook AppSecret not configured");
+        options.CallbackPath = "/signin-facebook";
+
+        // إضافة Permissions
+        options.Scope.Add("email");
+        options.Scope.Add("public_profile");
+
+        // إضافة Fields
+        options.Fields.Add("name");
+        options.Fields.Add("email");
+        options.Fields.Add("first_name");
+        options.Fields.Add("last_name");
+        options.Fields.Add("picture");
+
+        options.SaveTokens = true;
+
+        options.Events.OnCreatingTicket = context =>
+        {
+            return Task.CompletedTask;
+        };
+    });
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+    options.LoginPath = "/api/auth/login";
+    options.SlidingExpiration = true;
+    options.Cookie.SameSite = SameSiteMode.Lax; // مهم للـ External Login
+});
 
 builder.Services.AddAuthorization();
 // Add services to the container
@@ -104,6 +166,10 @@ builder.Services.AddScoped<WorkoutHandler>();               // Handler
 builder.Services.AddScoped<ProgressHandler>();             // Handler
 builder.Services.AddScoped<RecordsHandler>();             // Handler
 builder.Services.AddScoped<TrainerHandler>();            // Handler
+builder.Services.AddScoped<TrainerRequestHandler>();    // Handler
+builder.Services.AddScoped<ExternalLoginHandler>();
+
+
 
 
 
@@ -117,7 +183,9 @@ builder.Services.AddScoped<IWorkoutService, WorkoutService>();                  
 builder.Services.AddScoped<IPersonalRecordService, PersonalRecordService>();    // Service
 builder.Services.AddScoped<IProgressService, ProgressService>();               // Repository
 builder.Services.AddScoped<IRecordsService, RecordsService>();                // Repository
-builder.Services.AddScoped<ITrainerService, TrainerService>();                // Repository
+builder.Services.AddScoped<ITrainerService, TrainerService>();               // Repository
+builder.Services.AddScoped<ITrainerRequestService, TrainerRequestService>();// Repository
+
 
 
 
@@ -169,5 +237,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseStaticFiles(); // لازم يكون موجود
+
 
 app.Run();
