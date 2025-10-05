@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /appsettings.json
 /.config/dotnet-tools.json
+/wwwroot/images/custom-exercises
