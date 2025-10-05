@@ -17,23 +17,23 @@ namespace GymAssistant_API.Controllers
     {
         private readonly TrainerHandler _handler = handler;
 
-        [HttpPost("trainees/{traineeId:guid}")]
-        [Authorize]
-        [ProducesResponseType(typeof(TrainerTraineeResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [EndpointSummary("Adds a trainee to the authenticated trainer.")]
-        [EndpointDescription("Creates a relationship between the trainer and the specified trainee.")]
-        [EndpointName("AddTrainee")]
-        public async Task<IActionResult> AddTrainee([FromRoute] Guid traineeId, CancellationToken ct = default)
-        {
-            var result = await _handler.AddTrainee(GetCurrentUserId(), traineeId, ct);
-            return result.Match(
-                response => Ok(response),
-                Problem);
-        }
+        //[HttpPost("trainees/{traineeId:guid}")]
+        //[Authorize]
+        //[ProducesResponseType(typeof(TrainerTraineeResponse), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        //[EndpointSummary("Adds a trainee to the authenticated trainer.")]
+        //[EndpointDescription("Creates a relationship between the trainer and the specified trainee.")]
+        //[EndpointName("AddTrainee")]
+        //public async Task<IActionResult> AddTrainee([FromRoute] Guid traineeId, CancellationToken ct = default)
+        //{
+        //    var result = await _handler.AddTrainee(GetCurrentUserId(), traineeId, ct);
+        //    return result.Match(
+        //        response => Ok(response),
+        //        Problem);
+        //}
 
         [HttpGet("trainees")]
         [Authorize]
