@@ -12,18 +12,6 @@ namespace GymAssistant_API.Handeler.Identity.Trainer
         private readonly ILogger<TrainerHandler> logger = logger;
         private readonly ITrainerService trainerService = trainerService;
 
-        public async Task<Result<TrainerTraineeResponse>> AddTrainee(string trainerId, Guid traineeId,
-                                                             CancellationToken ct = default)
-        {
-            var addTrainee = await trainerService.AddTraineeAsync(trainerId, traineeId, ct);
-            if (addTrainee.IsError)
-            {
-                logger.LogError("Failed to add trainee {TraineeId} for trainer {TrainerId} : {Error}",
-                               traineeId, trainerId, addTrainee.TopError.Description);
-                return addTrainee.Errors;
-            }
-            return addTrainee.Value;
-        }
 
         public async Task<Result<List<TraineeData>>> GetTrainees(string trainerId,
                                                                  CancellationToken ct = default)
