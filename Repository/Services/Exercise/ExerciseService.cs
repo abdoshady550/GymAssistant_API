@@ -20,7 +20,7 @@ namespace GymAssistant_API.Repository.Services.Exercises
                                                                           string? description = null,
                                                                           string? Instructions = null,
                                                                           string? Equipment = null,
-                                                                          IFormFile? imageFile = default,
+                                                                          IFormFile? ImageFile = default,
                                                                          CancellationToken ct = default)
         {
             var profile = await _context.ClientProfiles
@@ -33,7 +33,7 @@ namespace GymAssistant_API.Repository.Services.Exercises
 
             // 🖼️ حفظ الصورة في wwwroot (لو موجودة)
             string? imageUrl = null;
-            if (imageFile != null && imageFile.Length > 0)
+            if (ImageFile != null && ImageFile.Length > 0)
             {
                 var uploadsFolder = Path.Combine(_environment.WebRootPath, "images", "custom-exercises");
                 if (!Directory.Exists(uploadsFolder))
@@ -41,17 +41,17 @@ namespace GymAssistant_API.Repository.Services.Exercises
                     Directory.CreateDirectory(uploadsFolder);
                 }
 
-                var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
+                var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(ImageFile.FileName)}";
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    await imageFile.CopyToAsync(stream, ct);
+                    await ImageFile.CopyToAsync(stream, ct);
                 }
 
                 // 🔗 هنا حطينا الدومين يدوي
                 const string baseUrl = "https://gymassistantapi.runasp.net";
-                imageUrl = $"{baseUrl}/images/custom-exercises/{uniqueFileName}";
+                imageUrl = $"/images/custom-exercises/{uniqueFileName}";
             }
 
             var exerciseResult = UserExercise.Create(Guid.NewGuid(),
@@ -107,6 +107,15 @@ namespace GymAssistant_API.Repository.Services.Exercises
             {
                 return Error.Validation("Exercise_InUse", "Cannot delete exercise that has been used in workouts.");
             }
+            // 🗑️ احذف الصورة من wwwroot لو موجودة
+            if (!string.IsNullOrEmpty(exercise.ImageUrl))
+            {
+                var oldImagePath = Path.Combine(_environment.WebRootPath, exercise.ImageUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+                if (File.Exists(oldImagePath))
+                {
+                    File.Delete(oldImagePath);
+                }
+            }
 
             _context.UserExercises.Remove(exercise);
             await _context.SaveChangesAsync(ct);
@@ -161,7 +170,7 @@ namespace GymAssistant_API.Repository.Services.Exercises
                 }
 
                 const string baseUrl = "https://gymassistantapi.runasp.net";
-                imageUrl = $"{baseUrl}/images/custom-exercises/{uniqueFileName}";
+                imageUrl = $"/images/custom-exercises/{uniqueFileName}";
             }
 
             exercise.Update(name, description, Instructions, Equipment, imageUrl);
@@ -241,7 +250,7 @@ namespace GymAssistant_API.Repository.Services.Exercises
 
                 // 🔗 هنا حطينا الدومين يدوي
                 const string baseUrl = "https://gymassistantapi.runasp.net";
-                imageUrl = $"{baseUrl}/images/custom-exercises/{uniqueFileName}";
+                imageUrl = $"/images/custom-exercises/{uniqueFileName}";
             }
             var exerciseResult = ExerciseEntity.Create(Guid.NewGuid(),
                                                  sectionId,
@@ -320,7 +329,7 @@ namespace GymAssistant_API.Repository.Services.Exercises
                 }
 
                 const string baseUrl = "https://gymassistantapi.runasp.net";
-                imageUrl = $"{baseUrl}/images/custom-exercises/{uniqueFileName}";
+                imageUrl = $"/images/custom-exercises/{uniqueFileName}";
             }
             var exerciseResult = exercise.Update(
                                                  sectionId,
