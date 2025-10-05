@@ -21,7 +21,7 @@ namespace GymAssistant_API.Handeler.Exercise
                                                                           req.Description,
                                                                           req.Instructions,
                                                                           req.Equipment,
-                                                                          req.ImageUrl,
+                                                                          req.ImageFile,
                                                                           ct);
             if (createExercise.IsError)
             {
@@ -76,7 +76,7 @@ namespace GymAssistant_API.Handeler.Exercise
                                                                           req.Description,
                                                                           req.Instructions,
                                                                           req.Equipment,
-                                                                          req.ImageUrl,
+                                                                          req.ImageFile,
                                                                           ct);
             if (updateExercise.IsError)
             {
