@@ -21,13 +21,16 @@ namespace GymAssistant_API.Model.Entities.Exercise
                              string userId,
                              string name,
                              string? description = null,
-                             string? Instructions = null,
-                             string? Equipment = null,
-                             string? ImageUrl = null) : base(id)
+                             string? instructions = null,
+                             string? equipment = null,
+                             string? imageUrl = null) : base(id)
         {
             UserId = userId;
             Name = name;
             Description = description;
+            Instructions = instructions;
+            Equipment = equipment;
+            ImageUrl = imageUrl;
             CreatedAtUtc = DateTimeOffset.UtcNow;
         }
         public static Result<UserExercise> Create(Guid id,
