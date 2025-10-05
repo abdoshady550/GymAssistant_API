@@ -8,7 +8,6 @@ namespace GymAssistant_API.Repository.Interfaces.User.Trainer
 {
     public interface ITrainerService
     {
-        Task<Result<TrainerTraineeResponse>> AddTraineeAsync(string trainerId, Guid traineeId, CancellationToken ct = default);
         Task<Result<List<TraineeData>>> GetTraineesAsync(string trainerId, CancellationToken ct = default);
         Task<Result<TraineeData>> GetTraineeAsync(string trainerId, Guid traineeId, CancellationToken ct = default);
         Task<Result<Deleted>> RemoveTraineeAsync(string trainerId, Guid traineeId, CancellationToken ct = default);
