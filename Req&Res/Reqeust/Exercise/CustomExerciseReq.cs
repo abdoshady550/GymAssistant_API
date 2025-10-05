@@ -5,7 +5,7 @@
         string? Description = default,
         string? Instructions = default,
         string? Equipment = default,
-        IFormFile? ImageUrl = default
+        IFormFile? ImageFile = default
     );
 
 }
