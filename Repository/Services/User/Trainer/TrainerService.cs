@@ -32,47 +32,6 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
             _recordsService = records;
         }
 
-        public async Task<Result<TrainerTraineeResponse>> AddTraineeAsync(string trainerId, Guid traineeId, CancellationToken ct = default)
-        {
-            var trainerProfile = await _context.ClientProfiles
-                .FirstOrDefaultAsync(p => p.AppUserId == trainerId && p.Role == UserRole.Trainer, ct);
-
-            if (trainerProfile == null)
-            {
-                return Error.Validation("Trainer_NotFound", "Trainer profile not found or user is not a trainer.");
-            }
-
-            var traineeProfile = await _context.ClientProfiles
-                .FirstOrDefaultAsync(p => p.Id == traineeId, ct);
-
-            if (traineeProfile == null)
-            {
-                return Error.NotFound("Trainee_NotFound", "Trainee not found.");
-            }
-
-            // Check if relationship already exists
-            var existingRelation = await _context.TrainerTrainees
-                .FirstOrDefaultAsync(tt => tt.TrainerId == trainerProfile.Id && tt.TraineeId == traineeId, ct);
-
-            if (existingRelation != null)
-            {
-                return Error.Validation("Relationship_Exists", "This trainee is already assigned to you.");
-            }
-
-            var relationResult = TrainerTrainee.Create(Guid.NewGuid(), trainerProfile.Id, traineeId);
-            if (relationResult.IsError)
-            {
-                return relationResult.Errors;
-            }
-
-            var relation = relationResult.Value;
-            _context.TrainerTrainees.Add(relation);
-            await _context.SaveChangesAsync(ct);
-            var response = TrainerTraineeResponse.FromEntity(relation);
-
-            return response;
-        }
-
         public async Task<Result<List<TraineeData>>> GetTraineesAsync(string trainerId, CancellationToken ct = default)
         {
             var trainerProfile = await _context.ClientProfiles
