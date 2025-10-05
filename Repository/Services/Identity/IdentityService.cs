@@ -1,20 +1,18 @@
-using GymAssistant_API.Data;
+﻿using GymAssistant_API.Data;
 using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Identity.Dtos;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace GymAssistant_API.Repository.Services.Identity;
 
 public class IdentityService(AppDbContext context,
                              UserManager<AppUser> userManager,
+                             SignInManager<AppUser> signInManager,
                              IUserClaimsPrincipalFactory<AppUser> userClaimsPrincipalFactory,
                              IAuthorizationService authorizationService,
                              IEmailService emailService,
@@ -23,6 +21,7 @@ public class IdentityService(AppDbContext context,
 {
     private readonly AppDbContext _context = context;
     private readonly UserManager<AppUser> _userManager = userManager;
+    private readonly SignInManager<AppUser> _signInManager = signInManager;
     private readonly IUserClaimsPrincipalFactory<AppUser> _userClaimsPrincipalFactory = userClaimsPrincipalFactory;
     private readonly IAuthorizationService _authorizationService = authorizationService;
     private readonly IEmailService _emailService = emailService;
@@ -283,4 +282,208 @@ public class IdentityService(AppDbContext context,
 
 
     }
+
+    #region External Login Methods 
+    public async Task<Result<ExternalLoginInfo>> GetExternalLoginInfoAsync()
+    {
+        var info = await _signInManager.GetExternalLoginInfoAsync();
+
+        if (info == null)
+        {
+            _logger.LogWarning("Failed to get external login info");
+            return Error.NotFound("External_Login_Failed", "Failed to get external login info");
+        }
+
+        return info;
+    }
+    public async Task<Result<AppUserDto>> ExternalLoginAsync(ExternalAuthInfoDto externalInfo)
+    {
+        try
+        {
+            _logger.LogInformation("Starting external login for email: {Email}, provider: {Provider}",
+                externalInfo.Email, externalInfo.Provider);
+
+            // البحث عن المستخدم بالإيميل
+            var user = await _userManager.FindByEmailAsync(externalInfo.Email);
+
+            if (user == null)
+            {
+                _logger.LogInformation("User not found, creating new user for email: {Email}", externalInfo.Email);
+
+                // إنشاء مستخدم جديد
+                user = new AppUser
+                {
+                    UserName = externalInfo.Email,
+                    Email = externalInfo.Email,
+                    EmailConfirmed = true // تأكيد الإيميل تلقائياً
+                };
+
+                var createResult = await _userManager.CreateAsync(user);
+
+                if (!createResult.Succeeded)
+                {
+                    _logger.LogError("Failed to create user: {Errors}",
+                        string.Join(", ", createResult.Errors.Select(e => e.Description)));
+
+                    var errors = createResult.Errors.Select(e =>
+                        Error.Validation(e.Code, e.Description)).ToList();
+                    return errors;
+                }
+
+                // إضافة Role افتراضي
+                var roleResult = await _userManager.AddToRoleAsync(user, "User");
+                if (!roleResult.Succeeded)
+                {
+                    _logger.LogWarning("Failed to assign default role to user {UserId}", user.Id);
+                }
+
+                // إنشاء ClientProfile للمستخدم الجديد
+                var firstName = externalInfo.FirstName ?? "User";
+                var lastName = externalInfo.LastName ?? "Name";
+
+                var profileResult = ClientProfile.CreateProfile(
+                    Guid.NewGuid(),
+                    user.Id,
+                    firstName,
+                    lastName,
+                    Gender.Male, // افتراضي - يمكن للمستخدم تعديله لاحقاً
+                    UserRole.User
+                );
+
+                if (!profileResult.IsError)
+                {
+                    _context.ClientProfiles.Add(profileResult.Value);
+                    await _context.SaveChangesAsync();
+                    _logger.LogInformation("Created profile for user {UserId}", user.Id);
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to create profile for user {UserId}: {Error}",
+                        user.Id, profileResult.TopError.Description);
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Existing user found with email: {Email}", externalInfo.Email);
+            }
+
+            // ربط External Login بالمستخدم
+            var loginInfo = new UserLoginInfo(
+                externalInfo.Provider,
+                externalInfo.ProviderId,
+                externalInfo.Provider
+            );
+
+            // التحقق من وجود الـ External Login
+            var logins = await _userManager.GetLoginsAsync(user);
+            var loginExists = logins.Any(l =>
+                l.LoginProvider == externalInfo.Provider &&
+                l.ProviderKey == externalInfo.ProviderId
+            );
+
+            if (!loginExists)
+            {
+                _logger.LogInformation("Adding external login for user {UserId}, provider: {Provider}",
+                    user.Id, externalInfo.Provider);
+
+                var addLoginResult = await _userManager.AddLoginAsync(user, loginInfo);
+
+                if (!addLoginResult.Succeeded)
+                {
+                    _logger.LogWarning("Failed to add external login for user {Email}: {Errors}",
+                        user.Email,
+                        string.Join(", ", addLoginResult.Errors.Select(e => e.Description)));
+                }
+                else
+                {
+                    _logger.LogInformation("Successfully added external login for user {UserId}", user.Id);
+                }
+            }
+
+            // إرجاع معلومات المستخدم
+            var roles = await _userManager.GetRolesAsync(user);
+            var claims = await _userManager.GetClaimsAsync(user);
+
+            _logger.LogInformation("External login successful for user {UserId}", user.Id);
+
+            return new AppUserDto(user.Id, user.Email!, roles, claims);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during external login for email: {Email}, provider: {Provider}",
+                externalInfo.Email, externalInfo.Provider);
+            return Error.Failure("External_Login_Failed", "An error occurred during external login");
+        }
+    }
+    public async Task<Result<SignInResult>> ExternalLoginSignInAsync(string loginProvider, string providerKey)
+    {
+        try
+        {
+            _logger.LogInformation("Attempting external sign-in with provider: {Provider}", loginProvider);
+
+            var result = await _signInManager.ExternalLoginSignInAsync(
+                loginProvider,
+                providerKey,
+                isPersistent: false,
+                bypassTwoFactor: true
+            );
+
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("External sign-in successful for provider: {Provider}", loginProvider);
+            }
+            else
+            {
+                _logger.LogWarning("External sign-in failed for provider: {Provider}. IsLockedOut: {IsLockedOut}, RequiresTwoFactor: {RequiresTwoFactor}",
+                    loginProvider, result.IsLockedOut, result.RequiresTwoFactor);
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during external sign-in for provider: {Provider}", loginProvider);
+            return Error.Failure("External_SignIn_Failed", "An error occurred during external sign-in");
+        }
+    }
+    public async Task<Result<IdentityResult>> AddExternalLoginAsync(string userId, ExternalLoginInfo info)
+    {
+        try
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                _logger.LogWarning("User not found: {UserId}", userId);
+                return Error.NotFound("User_Not_Found", "User not found");
+            }
+
+            _logger.LogInformation("Adding external login for user {UserId}, provider: {Provider}",
+                userId, info.LoginProvider);
+
+            var result = await _userManager.AddLoginAsync(user, info);
+
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("Successfully added external login for user {UserId}", userId);
+            }
+            else
+            {
+                _logger.LogWarning("Failed to add external login for user {UserId}: {Errors}",
+                    userId,
+                    string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error adding external login for user: {UserId}", userId);
+            return Error.Failure("Add_External_Login_Failed", "An error occurred while adding external login");
+        }
+    }
+
+
+    #endregion
+
 }
