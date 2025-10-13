@@ -75,7 +75,7 @@ namespace GymAssistant_API.Repository.Services.User
                 }
                 await _userManager.AddToRoleAsync(user, role);
 
-                return new AppUserDto(user.Id, user.Email!, await _userManager.GetRolesAsync(user), await _userManager.GetClaimsAsync(user));
+                return new AppUserDto(user.Id, user.Email!, await _userManager.GetRolesAsync(user));
             }
             catch (Exception ex)
             {
