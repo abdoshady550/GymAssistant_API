@@ -1,5 +1,6 @@
 ﻿using GymAssistant_API.Model.Entities.Exercise;
 using GymAssistant_API.Model.Results;
+using System.Text.RegularExpressions;
 
 namespace GymAssistant_API.Model.Entities.User
 {
@@ -8,6 +9,7 @@ namespace GymAssistant_API.Model.Entities.User
         private readonly List<BodyMeasurement> _measurements = new();
         private readonly List<WorkoutSession> _workouts = new();
         private readonly List<UserExercise> _customExercises = new();
+        private readonly List<SectionGroup> _sectionGroup = new();
         private readonly List<TrainerTrainee> _trainees = new();
         private readonly List<TrainerTrainee> _trainers = new();
         private readonly List<PersonalRecord> _personalRecords = new();
@@ -26,6 +28,9 @@ namespace GymAssistant_API.Model.Entities.User
         public IReadOnlyCollection<BodyMeasurement> Measurements => _measurements.AsReadOnly();
         public IReadOnlyCollection<WorkoutSession> Workouts => _workouts.AsReadOnly();
         public IReadOnlyCollection<UserExercise> CustomExercises => _customExercises.AsReadOnly();
+        public IReadOnlyCollection<SectionGroup> SectionGroup => _sectionGroup.AsReadOnly();
+
+
         public IReadOnlyCollection<PersonalRecord> PersonalRecords => _personalRecords.AsReadOnly();
 
         // Navigation for Trainer / Trainee relations
@@ -73,7 +78,7 @@ namespace GymAssistant_API.Model.Entities.User
 
 
         }
-        public Result<Updated> UpdateProfile(string firstName, string lastName, Gender gender, DateTime? birthDate, int? heightCm)
+        public Result<Updated> UpdateProfile(string firstName, string lastName, Gender gender, string? phoneNumber, DateTime? birthDate, int? heightCm)
         {
             if (string.IsNullOrWhiteSpace(firstName))
             {
@@ -100,6 +105,19 @@ namespace GymAssistant_API.Model.Entities.User
             {
                 return UserErrors.GenderInvalid;
             }
+            //  Phone number validation 
+            if (!string.IsNullOrWhiteSpace(phoneNumber) &&
+                !Regex.IsMatch(phoneNumber, @"^(?:\+20|0)?1[0125][0-9]{8}$"))
+            {
+                return Error.Validation("Invalid_PhoneNumber", "Phone number format is not valid.");
+            }
+            else
+            {
+                AppUser.PhoneNumber = phoneNumber;
+            }
+
+            AppUser.PhoneNumber = phoneNumber;
+
             FirstName = firstName;
             LastName = lastName;
             BirthDate = birthDate;
@@ -126,6 +144,12 @@ namespace GymAssistant_API.Model.Entities.User
             if (exercise is null) throw new ArgumentNullException(nameof(exercise));
             _customExercises.Add(exercise);
         }
+        public void AddSectionGroup(SectionGroup Group)
+        {
+            if (Group is null) throw new ArgumentNullException(nameof(Group));
+            _sectionGroup.Add(Group);
+        }
+
 
     }
 
