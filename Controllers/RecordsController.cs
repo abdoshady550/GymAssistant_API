@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using GymAssistant_API.Handeler.Progress;
 using GymAssistant_API.Model.Entities.Exercise;
+using GymAssistant_API.Req_Res.Response.Progress;
 using GymAssistant_API.Req_Res.Response.Records;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -101,6 +102,25 @@ namespace GymAssistant_API.Controllers
                 response => Ok(response),
                 Problem);
         }
+        [HttpGet("states")]
+        [Authorize]
+        [ProducesResponseType(typeof(StatesRes), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [EndpointSummary("Retrieves state statistics for the authenticated user.")]
+        [EndpointDescription("Fetches various state statistics related to workouts and records for the current user.")]
+        [EndpointName("GetStates")]
+        public async Task<IActionResult> GetStates(CancellationToken ct = default)
+        {
+
+            var result = await _handler.GetStatesAsync(GetCurrentUserId(), ct);
+            return result.Match(
+                response => Ok(response),
+                Problem);
+        }
+
         private string GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 
