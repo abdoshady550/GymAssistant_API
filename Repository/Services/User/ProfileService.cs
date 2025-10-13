@@ -18,8 +18,6 @@ namespace GymAssistant_API.Repository.Services.User
         private readonly AppDbContext _context = context;
         private readonly UserManager<AppUser> _user = userManager;
 
-
-
         public async Task<Result<BodyMeasurement>> AddBodyMeasurementAsync(string userId,
                                                                            decimal weightKg,
                                                                            decimal? bodyFatPercent = null,
@@ -151,9 +149,8 @@ namespace GymAssistant_API.Repository.Services.User
             };
         }
 
-        public async Task<Result<List<BodyMeasurement>>> GetMeasurementHistoryAsync(string userId,
-                                                                                    int pageSize,
-                                                                                    int pageNumber,
+        public async Task<Result<List<BodyMeasurement>>> GetMeasurementHistoryAsync(string userId, int pageSize, int pageNumber,
+
                                                                                     CancellationToken ct = default)
         {
             if (userId == null)
@@ -174,17 +171,19 @@ namespace GymAssistant_API.Repository.Services.User
                                                               string firstName,
                                                               string lastName,
                                                               Gender gender,
+                                                              string? phoneNumber,
                                                               DateTime? birthDate,
                                                               int? heightCm, CancellationToken ct = default)
         {
-            var profile = await _context.ClientProfiles.FindAsync(Id);
+            var profile = await _context.ClientProfiles.Include(P => P.Measurements)
+                .FirstOrDefaultAsync(P => P.Id == Id, ct);
             if (profile == null)
             {
                 _logger.LogError("User Profile not found for ProfileID {ProfileId}", Id);
 
                 return Error.NotFound("Profile_NotFound", "User profile not found.");
             }
-            profile.UpdateProfile(firstName, lastName, gender, birthDate, heightCm);
+            profile.UpdateProfile(firstName, lastName, gender, phoneNumber, birthDate, heightCm);
 
             _context.ClientProfiles.Update(profile);
             await _context.SaveChangesAsync();
@@ -192,57 +191,41 @@ namespace GymAssistant_API.Repository.Services.User
             return Result.Updated;
 
         }
-        public async Task<Result<ProfileResponse>> GetProfileAsync(string id, int pageSize, int page, CancellationToken ct = default)
+        public async Task<Result<ProfileResponse>> GetProfileAsync(string id, CancellationToken ct = default)
         {
             var userProfile = await _context.ClientProfiles
                 .FirstOrDefaultAsync(p => p.AppUserId == id);
             if (userProfile == null)
             {
-                _logger.LogError("User Profile not found for UserID {UserId}", id);
+                _logger.LogError("User Profile not found for ProfileID {ProfileId}", id);
+
                 return Error.NotFound("Profile_NotFound", "User profile not found.");
             }
+
             var profile = await _context.ClientProfiles
+            .Include(p => p.AppUser)
             .Include(p => p.Measurements)
             .FirstOrDefaultAsync(p => p.Id == userProfile.Id);
-
             if (profile == null)
             {
+                _logger.LogError("User Profile not found for ProfileID {ProfileId}", id);
+
                 return Error.NotFound("Profile_NotFound", "User profile not found.");
             }
-            var allMeasurements = await GetMeasurementHistoryAsync(id, pageSize, page);
-
-            if (allMeasurements.IsError)
-            {
-                return allMeasurements.Errors;
-            }
-
-            var latestMeasurement = allMeasurements.Value
-                .OrderByDescending(m => m.CreatedAtUtc)
-                .FirstOrDefault();
-
-            var measurementsDto = allMeasurements.Value
-                .Select(m => new BodyMeasurementDto
-                {
-                    Id = m.Id,
-                    WeightKg = m.WeightKg,
-                    BodyFatPercent = m.BodyFatPercent,
-                    MuscleMassKg = m.MuscleMassKg,
-                    CreatedAtUtc = m.CreatedAtUtc
-
-                }).ToList();
 
             var response = new ProfileResponse
             {
                 FirstName = profile.FirstName,
                 LastName = profile.LastName,
+                phoneNumber = profile.AppUser.PhoneNumber,
                 Gender = profile.Gender,
                 Role = profile.Role,
                 DateOfBirth = profile.BirthDate,
                 HeightCm = profile.HeightCm,
-                LastWeightKg = latestMeasurement.WeightKg,
-                LastMuscleMassKgdecimal = latestMeasurement.MuscleMassKg,
-                LastBodyFatPercent = latestMeasurement.BodyFatPercent,
-                bodyMeasurementsHistory = measurementsDto
+                LastWeightKg = profile.Measurements.OrderBy(w => w.CreatedAtUtc).Select(m => m.WeightKg).LastOrDefault(),
+                LastMuscleMassKgdecimal = profile.Measurements.OrderBy(w => w.CreatedAtUtc).Select(m => m.MuscleMassKg).LastOrDefault(),
+                LastBodyFatPercent = profile.Measurements.OrderBy(w => w.CreatedAtUtc).Select(m => m.BodyFatPercent).LastOrDefault(),
+
             };
             return response;
         }
