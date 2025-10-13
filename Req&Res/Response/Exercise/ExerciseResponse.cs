@@ -1,4 +1,5 @@
-﻿using GymAssistant_API.Model.Entities.Exercise;
+﻿using ExerciseEntity = GymAssistant_API.Model.Entities.Exercise.Exercise;
+using GymAssistant_API.Model.Entities.Exercise;
 
 namespace GymAssistant_API.Req_Res.Response
 {
@@ -13,6 +14,26 @@ namespace GymAssistant_API.Req_Res.Response
         DifficultyLevel? DifficultyLevel = default,
         int? DefaultSets = default,
         int? DefaultReps = default,
-        DateTimeOffset? CreatedAtUtc = default
-    );
+        DateTimeOffset? CreatedAtUtc = default,
+        bool? IsCustomExercise = false
+    )
+    {
+        public static ExerciseResponse FromEntity(ExerciseEntity exercise)
+        {
+            return new ExerciseResponse(
+                exercise.Id,
+                exercise.SectionId,
+                exercise.Name,
+                exercise.Description,
+                exercise.Instructions,
+                exercise.Equipment,
+                exercise.ImageUrl,
+                exercise.DifficultyLevel,
+                exercise.DefaultSets,
+                exercise.DefaultReps,
+                exercise.CreatedAtUtc,
+                exercise.IsCustomExercise
+                );
+        }
+    };
 }
