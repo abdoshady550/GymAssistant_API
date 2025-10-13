@@ -2,6 +2,7 @@
 using GymAssistant_API.Model.Entities.Exercise;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Exercise;
+using GymAssistant_API.Req_Res.Response.Progress;
 using GymAssistant_API.Req_Res.Response.Records;
 using Microsoft.EntityFrameworkCore;
 
@@ -167,6 +168,72 @@ namespace GymAssistant_API.Repository.Services.Progress
             };
 
             return achievements;
+        }
+        public async Task<Result<StatesRes>> GetStates(string userId, CancellationToken ct = default)
+        {
+            var profile = await _context.ClientProfiles
+                .FirstOrDefaultAsync(p => p.AppUserId == userId, ct);
+            if (profile == null)
+            {
+                return Error.NotFound("Profile_NotFound", "User profile not found.");
+            }
+            var workoutsCount = await _context.WorkoutSessions
+                .Where(ws => ws.ClientProfileId == profile.Id)
+                .CountAsync(ct);
+            var customExercisesCount = await _context.UserExercises.Where(ue => ue.ClientProfileId == profile.Id)
+                .CountAsync(ct);
+            var recordsCount = await _context.PersonalRecords.Where(pr => pr.ClientProfileId == profile.Id).CountAsync(ct);
+            ////////////////////////////
+            var lastWorkout = await _context.WorkoutSessions
+                .Where(ws => ws.ClientProfileId == profile.Id)
+                .OrderByDescending(ws => ws.Date)
+                .FirstOrDefaultAsync(ct);
+            var lastRecord = await _context.PersonalRecords
+                .Where(pr => pr.ClientProfileId == profile.Id)
+                .OrderByDescending(pr => pr.CreatedAtUtc)
+                .FirstOrDefaultAsync(ct);
+            var lastWorkoutDate = lastWorkout?.Date;
+            var lastRecordDate = lastRecord?.CreatedAtUtc;
+            var daysSinceLastWorkout = lastWorkoutDate.HasValue ? (DateTime.UtcNow - lastWorkoutDate.Value).Days : (int?)null;
+            var daysSinceLastRecord = lastRecordDate.HasValue ? (DateTime.UtcNow - lastRecordDate.Value).Days : (int?)null;
+            ////////////////////////////
+            var workoutSessions = await _context.WorkoutSessions
+               .Where(ws => ws.ClientProfileId == profile.Id)
+               .Select(ws => new { ws.StartTime, ws.EndTime })
+               .ToListAsync(ct);
+
+            var averageWorkoutDuration = workoutSessions
+                .Where(ws => ws.StartTime.HasValue && ws.EndTime.HasValue)
+                .Select(ws => (ws.EndTime!.Value - ws.StartTime!.Value).TotalMinutes)
+                .DefaultIfEmpty(0)
+                .Average();
+
+            var averageRecordsPerWorkout = workoutsCount > 0 ?
+                (decimal)recordsCount / workoutsCount : 0;
+
+            ///////////////////////////
+            var personalBestWeight = await _context.PersonalRecords
+                .Where(pr => pr.ClientProfileId == profile.Id && pr.RecordType == RecordType.MaxWeight)
+                .MaxAsync(pr => (decimal?)pr.Value, ct);
+            var personalBestReps = await _context.PersonalRecords
+                .Where(pr => pr.ClientProfileId == profile.Id && pr.RecordType == RecordType.MaxReps)
+                .MaxAsync(pr => (int?)pr.Value, ct);
+            var personalBestVolume = await _context.PersonalRecords
+                .Where(pr => pr.ClientProfileId == profile.Id && pr.RecordType == RecordType.MaxVolume)
+                .MaxAsync(pr => (decimal?)pr.Value, ct);
+
+
+
+            return new StatesRes(workoutsCount,
+                                  customExercisesCount,
+                                  recordsCount,
+                                  daysSinceLastWorkout,
+                                  daysSinceLastRecord,
+                                  averageWorkoutDuration,
+                                  averageRecordsPerWorkout,
+                                  personalBestWeight,
+                                  personalBestReps,
+                                  personalBestVolume);
         }
 
         private List<Milestone> CalculateMilestones(List<PersonalRecord> records)
