@@ -12,16 +12,18 @@ namespace GymAssistant_API.Handeler.Exercise
         private readonly ILogger<CustomExerciseHandler> logger = logger;
         private readonly IExercise exercise = exercise;
 
-        public async Task<Result<CustomExerciseRes>> CreateCustomExercise(string userId,
+        public async Task<Result<CustomExerciseRes>> CreateCustomExercise(string userId, Guid sectionId,
                                                                     CustomExerciseReq req,
                                                                      CancellationToken ct = default)
         {
             var createExercise = await exercise.CreateCustomExerciseAsync(userId,
+                                                                          sectionId,
                                                                           req.Name,
                                                                           req.Description,
                                                                           req.Instructions,
                                                                           req.Equipment,
                                                                           req.ImageFile,
+                                                                          req.DifficultyLevel,
                                                                           ct);
             if (createExercise.IsError)
             {
@@ -42,10 +44,10 @@ namespace GymAssistant_API.Handeler.Exercise
             }
             return Result.Deleted;
         }
-        public async Task<Result<List<CustomExerciseRes>>> GetCustomExercises(string userId,
+        public async Task<Result<List<CustomExerciseRes>>> GetCustomExercises(string userId, DifficultyLevel? difficulty = null,
                                                                      CancellationToken ct = default)
         {
-            var getExercises = await exercise.GetCustomExercisesAsync(userId, ct);
+            var getExercises = await exercise.GetCustomExercisesAsync(userId, difficulty, ct);
             if (getExercises.IsError)
             {
                 logger.LogError("Failed to retrieve custom exercises for user {UserId}: {Error}", userId, getExercises.Errors);
@@ -67,16 +69,19 @@ namespace GymAssistant_API.Handeler.Exercise
         }
         public async Task<Result<Updated>> UpdateCustomExercise(string userId,
                                                               Guid exerciseId,
+                                                              Guid sectionId,
                                                               CustomExerciseReq req,
                                                               CancellationToken ct = default)
         {
             var updateExercise = await exercise.UpdateCustomExerciseAsync(userId,
                                                                           exerciseId,
+                                                                          sectionId,
                                                                           req.Name,
                                                                           req.Description,
                                                                           req.Instructions,
                                                                           req.Equipment,
                                                                           req.ImageFile,
+                                                                          req.DifficultyLevel,
                                                                           ct);
             if (updateExercise.IsError)
             {
