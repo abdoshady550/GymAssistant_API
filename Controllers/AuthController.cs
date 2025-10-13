@@ -27,7 +27,7 @@ namespace GymAssistant_API.Controllers
 
 
         [HttpPost("register")]
-        [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(AppUserDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [EndpointSummary("Registers a new user account.")]
@@ -44,7 +44,7 @@ namespace GymAssistant_API.Controllers
 
         }
         [HttpPost("login")]
-        [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [EndpointSummary("Generates an access and refresh token for a valid user.")]
@@ -123,6 +123,38 @@ namespace GymAssistant_API.Controllers
             return result.Match(
                 response => Ok(response),
                 Problem);
+        }
+
+        // external authentication (Google, Facebook) 
+
+        [HttpPost("external-login")]
+        [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [EndpointSummary("Login or register using Google/Facebook")]
+        [EndpointDescription("Authenticates or creates a user account using Google or Facebook credentials and returns JWT tokens.")]
+        [EndpointName("ExternalLogin")]
+        public async Task<IActionResult> ExternalLogin(
+            [FromBody] ExternalLoginDto request,
+            [FromServices] ExternalLoginHandler externalLoginHandler,
+            CancellationToken ct = default)
+        {
+            var result = await externalLoginHandler.Handle(request, ct);
+
+            return result.Match(
+                response => Ok(response),
+                Problem);
+        }
+
+        [HttpGet("external-providers")]
+        [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
+        [EndpointSummary("Get available external login providers")]
+        [EndpointDescription("Returns a list of configured external authentication providers (Google, Facebook, etc.)")]
+        [EndpointName("GetExternalProviders")]
+        public IActionResult GetExternalProviders()
+        {
+            var providers = new List<string> { "Google", "Facebook" };
+            return Ok(providers);
         }
         private string GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
     }
