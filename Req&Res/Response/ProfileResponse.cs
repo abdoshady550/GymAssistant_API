@@ -8,6 +8,7 @@ namespace GymAssistant_API.Req_Res.Response
     {
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
+        public string? phoneNumber { get; set; } = default;
         public DateTime? DateOfBirth { get; set; }
         public Gender? Gender { get; set; } = default;
         public UserRole? Role { get; set; } = default;
@@ -16,7 +17,7 @@ namespace GymAssistant_API.Req_Res.Response
         public decimal? LastMuscleMassKgdecimal { get; set; } = default;
         public decimal? LastBodyFatPercent { get; set; } = default;
 
-        public List<BodyMeasurementDto> bodyMeasurementsHistory { get; set; } = new();
+        //public List<BodyMeasurementDto> bodyMeasurementsHistory { get; set; } = new();
 
     }
 }
