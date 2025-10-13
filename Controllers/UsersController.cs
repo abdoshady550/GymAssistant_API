@@ -47,7 +47,7 @@ namespace GymAssistant_API.Controllers
         [HttpPut("update-profile")]
         [Consumes("multipart/form-data")]
         [Authorize]
-        [ProducesResponseType(typeof(Result<Updated>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Result<ProfileResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -71,9 +71,9 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves the user's profile information.")]
         [EndpointDescription("Fetches the profile details of the authenticated user.")]
         [EndpointName("GetUserProfile")]
-        public async Task<IActionResult> GetProfile([FromQuery] int pageSize, [FromQuery] int page, CancellationToken ct = default)
+        public async Task<IActionResult> GetProfile(CancellationToken ct = default)
         {
-            var result = await _getProfile.Handle(GetCurrentUserId(), pageSize, page, ct);
+            var result = await _getProfile.Handle(GetCurrentUserId(), ct);
             return result.Match(
                 response => Ok(response),
                 Problem);
