@@ -8,6 +8,8 @@ namespace GymAssistant_API.Model.Entities.Exercise
     {
         public Guid SectionId { get; private set; }
         public Section Section { get; private set; } = default!;
+        public Guid? SectionGroupId { get; private set; }
+        public SectionGroup? SectionGroup { get; private set; } = default!;
 
         public string Name { get; private set; }
         public string? Description { get; private set; }
@@ -17,6 +19,8 @@ namespace GymAssistant_API.Model.Entities.Exercise
         public DifficultyLevel? DifficultyLevel { get; private set; }
         public int? DefaultSets { get; private set; }
         public int? DefaultReps { get; private set; }
+        public bool IsCustomExercise { get; private set; }
+
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         private Exercise() { }
@@ -36,6 +40,7 @@ namespace GymAssistant_API.Model.Entities.Exercise
             DifficultyLevel = difficultyLevel;
             DefaultSets = defaultSets;
             DefaultReps = defaultReps;
+            IsCustomExercise = false;
             CreatedAtUtc = DateTime.UtcNow;
         }
         public static Result<Exercise> Create(Guid id, Guid sectionId, string name, string? description = null,
