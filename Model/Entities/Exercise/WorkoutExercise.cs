@@ -13,7 +13,7 @@ namespace GymAssistant_API.Model.Entities.Exercise
         public Guid? ExerciseId { get; private set; }
         public Exercise? Exercise { get; private set; }
         public Guid? UserExerciseId { get; private set; }
-        public UserExercise? UserExercise { get; private set; } // وهذا كمان مفقود
+        public UserExercise? UserExercise { get; private set; }
 
 
         public Guid ClientProfileId { get; set; }
