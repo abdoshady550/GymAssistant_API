@@ -15,6 +15,8 @@ namespace GymAssistant_API.Req_Res.Reqeust
 
         [EnumDataType(typeof(Gender))]
         Gender Gender,
+        [StringLength(50)]
+        string? PhoneNumber,
 
         [DataType(DataType.Date)]
         DateTime? BirthDate,
