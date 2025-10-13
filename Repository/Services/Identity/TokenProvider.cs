@@ -1,11 +1,8 @@
 using GymAssistant_API.Data;
-using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Identity;
 using GymAssistant_API.Model.Identity.Dtos;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Identity;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -66,7 +63,7 @@ public class TokenProvider(IConfiguration configuration, AppDbContext context) :
         var audience = jwtSettings["Audience"]!;
         var key = jwtSettings["Key"]!;
 
-        var expires = DateTime.UtcNow.AddMinutes(int.Parse(jwtSettings["ExpiresInMin"]!));
+        var expires = DateTime.UtcNow.AddMinutes(double.Parse(jwtSettings["ExpiresInMin"]!));
 
         var claims = new List<Claim>
         {
@@ -94,8 +91,11 @@ public class TokenProvider(IConfiguration configuration, AppDbContext context) :
 
         var securityToken = tokenHandler.CreateToken(descriptor);
 
+        var userId = user.UserId;
+
         var oldRefreshTokens = await _context.RefreshTokens
-              .Where(rt => rt.UserId == user.UserId)
+              .AsNoTracking()
+              .Where(rt => rt.UserId == userId)
               .ExecuteDeleteAsync(ct);
 
         var refreshTokenResult = RefreshToken.Create(
@@ -119,7 +119,8 @@ public class TokenProvider(IConfiguration configuration, AppDbContext context) :
         {
             AccessToken = tokenHandler.WriteToken(securityToken),
             RefreshToken = refreshToken.Token,
-            ExpiresOnUtc = expires
+            ExpiresOnUtc = expires,
+            User = user
         };
     }
 
