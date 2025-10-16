@@ -24,7 +24,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Creates a new workout session for a client profile.")]
         [EndpointDescription("Creates a new workout session for a specified client profile with optional notes and trainer information.")]
         [EndpointName("CreateWorkoutSession")]
-        public async Task<IActionResult> CreateSession([FromBody] CreateWorkoutSessionRequest request,
+        public async Task<ActionResult> CreateSession([FromBody] CreateWorkoutSessionRequest request,
                                                        CancellationToken ct = default)
         {
             var result = await _workout.CreateWorkoutSession(GetCurrentUserId(), request, ct);
@@ -40,7 +40,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves a workout session by its ID.")]
         [EndpointDescription("Fetches a workout session for the current user based on the provided session ID.")]
         [EndpointName("GetWorkoutSessionById")]
-        public async Task<IActionResult> GetSessionById([FromQuery] Guid id,
+        public async Task<ActionResult> GetSessionById([FromQuery] Guid id,
                                                         CancellationToken ct = default)
         {
             var result = await _workout.GetWorkoutSession(GetCurrentUserId(), id, ct);
@@ -56,7 +56,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Starts a workout session by setting its start time.")]
         [EndpointDescription("Marks the start of a workout session for the current user by updating the start time.")]
         [EndpointName("StartWorkoutSession")]
-        public async Task<IActionResult> StartWorkoutSession([FromQuery] Guid id,
+        public async Task<ActionResult> StartWorkoutSession([FromQuery] Guid id,
                                                              CancellationToken ct = default)
         {
             var startTime = DateTime.UtcNow;
@@ -73,7 +73,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Completes a workout session by setting its end time and marking it as completed.")]
         [EndpointDescription("Marks the completion of a workout session for the current user by updating the end time and setting it as completed.")]
         [EndpointName("CompleteWorkoutSession")]
-        public async Task<IActionResult> CompleteWorkoutSession([FromQuery] Guid id, string? notes = null, CancellationToken ct = default)
+        public async Task<ActionResult> CompleteWorkoutSession([FromQuery] Guid id, string? notes = null, CancellationToken ct = default)
         {
             var endTime = DateTime.UtcNow;
             var result = await _workout.CompleteWorkoutSession(GetCurrentUserId(), id, endTime, notes, ct);
@@ -89,7 +89,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Adds an exercise to a workout session.")]
         [EndpointDescription("Adds a specified exercise to an existing workout session for the current user.")]
         [EndpointName("AddExerciseToWorkoutSession")]
-        public async Task<IActionResult> AddExerciseToWorkoutSession([FromQuery] Guid sessionId,
+        public async Task<ActionResult> AddExerciseToWorkoutSession([FromQuery] Guid sessionId,
                                                                      [FromQuery] Guid? exerciseId = null,
                                                                      [FromQuery] Guid? userExerciseId = null,
                                                                      [FromQuery] CancellationToken ct = default)
@@ -107,7 +107,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves a workout exercise by its ID.")]
         [EndpointDescription("Fetches a workout exercise for the current user based on the provided exercise ID.")]
         [EndpointName("GetWorkoutExerciseById")]
-        public async Task<IActionResult> GetWorkoutExerciseById([FromQuery] Guid sessionId, [FromQuery] Guid exerciseId, CancellationToken ct = default)
+        public async Task<ActionResult> GetWorkoutExerciseById([FromQuery] Guid sessionId, [FromQuery] Guid exerciseId, CancellationToken ct = default)
         {
             var result = await _workout.GetWorkoutExercise(GetCurrentUserId(), sessionId, exerciseId, ct);
             return result.Match(
@@ -122,7 +122,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Adds a set to a workout exercise.")]
         [EndpointDescription("Adds a specified set to an existing workout exercise for the current user.")]
         [EndpointName("AddSetToWorkoutExercise")]
-        public async Task<IActionResult> AddSetToWorkoutExercise([FromQuery] Guid sessionId,
+        public async Task<ActionResult> AddSetToWorkoutExercise([FromQuery] Guid sessionId,
                                                                  [FromQuery] Guid exerciseId,
                                                                  [FromBody] AddExerciseSetRequest request,
                                                                  CancellationToken ct = default)
@@ -140,7 +140,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves an exercise set by its ID.")]
         [EndpointDescription("Fetches an exercise set for the current user based on the provided set ID.")]
         [EndpointName("GetExerciseSetById")]
-        public async Task<IActionResult> GetExerciseSetById([FromQuery] Guid sessionId,
+        public async Task<ActionResult> GetExerciseSetById([FromQuery] Guid sessionId,
                                                             [FromQuery] Guid exerciseId,
                                                             [FromQuery] Guid setId,
                                                             CancellationToken ct = default)
@@ -158,7 +158,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Updates an existing exercise set.")]
         [EndpointDescription("Updates the details of an existing exercise set for the current user.")]
         [EndpointName("UpdateExerciseSet")]
-        public async Task<IActionResult> UpdateExerciseSet([FromQuery] Guid sessionId,
+        public async Task<ActionResult> UpdateExerciseSet([FromQuery] Guid sessionId,
                                                            [FromQuery] Guid exerciseId,
                                                            [FromQuery] Guid setId,
                                                            [FromBody] UpdateExerciseSetRequest request,
@@ -177,7 +177,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves the workout history for the current user.")]
         [EndpointDescription("Fetches all past workout sessions for the current user, ordered by date in descending order.")]
         [EndpointName("GetWorkoutHistory")]
-        public async Task<IActionResult> GetWorkoutHistory([FromQuery] int pageSize = 20,
+        public async Task<ActionResult> GetWorkoutHistory([FromQuery] int pageSize = 20,
                                                            [FromQuery] int pageNumber = 1,
                                                            [FromBody] DateTime? fromDate = null,
                                                            DateTime? toDate = null,

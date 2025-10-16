@@ -24,7 +24,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Get Exercise Progress")]
         [EndpointDescription("Retrieves the progress data for a specific exercise over a defined number of days.")]
         [EndpointName("GetExerciseProgress")]
-        public async Task<IActionResult> GetExerciseProgress(Guid exerciseId, [FromQuery] int days = 30, CancellationToken ct = default)
+        public async Task<ActionResult> GetExerciseProgress(Guid exerciseId, [FromQuery] int days = 30, CancellationToken ct = default)
         {
             var result = await _handler.GetExerciseProgress(GetCurrentUserId(), exerciseId, days, ct);
             return result.Match(
@@ -41,7 +41,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Get Custom Exercise Progress")]
         [EndpointDescription("Retrieves the progress data for a specific custom exercise over a defined number of days.")]
         [EndpointName("GetCustomExerciseProgress")]
-        public async Task<IActionResult> GetCustomExerciseProgress(Guid userExerciseId, [FromQuery] int days = 30, CancellationToken ct = default)
+        public async Task<ActionResult> GetCustomExerciseProgress(Guid userExerciseId, [FromQuery] int days = 30, CancellationToken ct = default)
         {
             var result = await _handler.GetCustomExerciseProgress(GetCurrentUserId(), userExerciseId, days, ct);
             return result.Match(
@@ -58,7 +58,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Get Section Progress")]
         [EndpointDescription("Retrieves the progress data for a specific section over a defined number of days.")]
         [EndpointName("GetSectionProgress")]
-        public async Task<IActionResult> GetSectionProgress(Guid sectionId, [FromQuery] int days = 30, CancellationToken ct = default)
+        public async Task<ActionResult> GetSectionProgress(Guid sectionId, [FromQuery] int days = 30, CancellationToken ct = default)
         {
             var result = await _handler.GetSectionProgress(GetCurrentUserId(), sectionId, days, ct);
             return result.Match(
@@ -75,7 +75,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Get Progress Overview")]
         [EndpointDescription("Retrieves an overview of the user's progress over a defined number of days.")]
         [EndpointName("GetProgressOverview")]
-        public async Task<IActionResult> GetProgressOverview([FromQuery] int days = 7, CancellationToken ct = default)
+        public async Task<ActionResult> GetProgressOverview([FromQuery] int days = 7, CancellationToken ct = default)
         {
             var result = await _handler.GetProgressOverview(GetCurrentUserId(), days, ct);
             return result.Match(
@@ -92,7 +92,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Get Exercise Progress Charts")]
         [EndpointDescription("Retrieves chart data for a specific exercise's progress over a defined number of days.")]
         [EndpointName("GetExerciseProgressCharts")]
-        public async Task<IActionResult> GetExerciseProgressCharts(Guid exerciseId, [FromQuery] int days = 30, CancellationToken ct = default)
+        public async Task<ActionResult> GetExerciseProgressCharts(Guid exerciseId, [FromQuery] int days = 30, CancellationToken ct = default)
         {
             var result = await _handler.GetExerciseChartData(GetCurrentUserId(), exerciseId, days, ct);
             return result.Match(
@@ -109,7 +109,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Get Volume Progress Charts")]
         [EndpointDescription("Retrieves volume chart data over a defined number of days, optionally filtered by section.")]
         [EndpointName("GetVolumeProgressCharts")]
-        public async Task<IActionResult> GetVolumeProgressCharts([FromQuery] int days = 30, [FromQuery] Guid? sectionId = null, CancellationToken ct = default)
+        public async Task<ActionResult> GetVolumeProgressCharts([FromQuery] int days = 30, [FromQuery] Guid? sectionId = null, CancellationToken ct = default)
         {
             var result = await _handler.GetVolumeChartData(GetCurrentUserId(), days, sectionId, ct);
             return result.Match(

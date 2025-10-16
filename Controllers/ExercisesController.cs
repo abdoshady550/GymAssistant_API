@@ -30,7 +30,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Creates a custom exercise for the authenticated user.")]
         [EndpointDescription("Allows the authenticated user to create a custom exercise with specified details.")]
         [EndpointName("CreateCustomExercise")]
-        public async Task<IActionResult> CreateCustomExercise([FromQuery] Guid sectionId, [FromForm] CustomExerciseReq req,
+        public async Task<ActionResult> CreateCustomExercise([FromQuery] Guid sectionId, [FromForm] CustomExerciseReq req,
                                                               CancellationToken ct = default)
         {
 
@@ -49,7 +49,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Updates a custom exercise for the authenticated user.")]
         [EndpointDescription("Allows the authenticated user to update a custom exercise by its ID.")]
         [EndpointName("UpdateCustomExercise")]
-        public async Task<IActionResult> UpdateCustomExercise([FromQuery] Guid exerciseId, [FromQuery] Guid sectionId,
+        public async Task<ActionResult> UpdateCustomExercise([FromQuery] Guid exerciseId, [FromQuery] Guid sectionId,
                                                               [FromForm] CustomExerciseReq req,
                                                               CancellationToken ct = default)
         {
@@ -68,7 +68,7 @@ namespace GymAssistant_API.Controllers
         [EndpointDescription("Allows the authenticated user to delete a custom exercise by its ID.")]
         [EndpointName("DeleteCustomExercise")]
 
-        public async Task<IActionResult> DeleteCustomExercise([FromQuery] Guid exerciseId,
+        public async Task<ActionResult> DeleteCustomExercise([FromQuery] Guid exerciseId,
                                                               CancellationToken ct = default)
         {
             var result = await _customExercise.DeleteCustomExercise(GetCurrentUserId(), exerciseId, ct);
@@ -85,7 +85,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves all custom exercises for the authenticated user.")]
         [EndpointDescription("Fetches all custom exercises created by the authenticated user.")]
         [EndpointName("GetCustomExercises")]
-        public async Task<IActionResult> GetCustomExercises([FromQuery] DifficultyLevel? difficulty = null, CancellationToken ct = default)
+        public async Task<ActionResult> GetCustomExercises([FromQuery] DifficultyLevel? difficulty = null, CancellationToken ct = default)
         {
             var result = await _customExercise.GetCustomExercises(GetCurrentUserId(), difficulty, ct);
             return result.Match(
@@ -101,7 +101,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves a specific custom exercise for the authenticated user.")]
         [EndpointDescription("Fetches a specific custom exercise by its ID for the authenticated user.")]
         [EndpointName("GetCustomExercise")]
-        public async Task<IActionResult> GetCustomExercise([FromQuery] Guid exerciseId,
+        public async Task<ActionResult> GetCustomExercise([FromQuery] Guid exerciseId,
                                                            CancellationToken ct = default)
         {
             var result = await _customExercise.GetCustomExercise(GetCurrentUserId(), exerciseId, ct);
@@ -117,7 +117,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves a specific exercise by its ID.")]
         [EndpointDescription("Fetches a specific exercise by its ID.")]
         [EndpointName("GetExerciseById")]
-        public async Task<IActionResult> GetExerciseById([FromQuery] Guid exerciseId,
+        public async Task<ActionResult> GetExerciseById([FromQuery] Guid exerciseId,
                                                            CancellationToken ct = default)
         {
             var result = await exercise.GetExerciseById(exerciseId, ct);
@@ -127,6 +127,7 @@ namespace GymAssistant_API.Controllers
         }
 
         [HttpPost("create-exercises")]
+        [Consumes("multipart/form-data")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(List<ExerciseResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -135,7 +136,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Creates a new exercise.")]
         [EndpointDescription("Allows an admin user to create a new exercise with specified details.")]
         [EndpointName("CreateExercise")]
-        public async Task<IActionResult> CreateExercise([FromQuery] Guid sectionId, [FromForm] ExerciseReq req,
+        public async Task<ActionResult> CreateExercise([FromQuery] Guid sectionId, [FromForm] ExerciseReq req,
                                                        CancellationToken ct = default)
         {
 
@@ -145,6 +146,7 @@ namespace GymAssistant_API.Controllers
                Problem);
         }
         [HttpPut("update-exercises")]
+        [Consumes("multipart/form-data")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(Result<Updated>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -153,7 +155,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Updates an existing exercise.")]
         [EndpointDescription("Allows an admin user to update an existing exercise by its ID.")]
         [EndpointName("UpdateExercise")]
-        public async Task<IActionResult> UpdateExercise([FromQuery] Guid exerciseId,
+        public async Task<ActionResult> UpdateExercise([FromQuery] Guid exerciseId,
                                                        [FromQuery] Guid sectionId,
                                                        [FromForm] UpdateExerciseReq req,
                                                        CancellationToken ct = default)
@@ -173,7 +175,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Deletes an existing exercise.")]
         [EndpointDescription("Allows an admin user to delete an existing exercise by its ID.")]
         [EndpointName("DeleteExercise")]
-        public async Task<IActionResult> DeleteExercise([FromQuery] Guid exerciseId,
+        public async Task<ActionResult> DeleteExercise([FromQuery] Guid exerciseId,
                                                        CancellationToken ct = default)
         {
 
@@ -183,6 +185,7 @@ namespace GymAssistant_API.Controllers
                Problem);
         }
         [HttpGet("get-sections")]
+        [Authorize]
         [ProducesResponseType(typeof(List<SectionResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -190,9 +193,9 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves all sections.")]
         [EndpointDescription("Fetches all available sections.")]
         [EndpointName("GetSections")]
-        public async Task<IActionResult> GetSections(CancellationToken ct = default)
+        public async Task<ActionResult> GetSections(CancellationToken ct = default)
         {
-            var result = await exercise.GetSections(ct);
+            var result = await exercise.GetSections(GetCurrentUserId(), ct);
             return result.Match(
                response => Ok(response),
                Problem);
@@ -206,7 +209,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves a specific section by its ID.")]
         [EndpointDescription("Fetches a specific section by its ID.")]
         [EndpointName("GetSectionById")]
-        public async Task<IActionResult> GetSectionById([FromQuery] Guid sectionId, CancellationToken ct = default)
+        public async Task<ActionResult> GetSectionById([FromQuery] Guid sectionId, CancellationToken ct = default)
 
         {
             var result = await exercise.GetSectionByIdAsync(GetCurrentUserId(), sectionId, ct);
@@ -223,7 +226,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves exercises by section ID.")]
         [EndpointDescription("Fetches exercises belonging to a specific section, optionally filtered by difficulty level.")]
         [EndpointName("GetExercisesBySection")]
-        public async Task<IActionResult> ExercisesBySection([FromQuery] Guid sectionId, [FromQuery] string? searchTerm = null, [FromQuery] DifficultyLevel? difficulty = null,
+        public async Task<ActionResult> ExercisesBySection([FromQuery] Guid sectionId, [FromQuery] string? searchTerm = null, [FromQuery] DifficultyLevel? difficulty = null,
                                                            CancellationToken ct = default)
         {
 
@@ -232,7 +235,8 @@ namespace GymAssistant_API.Controllers
                response => Ok(response),
                Problem);
         }
-        [HttpPost("create-section")]
+        [HttpPost("create-section-group")]
+        [Consumes("multipart/form-data")]
         [Authorize]
         [ProducesResponseType(typeof(SectionGroupResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -242,7 +246,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Creates a new section group within an exercise section.")]
         [EndpointDescription("Allows the authenticated user to create a new section group within a specified exercise section.")]
         [EndpointName("CreateSectionGroup")]
-        public async Task<IActionResult> CreateSectionGroup([FromBody] SectionGroupReq req, CancellationToken ct = default)
+        public async Task<ActionResult> CreateSectionGroup([FromForm] SectionGroupReq req, CancellationToken ct = default)
 
         {
             var result = await exercise.CreateSectionGroup(GetCurrentUserId(), req, ct);
@@ -260,7 +264,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves all section groups within a specific exercise section.")]
         [EndpointDescription("Allows the authenticated user to retrieve all section groups within a specified exercise section.")]
         [EndpointName("GetAllSectionGroups")]
-        public async Task<IActionResult> AllSectionGroups([FromQuery] Guid sectionId, CancellationToken ct = default)
+        public async Task<ActionResult> AllSectionGroups([FromQuery] Guid sectionId, CancellationToken ct = default)
         {
             var result = await exercise.AllSectionGroups(GetCurrentUserId(), sectionId, ct);
             return result.Match(
@@ -277,7 +281,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Adds an exercise to a section group.")]
         [EndpointDescription("Allows the authenticated user to add an exercise or custom exercise to a specified section group.")]
         [EndpointName("AddExerciseToSectionGroup")]
-        public async Task<IActionResult> AddExerciseToSectionGroup([FromQuery] Guid groupId,
+        public async Task<ActionResult> AddExerciseToSectionGroup([FromQuery] Guid groupId,
                                                                    [FromQuery] Guid? exerciseId = null,
                                                                    [FromQuery] Guid? customExerciseId = null,
                                                                    CancellationToken ct = default)
@@ -297,7 +301,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Updates an existing exercises group.")]
         [EndpointDescription("Allows the authenticated user to update an existing exercise group by its ID.")]
         [EndpointName("UpdateSectionGroup")]
-        public async Task<IActionResult> UpdateGroup([FromQuery] Guid sectionId, string name, string descripion, CancellationToken ct = default)
+        public async Task<ActionResult> UpdateGroup([FromQuery] Guid sectionId, string name, string descripion, CancellationToken ct = default)
         {
             var result = await exercise.UpdateGroup(GetCurrentUserId(), sectionId, name, descripion, ct);
             return result.Match(
@@ -314,7 +318,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Deletes an existing exercise group.")]
         [EndpointDescription("Allows the authenticated user to delete an existing exercise group by its ID.")]
         [EndpointName("DeleteSectionGroup")]
-        public async Task<IActionResult> DeleteGroup([FromQuery] Guid sectionId, CancellationToken ct = default)
+        public async Task<ActionResult> DeleteGroup([FromQuery] Guid sectionId, CancellationToken ct = default)
         {
             var result = await exercise.DeleteGroup(GetCurrentUserId(), sectionId, ct);
             return result.Match(
@@ -331,7 +335,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Deletes an existing exercise from section group.")]
         [EndpointDescription("Allows the authenticated user to delete an existing exercise section group by its ID.")]
         [EndpointName("DeleteExerciseFromSectionGroup")]
-        public async Task<IActionResult> DeleteExerciseFromSectionGroup([FromQuery] Guid groupId,
+        public async Task<ActionResult> DeleteExerciseFromSectionGroup([FromQuery] Guid groupId,
                                                                         [FromQuery] Guid? exerciseId = null,
                                                                         [FromQuery] Guid? customExerciseId = null,
                                                                         CancellationToken ct = default)

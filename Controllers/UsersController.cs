@@ -25,7 +25,7 @@ namespace GymAssistant_API.Controllers
         private readonly GetMeasurementHandler _getMeasurement = getMeasurement;
 
         [HttpPost("create-profile")]
-        [Consumes("multipart/form-data")]
+        [Consumes("application/x-www-form-urlencoded")]
         [Authorize]
         [ProducesResponseType(typeof(ProfileResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -34,7 +34,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Creates a user profile with optional body measurements.")]
         [EndpointDescription("Creates or updates the user's profile information.")]
         [EndpointName("CreateUserProfile")]
-        public async Task<IActionResult> CreateProfile([FromForm] CreateProfileRequest request,
+        public async Task<ActionResult> CreateProfile([FromForm] CreateProfileRequest request,
                                                        [FromForm] MeasurementRequest measurementRequest,
                                                        CancellationToken ct = default)
         {
@@ -45,7 +45,7 @@ namespace GymAssistant_API.Controllers
                 Problem);
         }
         [HttpPut("update-profile")]
-        [Consumes("multipart/form-data")]
+        [Consumes("application/x-www-form-urlencoded")]
         [Authorize]
         [ProducesResponseType(typeof(Result<ProfileResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -54,7 +54,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Updates a user profile with optional body measurements.")]
         [EndpointDescription("Creates or updates the user's profile information.")]
         [EndpointName("UpdateUserProfile")]
-        public async Task<IActionResult> UpdateProfile([FromForm] UpdateProfileRequest request,
+        public async Task<ActionResult> UpdateProfile([FromForm] UpdateProfileRequest request,
                                                        CancellationToken ct = default)
         {
             var result = await _updateProfile.Handle(GetCurrentUserId(), request, ct);
@@ -71,7 +71,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves the user's profile information.")]
         [EndpointDescription("Fetches the profile details of the authenticated user.")]
         [EndpointName("GetUserProfile")]
-        public async Task<IActionResult> GetProfile(CancellationToken ct = default)
+        public async Task<ActionResult> GetProfile(CancellationToken ct = default)
         {
             var result = await _getProfile.Handle(GetCurrentUserId(), ct);
             return result.Match(
@@ -88,7 +88,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves the user's body measurement history.")]
         [EndpointDescription("Fetches the body measurement history of the authenticated user.")]
         [EndpointName("GetUserMeasurements")]
-        public async Task<IActionResult> GetMeasurements([FromQuery] int pageSize, [FromQuery] int page, CancellationToken ct = default)
+        public async Task<ActionResult> GetMeasurements([FromQuery] int pageSize, [FromQuery] int page, CancellationToken ct = default)
         {
             var result = await _getMeasurement.GetMeasurementHistoryAsync(GetCurrentUserId(), pageSize, page, ct);
             return result.Match(
@@ -105,7 +105,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves the user's body measurement charts.")]
         [EndpointDescription("Fetches the body measurement charts of the authenticated user over a specified number of days.")]
         [EndpointName("GetUserMeasurementCharts")]
-        public async Task<IActionResult> GetMeasurementCharts([FromQuery] int days, CancellationToken ct = default)
+        public async Task<ActionResult> GetMeasurementCharts([FromQuery] int days, CancellationToken ct = default)
         {
             var result = await _getMeasurement.GetMeasurementChartsAsync(GetCurrentUserId(), days, ct);
             return result.Match(
@@ -121,7 +121,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Updates a specific body measurement entry.")]
         [EndpointDescription("Updates a specific body measurement entry for the authenticated user.")]
         [EndpointName("UpdateUserMeasurement")]
-        public async Task<IActionResult> UpdateMeasurement([FromQuery] Guid Id,
+        public async Task<ActionResult> UpdateMeasurement([FromQuery] Guid Id,
                                                            [FromBody] UpdateMeasurementRequest request,
                                                            CancellationToken ct = default)
         {
@@ -139,7 +139,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Deletes a specific body measurement entry.")]
         [EndpointDescription("Deletes a specific body measurement entry for the authenticated user.")]
         [EndpointName("DeleteUserMeasurement")]
-        public async Task<IActionResult> DeleteMeasurement([FromQuery] Guid Id, CancellationToken ct = default)
+        public async Task<ActionResult> DeleteMeasurement([FromQuery] Guid Id, CancellationToken ct = default)
         {
             var result = await _getMeasurement.DeleteMeasurementAsync(Id, ct);
             return result.Match(

@@ -33,7 +33,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Registers a new user account.")]
         [EndpointDescription("Creates a new user with the provided registration details and returns an access and refresh token if successful.")]
         [EndpointName("RegisterUser")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequest,
+        public async Task<ActionResult> Register([FromBody] RegisterRequest registerRequest,
                                          CancellationToken ct = default)
         {
             var result = await _registerHandler.Handle(registerRequest, ct);
@@ -50,7 +50,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Generates an access and refresh token for a valid user.")]
         [EndpointDescription("Authenticates a user using provided credentials and returns a JWT token pair.")]
         [EndpointName("GenerateToken")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest,
+        public async Task<ActionResult> Login([FromBody] LoginRequest loginRequest,
                                                CancellationToken ct = default)
         {
             var result = await _generateToken.Handle(loginRequest, ct);
@@ -68,7 +68,7 @@ namespace GymAssistant_API.Controllers
         [EndpointDescription("Exchanges an expired access token and a valid refresh token for a new token pair.")]
         [EndpointName("RefreshToken")]
 
-        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenQuery request, CancellationToken ct)
+        public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenQuery request, CancellationToken ct)
         {
             var result = await _refreshToken.Handle(request, ct);
             return result.Match(
@@ -84,7 +84,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Gets the current authenticated user's info.")]
         [EndpointDescription("Returns user information for the currently authenticated user based on the access token.")]
         [EndpointName("GetCurrentUserClaims")]
-        public async Task<IActionResult> GetCurrentUserInfo(CancellationToken ct)
+        public async Task<ActionResult> GetCurrentUserInfo(CancellationToken ct)
         {
             var result = await _getUserById.Handle(new GetUserByIdQuery(GetCurrentUserId()), ct);
 
@@ -99,7 +99,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Sends a password reset link to the user.")]
         [EndpointDescription("Accepts an email address, verifies the user exists, and sends a password reset link if successful.")]
         [EndpointName("ForgotPassword")]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto request,
+        public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordDto request,
                               CancellationToken ct = default)
         {
             var result = await _forgotPassword.Handle(request, ct);
@@ -115,7 +115,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Resets the user's password using a reset token.")]
         [EndpointDescription("Accepts a reset token, email, and new password to reset the user's password. Typically used after clicking the link sent by Forgot Password.")]
         [EndpointName("ResetPassword")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto request,
+        public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordDto request,
                                CancellationToken ct = default)
         {
             var result = await _resetPassword.Handle(request, ct);
@@ -134,7 +134,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Login or register using Google/Facebook")]
         [EndpointDescription("Authenticates or creates a user account using Google or Facebook credentials and returns JWT tokens.")]
         [EndpointName("ExternalLogin")]
-        public async Task<IActionResult> ExternalLogin(
+        public async Task<ActionResult> ExternalLogin(
             [FromBody] ExternalLoginDto request,
             [FromServices] ExternalLoginHandler externalLoginHandler,
             CancellationToken ct = default)
@@ -151,7 +151,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Get available external login providers")]
         [EndpointDescription("Returns a list of configured external authentication providers (Google, Facebook, etc.)")]
         [EndpointName("GetExternalProviders")]
-        public IActionResult GetExternalProviders()
+        public ActionResult GetExternalProviders()
         {
             var providers = new List<string> { "Google", "Facebook" };
             return Ok(providers);

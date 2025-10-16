@@ -45,7 +45,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves all trainees for the authenticated trainer.")]
         [EndpointDescription("Fetches a list of all trainees assigned to the current trainer.")]
         [EndpointName("GetTrainees")]
-        public async Task<IActionResult> GetTrainees(CancellationToken ct = default)
+        public async Task<ActionResult> GetTrainees(CancellationToken ct = default)
         {
             var result = await _handler.GetTrainees(GetCurrentUserId(), ct);
             return result.Match(
@@ -63,7 +63,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves a specific trainee for the authenticated trainer.")]
         [EndpointDescription("Fetches detailed information about the specified trainee.")]
         [EndpointName("GetTrainee")]
-        public async Task<IActionResult> GetTrainee([FromRoute] Guid traineeId, CancellationToken ct = default)
+        public async Task<ActionResult> GetTrainee([FromRoute] Guid traineeId, CancellationToken ct = default)
         {
             var result = await _handler.GetTrainee(GetCurrentUserId(), traineeId, ct);
             return result.Match(
@@ -81,7 +81,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Removes a trainee from the authenticated trainer.")]
         [EndpointDescription("Deletes the relationship between the trainer and the specified trainee.")]
         [EndpointName("RemoveTrainee")]
-        public async Task<IActionResult> RemoveTrainee([FromRoute] Guid traineeId, CancellationToken ct = default)
+        public async Task<ActionResult> RemoveTrainee([FromRoute] Guid traineeId, CancellationToken ct = default)
         {
             var result = await _handler.RemoveTrainee(GetCurrentUserId(), traineeId, ct);
             return result.Match(
@@ -99,7 +99,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Creates a workout session for a trainee.")]
         [EndpointDescription("Creates a new workout session for the specified trainee by the authenticated trainer.")]
         [EndpointName("CreateSessionForTrainee")]
-        public async Task<IActionResult> CreateSessionForTrainee([FromRoute] Guid traineeId,
+        public async Task<ActionResult> CreateSessionForTrainee([FromRoute] Guid traineeId,
                                                                  [FromQuery] DateTime date,
                                                                  [FromQuery] string? notes = null,
                                                                  CancellationToken ct = default)
@@ -120,7 +120,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves workout sessions for a trainee.")]
         [EndpointDescription("Fetches a paginated list of workout sessions for the specified trainee.")]
         [EndpointName("GetTraineeSessions")]
-        public async Task<IActionResult> GetTraineeSessions([FromRoute] Guid traineeId,
+        public async Task<ActionResult> GetTraineeSessions([FromRoute] Guid traineeId,
                                                             [FromQuery] int pageSize = 10,
                                                             [FromQuery] int pageNumber = 1,
                                                             CancellationToken ct = default)
@@ -141,7 +141,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves a specific workout session for a trainee.")]
         [EndpointDescription("Fetches detailed information about a specific workout session for the specified trainee.")]
         [EndpointName("GetTraineeSession")]
-        public async Task<IActionResult> GetTraineeSession([FromRoute] Guid traineeId,
+        public async Task<ActionResult> GetTraineeSession([FromRoute] Guid traineeId,
                                                            [FromRoute] Guid sectionId = default,
                                                            CancellationToken ct = default)
         {
@@ -161,7 +161,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves progress data for a trainee.")]
         [EndpointDescription("Fetches comprehensive progress information for the specified trainee over a given time period.")]
         [EndpointName("GetTraineeProgress")]
-        public async Task<IActionResult> GetTraineeProgress([FromRoute] Guid traineeId,
+        public async Task<ActionResult> GetTraineeProgress([FromRoute] Guid traineeId,
                                                             [FromQuery] int days = 30,
                                                             [FromQuery] Guid sectionId = default,
                                                             CancellationToken ct = default)
@@ -182,7 +182,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves dashboard data for the authenticated trainer.")]
         [EndpointDescription("Fetches comprehensive dashboard statistics and information for the current trainer.")]
         [EndpointName("GetTrainerDashboard")]
-        public async Task<IActionResult> GetTrainerDashboard(CancellationToken ct = default)
+        public async Task<ActionResult> GetTrainerDashboard(CancellationToken ct = default)
         {
             var result = await _handler.GetTrainerDashboard(GetCurrentUserId(), ct);
             return result.Match(

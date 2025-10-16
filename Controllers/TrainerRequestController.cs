@@ -46,7 +46,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Trainer gets all sent requests")]
         [EndpointDescription("Retrieves all requests sent by the authenticated trainer.")]
         [EndpointName("GetSentRequests")]
-        public async Task<IActionResult> GetSentRequests(
+        public async Task<ActionResult> GetSentRequests(
             [FromQuery] int pageSize = 10,
             [FromQuery] int pageNumber = 1,
             CancellationToken ct = default)
@@ -67,7 +67,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Trainer cancels a sent request")]
         [EndpointDescription("Allows a trainer to cancel a previously sent request.")]
         [EndpointName("CancelRequest")]
-        public async Task<IActionResult> CancelRequest(
+        public async Task<ActionResult> CancelRequest(
             [FromRoute] Guid requestId,
             CancellationToken ct)
         {
@@ -87,7 +87,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Trainee gets all received requests")]
         [EndpointDescription("Retrieves all requests received by the authenticated trainee.")]
         [EndpointName("GetReceivedRequests")]
-        public async Task<IActionResult> GetReceivedRequests(
+        public async Task<ActionResult> GetReceivedRequests(
             [FromQuery] int pageSize = 10,
             [FromQuery] int pageNumber = 1,
             CancellationToken ct = default)
@@ -108,7 +108,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Trainee accepts a received request")]
         [EndpointDescription("Allows a trainee to accept a received trainer request.")]
         [EndpointName("AcceptRequest")]
-        public async Task<IActionResult> AcceptRequest(
+        public async Task<ActionResult> AcceptRequest(
             [FromRoute] Guid requestId,
             CancellationToken ct)
         {
@@ -128,7 +128,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Trainee rejects a received request")]
         [EndpointDescription("Allows a trainee to reject a received trainer request.")]
         [EndpointName("RejectRequest")]
-        public async Task<IActionResult> RejectRequest(
+        public async Task<ActionResult> RejectRequest(
             [FromRoute] Guid requestId,
             CancellationToken ct)
         {
@@ -148,7 +148,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Get request by ID")]
         [EndpointDescription("Retrieves a specific trainer request by its ID.")]
         [EndpointName("GetRequestById")]
-        public async Task<IActionResult> GetRequestById(
+        public async Task<ActionResult> GetRequestById(
             [FromRoute] Guid requestId,
             CancellationToken ct)
         {
