@@ -44,7 +44,7 @@ namespace GymAssistant_API.Controllers
                 response => Ok(response),
                 Problem);
         }
-        [HttpPut("update-profile")]
+        [HttpPatch("update-profile")]
         [Consumes("application/x-www-form-urlencoded")]
         [Authorize]
         [ProducesResponseType(typeof(Result<ProfileResponse>), StatusCodes.Status200OK)]
@@ -112,7 +112,7 @@ namespace GymAssistant_API.Controllers
                 response => Ok(response),
                 Problem);
         }
-        [HttpPut("update-measurement")]
+        [HttpPatch("update-measurement")]
         [Authorize]
         [ProducesResponseType(typeof(Result<Updated>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -125,7 +125,14 @@ namespace GymAssistant_API.Controllers
                                                            [FromBody] UpdateMeasurementRequest request,
                                                            CancellationToken ct = default)
         {
-            var result = await _getMeasurement.UpdateMeasurementAsync(Id, request.WeightKg, request.BodyFatPercent, request.MuscleMassKg, ct);
+            var result = await _getMeasurement.UpdateMeasurementAsync(Id,
+                                                                      request.WeightKg,
+                                                                      request.WeightGoal,
+                                                                      request.BodyFatPercent,
+                                                                      request.BodyFatGoal,
+                                                                      request.MuscleMassKg,
+                                                                      request.MuscleMassGoal,
+                                                                      ct);
             return result.Match(
                 response => Ok(response),
                 Problem);
@@ -146,6 +153,24 @@ namespace GymAssistant_API.Controllers
                 response => Ok(response),
                 Problem);
         }
+        [HttpGet("measurement-cards")]
+        [Authorize]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [EndpointSummary("Retrieves measurement summary cards for the user.")]
+        [EndpointDescription("Fetches summary cards displaying key body measurement statistics for the authenticated user.")]
+        [EndpointName("GetUserMeasurementCards")]
+        public async Task<ActionResult> GetMeasurementCards(CancellationToken ct = default)
+        {
+            var result = await _getMeasurement.GetCards(GetCurrentUserId(), ct);
+            return result.Match(
+                response => Ok(response),
+                Problem);
+        }
+
 
 
 
