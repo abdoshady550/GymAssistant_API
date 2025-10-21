@@ -15,7 +15,7 @@ namespace GymAssistant_API.Handeler.User
         private readonly IProfile _profile = profile;
         private readonly AppDbContext _context = context;
 
-        public async Task<Result<Updated>> Handle(string id, UpdateProfileRequest request, CancellationToken ct = default)
+        public async Task<Result<ProfileResponse>> Handle(string id, UpdateProfileRequest request, CancellationToken ct = default)
         {
             var user = await _context.Users.FindAsync(id, ct);
             if (user == null)
@@ -28,30 +28,35 @@ namespace GymAssistant_API.Handeler.User
 
 
             var result = await _profile
-                .UpdateProfileAsync(updateProfile.Id,
+                                   .UpdateProfileAsync(updateProfile.Id,
                                     request.FirstName,
                                     request.LastName,
                                     request.Gender,
+                                    request.PhoneNumber,
                                     request.BirthDate,
                                     request.HeightCm, ct);
             if (result.IsError)
             {
                 _logger.LogError("Failed to update profile for user: {profileId}: {Error}", id, result.Errors);
                 return result.Errors;
-
             }
 
             var addMeasurements = await _profile
-          .AddBodyMeasurementAsync(id,
+                                  .AddBodyMeasurementAsync(id,
                                    request.WeightKg,
+                                   request.WeightGoal,
                                    request.MuscleMassKg,
-                                   request.BodyFatPercent, ct);
+                                   request.MuscleMassGoal,
+                                   request.BodyFatPercent,
+                                   request.BodyFatGoal
+                                   , ct);
             if (addMeasurements.IsError)
             {
                 _logger.LogError("Failed to add measurements for user {UserId}: {Error}", id, addMeasurements.Errors);
                 return addMeasurements.Errors;
             }
-            return Result.Updated;
+            var getProfile = await _profile.GetProfileAsync(id, ct);
+            return getProfile.Value;
 
         }
     }
