@@ -26,8 +26,12 @@ namespace GymAssistant_API.Handeler.User
             var addMeasurements = await _profile
                 .AddBodyMeasurementAsync(Id,
                                          measurementRequest.WeightKg,
+                                            measurementRequest.WeightGoal,
                                          measurementRequest.MuscleMassKg,
-                                         measurementRequest.BodyFatPercent, ct);
+                                            measurementRequest.MuscleMassGoal,
+                                         measurementRequest.BodyFatPercent,
+                                            measurementRequest.BodyFatGoal
+                                         , ct);
             if (addMeasurements.IsError)
             {
                 _logger.LogError("Failed to add measurements for user {UserId}: {Error}", Id, addMeasurements.Errors);
