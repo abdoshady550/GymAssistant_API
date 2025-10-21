@@ -2,6 +2,7 @@
 using GymAssistant_API.Handeler.Identity;
 using GymAssistant_API.Model.Identity.Dtos;
 using GymAssistant_API.Req_Res.Reqeust;
+using GymAssistant_API.Req_Res.Reqeust.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -15,7 +16,8 @@ namespace GymAssistant_API.Controllers
                                        GetUserByIdQueryHanlder GetUserById,
                                        RegisterHandler registerHandler,
                                        ForgotPasswordHandler forgotPassword,
-                                       ResetPasswordHandler resetPassword) : ApiController
+                                       ResetPasswordHandler resetPassword,
+                                       ChangePasswordHandler changePassword) : ApiController
     {
         private readonly GenerateTokenQueryHandler _generateToken = GenerateToken;
         private readonly RefreshTokenQueryHandler _refreshToken = RefreshToken;
@@ -23,8 +25,7 @@ namespace GymAssistant_API.Controllers
         private readonly RegisterHandler _registerHandler = registerHandler;
         private readonly ForgotPasswordHandler _forgotPassword = forgotPassword;
         private readonly ResetPasswordHandler _resetPassword = resetPassword;
-
-
+        private readonly ChangePasswordHandler _changePassword = changePassword;
 
         [HttpPost("register")]
         [ProducesResponseType(typeof(AppUserDto), StatusCodes.Status201Created)]
@@ -124,6 +125,23 @@ namespace GymAssistant_API.Controllers
                 response => Ok(response),
                 Problem);
         }
+        [HttpPost("change-password")]
+        [Authorize]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [EndpointSummary("Change password ")]
+        [EndpointDescription("Allows the authenticated user to change their password by providing the current and new passwords.")]
+        [EndpointName("ChangePassword")]
+        public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            var result = await _changePassword.Handle(GetCurrentUserId(), request);
+            return result.Match(
+                response => Ok(response),
+                Problem);
+        }
 
         // external authentication (Google, Facebook) 
 
@@ -155,6 +173,16 @@ namespace GymAssistant_API.Controllers
         {
             var providers = new List<string> { "Google", "Facebook" };
             return Ok(providers);
+        }
+        [HttpPost("update-seedin-users")]
+        [EndpointSummary("Secret")]
+
+        public async Task<ActionResult> UpdateSeedinUsers([FromQuery] string id, [FromBody] ChangeSeedingPasswordRequest request)
+        {
+            var result = await _changePassword.ChangeSeedingUsersPW(id, request);
+            return result.Match(
+                response => Ok(response),
+                Problem);
         }
         private string GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
     }
