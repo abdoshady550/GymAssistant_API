@@ -4,6 +4,7 @@ using GymAssistant_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,13 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GymAssistant_API.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251009182917_customEX_section_config")]
+    partial class customEX_section_config
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.10")
+                .HasAnnotation("ProductVersion", "9.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -60,15 +63,10 @@ namespace GymAssistant_API.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<Guid?>("SectionGroupId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("SectionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("SectionGroupId");
 
                     b.HasIndex("SectionId");
 
@@ -179,37 +177,6 @@ namespace GymAssistant_API.Data.Migrations
                     b.ToTable("Sections", (string)null);
                 });
 
-            modelBuilder.Entity("GymAssistant_API.Model.Entities.Exercise.SectionGroup", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ClientProfileId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("CreatedAtUtc")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("SectionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClientProfileId");
-
-                    b.HasIndex("SectionId");
-
-                    b.ToTable("SectionGroups");
-                });
-
             modelBuilder.Entity("GymAssistant_API.Model.Entities.Exercise.UserExercise", b =>
                 {
                     b.Property<Guid>("Id")
@@ -245,9 +212,6 @@ namespace GymAssistant_API.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<Guid?>("SectionGroupId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("SectionId")
                         .HasColumnType("uniqueidentifier");
 
@@ -258,8 +222,6 @@ namespace GymAssistant_API.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ClientProfileId");
-
-                    b.HasIndex("SectionGroupId");
 
                     b.HasIndex("SectionId");
 
@@ -339,103 +301,6 @@ namespace GymAssistant_API.Data.Migrations
                     b.ToTable("WorkoutSessions", (string)null);
                 });
 
-            modelBuilder.Entity("GymAssistant_API.Model.Entities.Notifications.DeviceToken", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("CreatedAtUtc")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset>("LastUsedUtc")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int>("Platform")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Token");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("UserId", "Token")
-                        .IsUnique();
-
-                    b.ToTable("DeviceTokens", (string)null);
-                });
-
-            modelBuilder.Entity("GymAssistant_API.Model.Entities.Notifications.Notification", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Body")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTimeOffset>("CreatedAtUtc")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Data")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSent")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("ReadAtUtc")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset?>("SentAtUtc")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedAtUtc");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("UserId", "IsRead");
-
-                    b.ToTable("Notifications", (string)null);
-                });
-
             modelBuilder.Entity("GymAssistant_API.Model.Entities.User.AppUser", b =>
                 {
                     b.Property<string>("Id")
@@ -507,10 +372,6 @@ namespace GymAssistant_API.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal?>("BodyFatGoal")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("decimal(10,2)");
-
                     b.Property<decimal?>("BodyFatPercent")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
@@ -521,10 +382,6 @@ namespace GymAssistant_API.Data.Migrations
                     b.Property<DateTimeOffset>("CreatedAtUtc")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<decimal?>("MuscleMassGoal")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("decimal(10,2)");
-
                     b.Property<decimal?>("MuscleMassKg")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
@@ -533,11 +390,7 @@ namespace GymAssistant_API.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("WeightGoal")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<decimal?>("WeightKg")
+                    b.Property<decimal>("WeightKg")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
 
@@ -852,11 +705,6 @@ namespace GymAssistant_API.Data.Migrations
 
             modelBuilder.Entity("GymAssistant_API.Model.Entities.Exercise.Exercise", b =>
                 {
-                    b.HasOne("GymAssistant_API.Model.Entities.Exercise.SectionGroup", "SectionGroup")
-                        .WithMany("Exercises")
-                        .HasForeignKey("SectionGroupId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("GymAssistant_API.Model.Entities.Exercise.Section", "Section")
                         .WithMany("Exercises")
                         .HasForeignKey("SectionId")
@@ -864,8 +712,6 @@ namespace GymAssistant_API.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Section");
-
-                    b.Navigation("SectionGroup");
                 });
 
             modelBuilder.Entity("GymAssistant_API.Model.Entities.Exercise.ExerciseSet", b =>
@@ -912,25 +758,6 @@ namespace GymAssistant_API.Data.Migrations
                     b.Navigation("WorkoutSession");
                 });
 
-            modelBuilder.Entity("GymAssistant_API.Model.Entities.Exercise.SectionGroup", b =>
-                {
-                    b.HasOne("GymAssistant_API.Model.Entities.User.ClientProfile", "User")
-                        .WithMany("SectionGroup")
-                        .HasForeignKey("ClientProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GymAssistant_API.Model.Entities.Exercise.Section", "Section")
-                        .WithMany("SectionGroup")
-                        .HasForeignKey("SectionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Section");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("GymAssistant_API.Model.Entities.Exercise.UserExercise", b =>
                 {
                     b.HasOne("GymAssistant_API.Model.Entities.User.ClientProfile", "User")
@@ -939,11 +766,6 @@ namespace GymAssistant_API.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymAssistant_API.Model.Entities.Exercise.SectionGroup", "SectionGroup")
-                        .WithMany("UserExercise")
-                        .HasForeignKey("SectionGroupId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("GymAssistant_API.Model.Entities.Exercise.Section", "Section")
                         .WithMany("UserExercise")
                         .HasForeignKey("SectionId")
@@ -951,8 +773,6 @@ namespace GymAssistant_API.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Section");
-
-                    b.Navigation("SectionGroup");
 
                     b.Navigation("User");
                 });
@@ -1122,15 +942,6 @@ namespace GymAssistant_API.Data.Migrations
                 {
                     b.Navigation("Exercises");
 
-                    b.Navigation("SectionGroup");
-
-                    b.Navigation("UserExercise");
-                });
-
-            modelBuilder.Entity("GymAssistant_API.Model.Entities.Exercise.SectionGroup", b =>
-                {
-                    b.Navigation("Exercises");
-
                     b.Navigation("UserExercise");
                 });
 
@@ -1156,8 +967,6 @@ namespace GymAssistant_API.Data.Migrations
                     b.Navigation("Measurements");
 
                     b.Navigation("PersonalRecords");
-
-                    b.Navigation("SectionGroup");
 
                     b.Navigation("Trainees");
 
