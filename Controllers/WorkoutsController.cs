@@ -92,7 +92,7 @@ namespace GymAssistant_API.Controllers
         public async Task<ActionResult> AddExerciseToWorkoutSession([FromQuery] Guid sessionId,
                                                                      [FromQuery] Guid? exerciseId = null,
                                                                      [FromQuery] Guid? userExerciseId = null,
-                                                                     [FromQuery] CancellationToken ct = default)
+                                                                      CancellationToken ct = default)
         {
             var result = await _workout.AddExerciseToWorkout(GetCurrentUserId(), sessionId, exerciseId, userExerciseId, ct);
             return result.Match(
@@ -107,9 +107,9 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves a workout exercise by its ID.")]
         [EndpointDescription("Fetches a workout exercise for the current user based on the provided exercise ID.")]
         [EndpointName("GetWorkoutExerciseById")]
-        public async Task<ActionResult> GetWorkoutExerciseById([FromQuery] Guid sessionId, [FromQuery] Guid exerciseId, CancellationToken ct = default)
+        public async Task<ActionResult> GetWorkoutExerciseById([FromQuery] Guid exerciseId, CancellationToken ct = default)
         {
-            var result = await _workout.GetWorkoutExercise(GetCurrentUserId(), sessionId, exerciseId, ct);
+            var result = await _workout.GetWorkoutExercise(GetCurrentUserId(), exerciseId, ct);
             return result.Match(
                 response => Ok(response),
                 Problem);
@@ -140,31 +140,27 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Retrieves an exercise set by its ID.")]
         [EndpointDescription("Fetches an exercise set for the current user based on the provided set ID.")]
         [EndpointName("GetExerciseSetById")]
-        public async Task<ActionResult> GetExerciseSetById([FromQuery] Guid sessionId,
-                                                            [FromQuery] Guid exerciseId,
-                                                            [FromQuery] Guid setId,
+        public async Task<ActionResult> GetExerciseSetById([FromQuery] Guid setId,
                                                             CancellationToken ct = default)
         {
-            var result = await _workout.GetExerciseSet(GetCurrentUserId(), sessionId, exerciseId, setId, ct);
+            var result = await _workout.GetExerciseSet(GetCurrentUserId(), setId, ct);
             return result.Match(
                 response => Ok(response),
                 Problem);
         }
-        [HttpPut("update-exercise-set")]
-        [ProducesResponseType(typeof(Result<Updated>), StatusCodes.Status200OK)]
+        [HttpPatch("update-exercise-set")]
+        [ProducesResponseType(typeof(Result<ExerciseSetRes>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [EndpointSummary("Updates an existing exercise set.")]
         [EndpointDescription("Updates the details of an existing exercise set for the current user.")]
         [EndpointName("UpdateExerciseSet")]
-        public async Task<ActionResult> UpdateExerciseSet([FromQuery] Guid sessionId,
-                                                           [FromQuery] Guid exerciseId,
-                                                           [FromQuery] Guid setId,
+        public async Task<ActionResult> UpdateExerciseSet([FromQuery] Guid setId,
                                                            [FromBody] UpdateExerciseSetRequest request,
                                                            CancellationToken ct = default)
         {
-            var result = await _workout.UpdateExerciseSet(GetCurrentUserId(), sessionId, exerciseId, setId, request, ct);
+            var result = await _workout.UpdateExerciseSet(GetCurrentUserId(), setId, request, ct);
             return result.Match(
                 response => Ok(response),
                 Problem);
