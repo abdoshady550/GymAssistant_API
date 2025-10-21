@@ -39,7 +39,7 @@ namespace GymAssistant_API.Controllers
                response => Ok(response),
                Problem);
         }
-        [HttpPut("update-custom-exercise")]
+        [HttpPatch("update-custom-exercise")]
         [Consumes("multipart/form-data")]
         [Authorize]
         [ProducesResponseType(typeof(Result<Updated>), StatusCodes.Status200OK)]
@@ -145,7 +145,7 @@ namespace GymAssistant_API.Controllers
                response => Ok(response),
                Problem);
         }
-        [HttpPut("update-exercises")]
+        [HttpPatch("update-exercises")]
         [Consumes("multipart/form-data")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(Result<Updated>), StatusCodes.Status200OK)]
@@ -291,7 +291,7 @@ namespace GymAssistant_API.Controllers
                response => Ok(response),
                Problem);
         }
-        [HttpPut("update-group")]
+        [HttpPatch("update-group")]
         [Authorize]
         [ProducesResponseType(typeof(Result<Updated>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
