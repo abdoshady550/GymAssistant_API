@@ -2,6 +2,7 @@
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Exercise;
 using GymAssistant_API.Repository.Services.Progress;
+using GymAssistant_API.Req_Res.Response.Progress;
 using GymAssistant_API.Req_Res.Response.Records;
 using Microsoft.AspNetCore.Mvc;
 
@@ -52,6 +53,17 @@ namespace GymAssistant_API.Handeler.Progress
             }
             return result.Value;
         }
+        public async Task<Result<StatesRes>> GetStatesAsync(string userId, CancellationToken ct = default)
+        {
+            var result = await _recordsService.GetStates(userId, ct);
+            if (result.IsError)
+            {
+                _logger.LogError("Error getting states for user {UserId}: {Errors}", userId, result.TopError.Description);
+                return result.Errors;
+            }
+            return result.Value;
+        }
+
         public async Task<Result<AchievementsData>> GetAchievements(string userId, DateTime? fromDate = null, DateTime? toDate = null, CancellationToken ct = default)
         {
             var result = await _recordsService.GetAchievementsAsync(userId, fromDate, toDate, ct);
