@@ -26,8 +26,11 @@ namespace GymAssistant_API.Handeler.User
             {
                 Id = m.Id,
                 WeightKg = m.WeightKg,
+                WeightGoal = m.WeightGoal,
                 MuscleMassKg = m.MuscleMassKg,
+                MuscleMassGoal = m.MuscleMassGoal,
                 BodyFatPercent = m.BodyFatPercent,
+                BodyFatGoal = m.BodyFatGoal,
                 CreatedAtUtc = m.CreatedAtUtc
             }).ToList();
             return dto;
@@ -46,12 +49,16 @@ namespace GymAssistant_API.Handeler.User
             return result.Value;
         }
         public async Task<Result<Updated>> UpdateMeasurementAsync(Guid Id,
-                                                                      decimal weightKg,
+                                                                      decimal? weightKg = null,
+                                                                      decimal? weightGoal = null,
                                                                       decimal? bodyFatPercent = null,
-                                                                      decimal? muscleMassKg = null, CancellationToken ct = default)
+                                                                      decimal? bodyFatGoal = null,
+                                                                      decimal? muscleMassKg = null,
+                                                                      decimal? muscleMassGoal = null
+                                                                      , CancellationToken ct = default)
         {
             logger.LogInformation("Updating measurement for Measurement {MeasurementId}", Id);
-            var result = await _profile.UpdateBodyMeasurementAsync(Id, weightKg, bodyFatPercent, muscleMassKg, ct);
+            var result = await _profile.UpdateBodyMeasurementAsync(Id, weightKg, weightGoal, bodyFatPercent, bodyFatGoal, muscleMassKg, muscleMassGoal, ct);
             if (result.IsError)
             {
                 logger.LogError("Failed to update measurement {MeasurementId}: {Errors}", Id, string.Join(", ", result.Errors.Select(e => e.Description)));
@@ -70,6 +77,17 @@ namespace GymAssistant_API.Handeler.User
             }
             return Result.Deleted;
 
+        }
+        public async Task<Result<object>> GetCards(string userId, CancellationToken ct)
+        {
+            logger.LogInformation("Getting measurement cards");
+            var result = await _profile.GetMeasurementCardsAsync(userId, ct);
+            if (result.IsError)
+            {
+                logger.LogError("Failed to get measurement cards: {Errors}", string.Join(", ", result.Errors.Select(e => e.Description)));
+                return result.Errors;
+            }
+            return result.Value;
         }
     }
 }
