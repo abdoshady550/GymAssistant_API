@@ -1,4 +1,5 @@
 using GymAssistant_API.Model.Entities.Exercise;
+using GymAssistant_API.Model.Entities.Notifications;
 using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -23,9 +24,14 @@ namespace GymAssistant_API.Data
         public DbSet<Exercise> Exercises => Set<Exercise>();
         public DbSet<UserExercise> UserExercises => Set<UserExercise>();
         public DbSet<Section> Sections => Set<Section>();
+        public DbSet<SectionGroup> SectionGroups => Set<SectionGroup>();
         public DbSet<PersonalRecord> PersonalRecords => Set<PersonalRecord>();
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
         public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
+        public DbSet<DeviceToken> DeviceTokens => Set<DeviceToken>();
+
+        public DbSet<Notification> Notifications => Set<Notification>();
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
