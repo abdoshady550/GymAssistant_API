@@ -12,7 +12,7 @@ namespace GymAssistant_API.Data.Configurations
 
             builder.HasKey(b => b.Id);
 
-            builder.Property(b => b.WeightKg).IsRequired();
+            builder.Property(b => b.WeightKg).IsRequired(false);
         }
     }
 }
