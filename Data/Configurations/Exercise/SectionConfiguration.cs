@@ -13,6 +13,11 @@ namespace GymAssistant_API.Data.Configurations
             builder.HasKey(s => s.Id);
 
             builder.Property(s => s.Name).IsRequired().HasMaxLength(200);
+
+            builder.HasMany(e => e.SectionGroup)
+                    .WithOne(s => s.Section)
+                    .HasForeignKey(e => e.SectionId)
+                    .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
