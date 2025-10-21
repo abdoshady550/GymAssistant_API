@@ -82,15 +82,15 @@ namespace GymAssistant_API.Handeler.Exercise.Workout
             _logger.LogInformation("Successfully added exercise to workout session with ID: {WorkoutSessionId} for user ID: {UserId}", sessionId, userId);
             return result;
         }
-        public async Task<Result<WorkoutExerciseRes>> GetWorkoutExercise(string userId, Guid sessionId, Guid exerciseId, CancellationToken ct = default)
+        public async Task<Result<WorkoutExerciseRes>> GetWorkoutExercise(string userId, Guid exerciseId, CancellationToken ct = default)
         {
-            var result = await _workoutService.GetWorkoutExerciseAsync(userId, sessionId, exerciseId, ct);
+            var result = await _workoutService.GetWorkoutExerciseAsync(userId, exerciseId, ct);
             if (result.IsError)
             {
-                _logger.LogError("Error retrieving workout exercise with ID: {ExerciseId} in session ID: {WorkoutSessionId} for user ID: {UserId}. Error: {Error}", exerciseId, sessionId, userId, result.Errors);
+                _logger.LogError("Error retrieving workout exercise with ID: {ExerciseId} for user ID: {UserId}. Error: {Error}", exerciseId, userId, result.Errors);
                 return result.Errors;
             }
-            _logger.LogInformation("Successfully retrieved workout exercise with ID: {ExerciseId} in session ID: {WorkoutSessionId} for user ID: {UserId}", exerciseId, sessionId, userId);
+            _logger.LogInformation("Successfully retrieved workout exercise with ID: {ExerciseId} for user ID: {UserId}", exerciseId, userId);
             return result;
         }
         public async Task<Result<ExerciseSetRes>> AddSetToExercise(string userId, Guid sessionId, Guid exerciseId, AddExerciseSetRequest request, CancellationToken ct = default)
@@ -111,23 +111,21 @@ namespace GymAssistant_API.Handeler.Exercise.Workout
             _logger.LogInformation("Successfully added set to exercise with ID: {ExerciseId} in session ID: {WorkoutSessionId} for user ID: {UserId}", exerciseId, sessionId, userId);
             return result;
         }
-        public async Task<Result<ExerciseSetRes>> GetExerciseSet(string userId, Guid sessionId, Guid exerciseId, Guid setId, CancellationToken ct = default)
+        public async Task<Result<ExerciseSetRes>> GetExerciseSet(string userId, Guid setId, CancellationToken ct = default)
         {
-            var result = await _workoutService.GetExerciseSetAsync(userId, sessionId, exerciseId, setId, ct);
+            var result = await _workoutService.GetExerciseSetAsync(userId, setId, ct);
             if (result.IsError)
             {
-                _logger.LogError("Error retrieving exercise set with ID: {SetId} for exercise ID: {ExerciseId} in session ID: {WorkoutSessionId} for user ID: {UserId}. Error: {Error}", setId, exerciseId, sessionId, userId, result.Errors);
+                _logger.LogError("Error retrieving exercise set with ID: {SetId}for user ID: {UserId}. Error: {Error}", setId, userId, result.Errors);
                 return result.Errors;
             }
-            _logger.LogInformation("Successfully retrieved exercise set with ID: {SetId} for exercise ID: {ExerciseId} in session ID: {WorkoutSessionId} for user ID: {UserId}", setId, exerciseId, sessionId, userId);
+            _logger.LogInformation("Successfully retrieved exercise set with ID: {SetId} for user ID: {UserId}", setId, userId);
             return result;
 
         }
-        public async Task<Result<Updated>> UpdateExerciseSet(string userId, Guid sessionId, Guid exerciseId, Guid setId, UpdateExerciseSetRequest request, CancellationToken ct = default)
+        public async Task<Result<ExerciseSetRes>> UpdateExerciseSet(string userId, Guid setId, UpdateExerciseSetRequest request, CancellationToken ct = default)
         {
             var result = await _workoutService.UpdateExerciseSetAsync(userId,
-                                                                      sessionId,
-                                                                      exerciseId,
                                                                       setId,
                                                                       request.Reps,
                                                                       request.WeightKg,
@@ -135,11 +133,11 @@ namespace GymAssistant_API.Handeler.Exercise.Workout
                                                                       request.Notes, ct);
             if (result.IsError)
             {
-                _logger.LogError("Error updating exercise set with ID: {SetId} for exercise ID: {ExerciseId} in session ID: {WorkoutSessionId} for user ID: {UserId}. Error: {Error}", setId, exerciseId, sessionId, userId, result.Errors);
+                _logger.LogError("Error updating exercise set with ID: {SetId}  for user ID: {UserId}. Error: {Error}", setId, userId, result.Errors);
                 return result.Errors;
             }
-            _logger.LogInformation("Successfully updated exercise set with ID: {SetId} for exercise ID: {ExerciseId} in session ID: {WorkoutSessionId} for user ID: {UserId}", setId, exerciseId, sessionId, userId);
-            return Result.Updated;
+            _logger.LogInformation("Successfully updated exercise set with ID: {SetId} for for user ID: {UserId}", setId, userId);
+            return result.Value;
         }
         public async Task<Result<List<WorkoutSessionRes>>> GetWorkoutHistory(string userId,
                                                                           int pageSize = 20,
