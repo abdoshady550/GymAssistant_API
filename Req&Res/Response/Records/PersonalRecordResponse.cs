@@ -9,6 +9,7 @@ namespace GymAssistant_API.Req_Res.Response.Records
         public Guid Id { get; set; }
         public Guid ClientProfileId { get; set; }
         public Guid? ExerciseId { get; set; }
+
         public Guid? UserExerciseId { get; set; }
         public RecordType RecordType { get; set; }
         public decimal Value { get; set; }
