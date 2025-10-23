@@ -4,6 +4,7 @@ using GymAssistant_API.Handeler.Exercise;
 using GymAssistant_API.Handeler.Exercise.Workout;
 using GymAssistant_API.Handeler.Identity;
 using GymAssistant_API.Handeler.Identity.Trainer;
+using GymAssistant_API.Handeler.Notifications;
 using GymAssistant_API.Handeler.Progress;
 using GymAssistant_API.Handeler.User;
 using GymAssistant_API.Infrastructure;
@@ -13,11 +14,13 @@ using GymAssistant_API.Repository.Interfaces.Exercise;
 using GymAssistant_API.Repository.Interfaces.ExerciseExercises;
 using GymAssistant_API.Repository.Interfaces.Exercises;
 using GymAssistant_API.Repository.Interfaces.Identity;
+using GymAssistant_API.Repository.Interfaces.Notifications;
 using GymAssistant_API.Repository.Interfaces.User;
 using GymAssistant_API.Repository.Interfaces.User.Trainer;
 using GymAssistant_API.Repository.Services.Exercise;
 using GymAssistant_API.Repository.Services.Exercises;
 using GymAssistant_API.Repository.Services.Identity;
+using GymAssistant_API.Repository.Services.Notifications;
 using GymAssistant_API.Repository.Services.Progress;
 using GymAssistant_API.Repository.Services.User;
 using GymAssistant_API.Repository.Services.User.Trainer;
@@ -167,10 +170,9 @@ builder.Services.AddScoped<ProgressHandler>();             // Handler
 builder.Services.AddScoped<RecordsHandler>();             // Handler
 builder.Services.AddScoped<TrainerHandler>();            // Handler
 builder.Services.AddScoped<TrainerRequestHandler>();    // Handler
-builder.Services.AddScoped<ExternalLoginHandler>();
-
-
-
+builder.Services.AddScoped<ExternalLoginHandler>();    // Handler
+builder.Services.AddScoped<ChangePasswordHandler>();  // Handler
+builder.Services.AddScoped<NotificationsHandler>();  // Handler
 
 
 
@@ -181,13 +183,15 @@ builder.Services.AddScoped<IProfile, ProfileService>();                         
 builder.Services.AddScoped<IExercise, ExerciseService>();                         // Service
 builder.Services.AddScoped<IWorkoutService, WorkoutService>();                   // Service
 builder.Services.AddScoped<IPersonalRecordService, PersonalRecordService>();    // Service
-builder.Services.AddScoped<IProgressService, ProgressService>();               // Repository
-builder.Services.AddScoped<IRecordsService, RecordsService>();                // Repository
-builder.Services.AddScoped<ITrainerService, TrainerService>();               // Repository
-builder.Services.AddScoped<ITrainerRequestService, TrainerRequestService>();// Repository
+builder.Services.AddScoped<IProgressService, ProgressService>();               // Service
+builder.Services.AddScoped<IRecordsService, RecordsService>();                // Service
+builder.Services.AddScoped<ITrainerService, TrainerService>();               // Service
+builder.Services.AddScoped<ITrainerRequestService, TrainerRequestService>();// Service
+builder.Services.AddScoped<IPushNotificationService, PushNotificationService>();// Service
 
 
-
+/// Background service for scheduled notifications
+builder.Services.AddHostedService<NotificationBackgroundService>();
 
 builder.Services.AddOpenApi(options =>
 {
