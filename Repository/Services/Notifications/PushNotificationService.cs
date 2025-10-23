@@ -7,8 +7,6 @@ using GymAssistant_API.Model.Entities.Notifications.Dtos.Res;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Notifications;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
-using System;
 using System.Text.Json;
 
 
