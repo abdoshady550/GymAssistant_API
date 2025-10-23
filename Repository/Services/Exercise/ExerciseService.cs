@@ -4,9 +4,7 @@ using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.ExerciseExercises;
 using GymAssistant_API.Req_Res.Response;
 using GymAssistant_API.Req_Res.Response.Exercise;
-using MailKit.Search;
 using Microsoft.EntityFrameworkCore;
-using static System.Collections.Specialized.BitVector32;
 using ExerciseEntity = GymAssistant_API.Model.Entities.Exercise.Exercise;
 
 namespace GymAssistant_API.Repository.Services.Exercises
@@ -90,18 +88,18 @@ namespace GymAssistant_API.Repository.Services.Exercises
 
             await _context.SaveChangesAsync(ct);
             var dto = new CustomExerciseRes(
-                exercise.Id,
-                exercise.UserId,
-                exercise.SectionId,
-                exercise.Name,
-                exercise.Description,
-                exercise.Instructions,
-                exercise.Equipment,
-                exercise.ImageUrl,
-                exercise.IsCustomExercise,
-                exercise.CreatedAtUtc,
-                exercise.DifficultyLevel
-
+        exercise.Id,
+        exercise.UserId,
+        exercise.SectionId,
+        section.Name,
+        exercise.Name,
+        exercise.Description,
+        exercise.Instructions,
+        exercise.Equipment,
+        exercise.ImageUrl,
+        exercise.IsCustomExercise,
+        exercise.CreatedAtUtc,
+        exercise.DifficultyLevel
     );
             return dto;
         }
@@ -202,31 +200,20 @@ namespace GymAssistant_API.Repository.Services.Exercises
 
         public async Task<Result<CustomExerciseRes>> GetCustomExerciseAsync(string userId, Guid exerciseId, CancellationToken ct = default)
         {
-            var exercise = await _context.UserExercises
+            var exercise = await _context.UserExercises.Include(e => e.Section)
                 .FirstOrDefaultAsync(e => e.Id == exerciseId && e.UserId == userId, ct);
 
             if (exercise == null)
             {
                 return Error.NotFound("Exercise_NotFound", "Custom exercise not found.");
             }
-            var dto = new CustomExerciseRes(
-                exercise.Id,
-                exercise.UserId,
-                exercise.SectionId,
-                exercise.Name,
-                exercise.Description,
-                exercise.Instructions,
-                exercise.Equipment,
-                exercise.ImageUrl,
-                exercise.IsCustomExercise,
-                exercise.CreatedAtUtc,
-                exercise.DifficultyLevel);
+            var dto = CustomExerciseRes.FromEntity(exercise);
             return dto;
         }
 
         public async Task<Result<List<CustomExerciseRes>>> GetCustomExercisesAsync(string userId, DifficultyLevel? difficulty = null, CancellationToken ct = default)
         {
-            var query = _context.UserExercises
+            var query = _context.UserExercises.Include(u => u.Section)
                       .Where(e => e.UserId == userId);
 
 
@@ -236,22 +223,10 @@ namespace GymAssistant_API.Repository.Services.Exercises
             }
 
 
-            var result = await query
+            var result = query
                 .OrderBy(e => e.Name)
-                .Select(e => new CustomExerciseRes(
-                    e.Id,
-                    e.UserId,
-                    e.SectionId,
-                    e.Name,
-                    e.Description,
-                    e.Instructions,
-                    e.Equipment,
-                    e.ImageUrl,
-                    e.IsCustomExercise,
-                    e.CreatedAtUtc,
-                    e.DifficultyLevel
-                ))
-                .ToListAsync(ct);
+                .Select(CustomExerciseRes.FromEntity).ToList();
+
             return result;
         }
 
@@ -309,6 +284,7 @@ namespace GymAssistant_API.Repository.Services.Exercises
             var dto = new ExerciseResponse(
                 exercise.Id,
                 exercise.SectionId,
+                section.Name,
                 exercise.Name,
                 exercise.Description,
                 exercise.Instructions,
@@ -426,25 +402,15 @@ namespace GymAssistant_API.Repository.Services.Exercises
             {
                 return Error.NotFound("Exercise_NotFound", "Exercise not found.");
             }
-            var dto = new ExerciseResponse(
-                exercise.Id,
-                exercise.SectionId,
-                exercise.Name,
-                exercise.Description,
-                exercise.Instructions,
-                exercise.Equipment,
-                exercise.ImageUrl,
-                exercise.DifficultyLevel
-
-            );
+            var dto = ExerciseResponse.FromEntity(exercise);
             return dto;
         }
         public async Task<Result<ExercisesResponse>> GetExercisesBySectionAsync(string userId, Guid sectionId, string? searchTerm = null, DifficultyLevel? difficulty = null, CancellationToken ct = default)
         {
-            var query = _context.Exercises
+            var query = _context.Exercises.Include(e => e.Section)
         .Where(e => e.SectionId == sectionId);
 
-            var querycustom = _context.UserExercises
+            var querycustom = _context.UserExercises.Include(e => e.Section)
                 .Where(e => e.SectionId == sectionId && e.UserId == userId);
 
 
@@ -467,57 +433,37 @@ namespace GymAssistant_API.Repository.Services.Exercises
                     e.Description.ToLower().Contains(search));
             }
 
-            var exercises = await query
+            var exercises = query
                 .OrderBy(e => e.Name)
-                .Select(e => new ExerciseResponse(
-                    e.Id,
-                    e.SectionId,
-                    e.Name,
-                    e.Description,
-                    e.Instructions,
-                    e.Equipment,
-                    e.ImageUrl,
-                    e.DifficultyLevel,
-                    e.DefaultSets,
-                    e.DefaultReps,
-                    e.CreatedAtUtc,
-                    e.IsCustomExercise
-                ))
-                .ToListAsync(ct);
+                .Select(ExerciseResponse.FromEntity)
+                .ToList();
 
-            var customExercises = await querycustom
+            var customExercises = querycustom
                 .OrderBy(e => e.Name)
-                .Select(e => new CustomExerciseRes(
-                    e.Id,
-                    e.UserId,
-                    e.SectionId,
-                    e.Name,
-                    e.Description,
-                    e.Instructions,
-                    e.Equipment,
-                    e.ImageUrl,
-                    e.IsCustomExercise,
-                    e.CreatedAtUtc,
-                    e.DifficultyLevel
-                ))
-                .ToListAsync(ct);
+                .Select(CustomExerciseRes.FromEntity).ToList();
 
             return new ExercisesResponse(exercises, customExercises);
         }
 
-        public async Task<Result<List<SectionResponse>>> GetSectionsAsync(CancellationToken ct = default)
+        public async Task<Result<List<SectionResponse>>> GetSectionsAsync(string userId, CancellationToken ct = default)
         {
+            var profile = await _context.ClientProfiles
+                .FirstOrDefaultAsync(p => p.AppUserId == userId, ct);
+            if (profile == null)
+            {
+                return Error.NotFound("Profile_NotFound", "User profile not found.");
+            }
             var sections = await _context.Sections
-                     .Include(s => s.Exercises)
-                     .Include(s => s.UserExercise)
-                     .Include(s => s.SectionGroup)
-                        .ThenInclude(s => s.Exercises)
-                     .Include(s => s.SectionGroup)
-                        .ThenInclude(s => s.UserExercise)
-                     .OrderBy(s => s.Name)
-                     .ToListAsync(ct);
+                 .Include(s => s.Exercises)
+                 .Include(s => s.UserExercise)
+                 .Include(s => s.SectionGroup)
+                    .ThenInclude(s => s.Exercises)
+                .Include(s => s.SectionGroup)
+                     .ThenInclude(sg => sg.UserExercise)
+                 .OrderBy(s => s.Name)
+                 .ToListAsync(ct);
             return sections
-                .Select(SectionResponse.FromEntity).ToList();
+                .Select(s => SectionResponse.FromEntity(userId, s)).ToList();
         }
         public async Task<Result<SectionResponse>> GetSectionByIdAsync(string userId, Guid sectionId, CancellationToken ct = default)
         {
@@ -526,7 +472,7 @@ namespace GymAssistant_API.Repository.Services.Exercises
             {
                 return Error.NotFound("Section_Not_Found", $"this section with{sectionId} not found");
             }
-            var result = SectionResponse.FromEntity(section);
+            var result = SectionResponse.FromEntity(userId, section);
 
             return result;
         }
@@ -582,13 +528,14 @@ namespace GymAssistant_API.Repository.Services.Exercises
             {
                 return Error.NotFound("Profile_NotFound", "User profile not found.");
             }
-            var group = await _context.SectionGroups.FindAsync(groupId, ct);
+            var group = await _context.SectionGroups
+                .Include(s => s.Exercises)
+                .Include(s => s.UserExercise)
+                .FirstOrDefaultAsync(s => s.Id == groupId, ct);
             if (group == null)
             {
                 return Error.NotFound("Group_NotFound", "User Group not found.");
             }
-
-
 
             ExerciseEntity? exercise = null;
 
@@ -598,6 +545,10 @@ namespace GymAssistant_API.Repository.Services.Exercises
                 if (exercise == null)
                 {
                     return Error.NotFound("Exercise_NotFound", $"Exercise with ID {exerciseId.Value} not found.");
+                }
+                if (group.Exercises.Any(e => e.Id == exercise.Id))
+                {
+                    return Error.Conflict("Exercise_AlreadyInGroup", "Exercise is already in the group.");
                 }
                 group.AddExercise(exercise);
             }
@@ -609,6 +560,10 @@ namespace GymAssistant_API.Repository.Services.Exercises
                 if (customExercise == null)
                 {
                     return Error.NotFound("Exercise_NotFound", $"Exercise with ID {customExerciseId.Value} not found.");
+                }
+                if (group.UserExercise.Any(e => e.Id == customExercise.Id))
+                {
+                    return Error.Conflict("Exercise_AlreadyInGroup", "Exercise is already in the group.");
                 }
                 group.AddUserExercise(customExercise);
 
