@@ -6,34 +6,41 @@ namespace GymAssistant_API.Req_Res.Reqeust
     public record UpdateProfileRequest(
 
         [StringLength(50)]
-        string FirstName,
+        string? FirstName=default,
 
 
         [StringLength(50)]
-        string LastName,
+        string ? LastName=default,
 
 
         [EnumDataType(typeof(Gender))]
-        Gender Gender,
+        Gender ?Gender=default,
         [StringLength(50)]
-        string? PhoneNumber,
+        string? PhoneNumber=default,
 
         [DataType(DataType.Date)]
-        DateTime? BirthDate,
+        DateTime? BirthDate=default,
 
         [Range(50, 300, ErrorMessage = "Height must be between 50 and 300 cm")]
-        int? HeightCm,
+        int? HeightCm = default,
 
 
         [Range(20, 400, ErrorMessage = "Weight must be between 20 and 400 kg")]
-        decimal WeightKg,
+        decimal? WeightKg    =default,
+
+        [Range(20, 400, ErrorMessage = "Weight must be between 20 and 400 kg")]
+        decimal? WeightGoal   =default,
+
 
         [Range(0, 100, ErrorMessage = "Body fat percentage must be between 0 and 100")]
-        decimal? BodyFatPercent = null,
+        decimal? BodyFatPercent = default,
+           [Range(0, 100, ErrorMessage = "Body fat percentage must be between 0 and 100")]
+        decimal? BodyFatGoal = default,
 
         [Range(10, 200, ErrorMessage = "Muscle mass must be between 10 and 200 kg")]
-        decimal? MuscleMassKg = null
-
+        decimal? MuscleMassKg = default,
+           [Range(10, 200, ErrorMessage = "Muscle mass must be between 10 and 200 kg")]
+        decimal? MuscleMassGoal = default
         );
 
 
