@@ -72,7 +72,7 @@ namespace GymAssistant_API.Model.Entities.Exercise
             return new UserExercise(id, userId, sectionId, name, description, Instructions, Equipment, ImageUrl, difficultyLevel);
         }
         public Result<Updated> Update(Guid? sectionId,
-                                                  string name,
+                                                  string? name = null,
                                                   string? description = null,
                                                   string? instructions = null,
                                                   string? equipment = null,
@@ -81,12 +81,33 @@ namespace GymAssistant_API.Model.Entities.Exercise
         {
             if (sectionId.HasValue)
                 SectionId = sectionId.Value;
-            Name = name;
-            Description = description;
-            Instructions = instructions;
-            Equipment = equipment;
-            ImageUrl = imageUrl;
-            DifficultyLevel = difficultyLevel;
+            if (!string.IsNullOrEmpty(name))
+            {
+                Name = name;
+            }
+            if (!string.IsNullOrEmpty(description))
+            {
+                Description = description;
+            }
+            if (!string.IsNullOrEmpty(instructions))
+            {
+                Instructions = instructions;
+            }
+            if (!string.IsNullOrEmpty(equipment))
+            {
+                Equipment = equipment;
+
+            }
+            if (!string.IsNullOrEmpty(imageUrl))
+            {
+                ImageUrl = imageUrl;
+
+            }
+            if (difficultyLevel.HasValue)
+            {
+                DifficultyLevel = difficultyLevel.Value;
+
+            }
 
 
             return Result.Updated;
