@@ -5,8 +5,13 @@ namespace GymAssistant_API.Req_Res.Response.Exercise
     public sealed record WorkoutExerciseRes(
         Guid Id,
         Guid WorkoutSessionId,
+        string SectionName,
         Guid? ExerciseId,
+        string? ExerciseName,
         Guid? UserExerciseId,
+        string? UserExerciseName,
+
+
         Guid ClientProfileId,
         IReadOnlyCollection<ExerciseSetRes> Sets
     )
@@ -16,8 +21,11 @@ namespace GymAssistant_API.Req_Res.Response.Exercise
             return new WorkoutExerciseRes(
                 entity.Id,
                 entity.WorkoutSessionId,
+                entity.Exercise?.Section.Name ?? entity.UserExercise?.Section.Name ?? string.Empty,
                 entity.ExerciseId,
+                entity.Exercise?.Name,
                 entity.UserExerciseId,
+                entity.UserExercise?.Name,
                 entity.ClientProfileId,
                 entity.Sets.Select(ExerciseSetRes.FromEntity).ToList()
             );
