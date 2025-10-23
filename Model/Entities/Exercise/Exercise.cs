@@ -68,10 +68,15 @@ namespace GymAssistant_API.Model.Entities.Exercise
                                         equipment, difficultyLevel, defaultSets, defaultReps);
             return exercise;
         }
-        public Result<Updated> Update(Guid? sectionId, string? name, string? description,
-                                     string? instructions, string? imageUrl,
-                                     string? equipment, DifficultyLevel? difficultyLevel,
-                                     int? defaultSets, int? defaultReps)
+        public Result<Updated> Update(Guid? sectionId,
+                                      string? name,
+                                      string? description,
+                                      string? instructions,
+                                      string? imageUrl,
+                                      string? equipment,
+                                      DifficultyLevel? difficultyLevel,
+                                      int? defaultSets,
+                                      int? defaultReps)
         {
 
 
@@ -85,14 +90,42 @@ namespace GymAssistant_API.Model.Entities.Exercise
             }
             if (sectionId.HasValue)
                 SectionId = sectionId.Value;
-            Name = name;
-            Description = description;
-            Instructions = instructions;
-            ImageUrl = imageUrl;
-            Equipment = equipment;
-            DifficultyLevel = difficultyLevel;
-            DefaultSets = defaultSets;
-            DefaultReps = defaultReps;
+            if (!string.IsNullOrEmpty(name))
+            {
+                Name = name;
+            }
+            if (!string.IsNullOrEmpty(description))
+            {
+                Description = description;
+            }
+            if (!string.IsNullOrEmpty(instructions))
+            {
+                Instructions = instructions;
+            }
+            if (!string.IsNullOrEmpty(equipment))
+            {
+                Equipment = equipment;
+
+            }
+            if (!string.IsNullOrEmpty(imageUrl))
+            {
+                ImageUrl = imageUrl;
+
+            }
+            if (difficultyLevel.HasValue)
+            {
+                DifficultyLevel = difficultyLevel.Value;
+
+            }
+            if (defaultSets.HasValue)
+            {
+                DefaultSets = defaultSets;
+            }
+            if (defaultReps.HasValue)
+            {
+                DefaultReps = defaultReps;
+            }
+
             return Result.Updated;
         }
 
