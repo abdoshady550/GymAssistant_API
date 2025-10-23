@@ -15,8 +15,12 @@ namespace GymAssistant_API.Req_Res.Response.Exercise
 
    )
     {
-        public static SectionResponse FromEntity(Section section)
+        public static SectionResponse FromEntity(string userId, Section section)
         {
+            var userCustomExercises = section.UserExercise
+                                    .Where(u => u.UserId == userId)
+                                    .Count();
+
             return new SectionResponse(
                 section.Id,
                 section.Name,
@@ -24,7 +28,7 @@ namespace GymAssistant_API.Req_Res.Response.Exercise
                 section.SectionGroup.Select(SectionGroupResponse.FromEntity).ToList(),
                 section.CreatedAtUtc,
                 section.Exercises.Count(),
-                section.UserExercise.Count(),
+                userCustomExercises,
                 section.Exercises.Count() + section.UserExercise.Count()
                 );
         }
