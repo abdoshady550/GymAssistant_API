@@ -5,6 +5,7 @@ using GymAssistant_API.Repository.Interfaces.Exercise;
 using GymAssistant_API.Req_Res.Response.Progress;
 using GymAssistant_API.Req_Res.Response.Records;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace GymAssistant_API.Repository.Services.Progress
 {
@@ -141,6 +142,9 @@ namespace GymAssistant_API.Repository.Services.Progress
             }
 
             var records = await query
+                .Include(r => r.WorkoutSession)
+                         .ThenInclude(Wo => Wo.WorkoutExercises)
+                         .ThenInclude(we => we.Sets)
                 .Include(pr => pr.Exercise)
                     .ThenInclude(e => e.Section)
                 .Include(pr => pr.UserExercise)
@@ -154,17 +158,18 @@ namespace GymAssistant_API.Repository.Services.Progress
                 RepsRecords = records.Count(r => r.RecordType == RecordType.MaxReps),
                 VolumeRecords = records.Count(r => r.RecordType == RecordType.MaxVolume),
                 RecentRecords = records.OrderByDescending(r => r.CreatedAtUtc).Take(5).Select(r => r.ToResponse()).ToList(),
-                RecordsBySection = records.Where(r => r.Exercise != null)
-                                        .GroupBy(r => r.Exercise.Section.Name)
-                                        .Select(g => new SectionAchievement
-                                        {
-                                            SectionName = g.Key,
-                                            RecordCount = g.Count(),
-                                            LatestRecord = g.Max(r => r.CreatedAtUtc)
-                                        })
-                                        .OrderByDescending(sa => sa.RecordCount)
-                                        .ToList(),
-                Milestones = CalculateMilestones(records)
+                RecordsBySection = records
+                                   .Where(r => r.Exercise != null)
+                                   .GroupBy(r => r.Exercise.Section.Name)
+                                   .Select(g => new SectionAchievement
+                                   {
+                                       SectionName = g.Key,
+                                       RecordCount = g.Count(),
+                                       LatestRecord = g.Any() ? g.Max(r => r.CreatedAtUtc) : default
+                                   })
+                                   .OrderByDescending(sa => sa.RecordCount)
+                                   .ToList(),
+                Milestones = await CalculateMilestones(records)
             };
 
             return achievements;
@@ -236,13 +241,14 @@ namespace GymAssistant_API.Repository.Services.Progress
                                   personalBestVolume);
         }
 
-        private List<Milestone> CalculateMilestones(List<PersonalRecord> records)
+        private async Task<List<Milestone>> CalculateMilestones(List<PersonalRecord> records)
         {
             var milestones = new List<Milestone>();
 
             // Weight milestones (every 10kg increment)
-            var maxWeight = records.Where(r => r.RecordType == RecordType.MaxWeight)
-                                  .Max(r => r.Value);
+            var weightRecords = records.Where(r => r.RecordType == RecordType.MaxWeight).ToList();
+            var maxWeight = weightRecords.Any() ? weightRecords.Max(r => r.Value) : 0;
+
             if (maxWeight >= 100)
             {
                 milestones.Add(new Milestone
@@ -250,14 +256,21 @@ namespace GymAssistant_API.Repository.Services.Progress
                     Title = "Century Club",
                     Description = $"Lifted {maxWeight}kg - your first 100kg milestone!",
                     Icon = "💪",
-                    Date = records.Where(r => r.RecordType == RecordType.MaxWeight && r.Value >= 100)
-                                 .Min(r => r.CreatedAtUtc)
+                    Record = records.Where(r => r.RecordType == RecordType.MaxWeight)
+                                 .OrderByDescending(r => r.Value)
+                                 .Select(r => r.ToResponse())
+                                 .FirstOrDefault(),
+                    Date = weightRecords
+                        .Where(r => r.Value >= 100)
+                        .OrderBy(r => r.CreatedAtUtc)
+                        .Select(r => r.CreatedAtUtc)
+                        .FirstOrDefault()
                 });
             }
 
             // Volume milestones
-            var maxVolume = records.Where(r => r.RecordType == RecordType.MaxVolume)
-                                  .Max(r => r.Value);
+            var volumeRecords = records.Where(r => r.RecordType == RecordType.MaxVolume).ToList();
+            var maxVolume = volumeRecords.Any() ? volumeRecords.Max(r => r.Value) : 0;
             if (maxVolume >= 1000)
             {
                 milestones.Add(new Milestone
@@ -265,21 +278,37 @@ namespace GymAssistant_API.Repository.Services.Progress
                     Title = "Volume Beast",
                     Description = $"Achieved {maxVolume}kg total volume in a single exercise!",
                     Icon = "🔥",
-                    Date = records.Where(r => r.RecordType == RecordType.MaxVolume && r.Value >= 1000)
-                                 .Min(r => r.CreatedAtUtc)
+                    Record = records.Where(r => r.RecordType == RecordType.MaxVolume)
+                                 .OrderByDescending(r => r.Value)
+                                 .Select(r => r.ToResponse())
+                                 .FirstOrDefault(),
+                    Date = volumeRecords
+                        .Where(r => r.Value >= 1000)
+                        .OrderBy(r => r.CreatedAtUtc)
+                        .Select(r => r.CreatedAtUtc)
+                        .FirstOrDefault()
                 });
             }
 
             // Consistency milestones
-            var recordCount = records.Count;
-            if (recordCount >= 50)
+            var repsRecords = records.Where(r => r.RecordType == RecordType.MaxReps).ToList();
+            var maxReps = repsRecords.Any() ? repsRecords.Max(r => r.Value) : 0;
+            if (maxReps >= 20)
             {
                 milestones.Add(new Milestone
                 {
-                    Title = "Record Breaker",
-                    Description = $"Set {recordCount} personal records!",
+                    Title = "Reps Breaker",
+                    Description = $"{maxReps} Reps personal records!",
                     Icon = "🏆",
-                    Date = records.OrderBy(r => r.CreatedAtUtc).Skip(49).First().CreatedAtUtc
+                    Record = records.Where(r => r.RecordType == RecordType.MaxReps)
+                                 .OrderByDescending(r => r.Value)
+                                 .Select(r => r.ToResponse())
+                                 .FirstOrDefault(),
+                    Date = repsRecords
+                        .Where(r => r.Value >= 20)
+                        .OrderBy(r => r.CreatedAtUtc)
+                        .Select(r => r.CreatedAtUtc)
+                        .FirstOrDefault()
                 });
             }
 
