@@ -11,10 +11,10 @@ namespace GymAssistant_API.Repository.Interfaces.Exercise
         Task<Result<Updated>> StartWorkoutSessionAsync(string userId, Guid sessionId, DateTime startTime, CancellationToken ct = default);
         Task<Result<Updated>> CompleteWorkoutSessionAsync(string userId, Guid sessionId, DateTime endTime, string? notes = null, CancellationToken ct = default);
         Task<Result<WorkoutExerciseRes>> AddExerciseToWorkoutAsync(string userId, Guid sessionId, Guid? exerciseId = null, Guid? userExerciseId = null, CancellationToken ct = default);
-        Task<Result<WorkoutExerciseRes>> GetWorkoutExerciseAsync(string userId, Guid sessionId, Guid exerciseId, CancellationToken ct = default);
+        Task<Result<WorkoutExerciseRes>> GetWorkoutExerciseAsync(string userId, Guid exerciseId, CancellationToken ct = default);
         Task<Result<ExerciseSetRes>> AddSetToExerciseAsync(string userId, Guid sessionId, Guid exerciseId, int setNumber, int reps, decimal weightKg, int? restTimeSeconds = null, string? notes = null, CancellationToken ct = default);
-        Task<Result<ExerciseSetRes>> GetExerciseSetAsync(string userId, Guid sessionId, Guid exerciseId, Guid setId, CancellationToken ct = default);
-        Task<Result<Updated>> UpdateExerciseSetAsync(string userId, Guid sessionId, Guid exerciseId, Guid setId, int reps, decimal weightKg, int? restTimeSeconds = null, string? notes = null, CancellationToken ct = default);
+        Task<Result<ExerciseSetRes>> GetExerciseSetAsync(string userId, Guid setId, CancellationToken ct = default);
+        Task<Result<ExerciseSetRes>> UpdateExerciseSetAsync(string userId, Guid setId, int? reps, decimal? weightKg, int? restTimeSeconds = null, string? notes = null, CancellationToken ct = default);
         Task<Result<List<WorkoutSessionRes>>> GetWorkoutHistoryAsync(string userId, int pageSize, int pageNumber, DateTime? fromDate = null, DateTime? toDate = null, CancellationToken ct = default);
     }
 }
