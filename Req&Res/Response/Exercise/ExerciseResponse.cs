@@ -6,6 +6,7 @@ namespace GymAssistant_API.Req_Res.Response
     public record ExerciseResponse(
         Guid Id,
         Guid SectionId,
+        string SectionName,
         string Name,
         string? Description = default,
         string? Instructions = default,
@@ -23,6 +24,7 @@ namespace GymAssistant_API.Req_Res.Response
             return new ExerciseResponse(
                 exercise.Id,
                 exercise.SectionId,
+                exercise.Section.Name,
                 exercise.Name,
                 exercise.Description,
                 exercise.Instructions,
