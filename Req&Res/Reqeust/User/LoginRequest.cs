@@ -8,5 +8,7 @@ namespace GymAssistant_API.Req_Res.Reqeust
     string Email,
     [Required(ErrorMessage = "Password is required")]
     [MinLength(1, ErrorMessage = "Password cannot be empty")]
-    string Password);
+    string Password,
+    string? fcmToken = null);
+
 }
