@@ -1,4 +1,5 @@
 ﻿using GymAssistant_API.Model.Entities.Notifications;
+using GymAssistant_API.Model.Entities.Notifications.Dtos.Req;
 using GymAssistant_API.Model.Entities.Notifications.Dtos.Res;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Identity;
@@ -79,23 +80,21 @@ namespace GymAssistant_API.Handeler.Notifications
             _logger.LogInformation("Bulk notification sent successfully to {UserCount} users", userIds.Count);
             return result.Value;
         }
-        public async Task<Result<PushNotificationResult>> SendToTokenAsync(string token,
-                                                                           string title,
-                                                                           string body,
-                                                                           Dictionary<string, string>? data = null,
+        public async Task<Result<PushNotificationResult>> SendToTokenAsync(SendToTokenPushNotificationRequest request,
                                                                            CancellationToken ct = default)
         {
-            var result = await _pushNotification.SendToTokenAsync(token,
-                                                                   title,
-                                                                   body,
-                                                                   data,
-                                                                   ct);
+            var result = await _pushNotification.SendToTokenAsync(request.token,
+                                                                  request.title,
+                                                                  request.body,
+                                                                  request.data,
+                                                                  request.image,
+                                                                  ct);
             if (result.IsError)
             {
-                _logger.LogError("Failed to send notification to token {Token}: {TopError}", token, result.TopError.Description);
+                _logger.LogError("Failed to send notification to token {Token}: {TopError}", request.token, result.TopError.Description);
                 return result.Errors;
             }
-            _logger.LogInformation("Notification sent successfully to token {Token}", token);
+            _logger.LogInformation("Notification sent successfully to token {Token}", request.token);
             return result.Value;
         }
         public async Task<Result<List<NotificationResponse>>> GetMyNotifications(
@@ -172,6 +171,156 @@ namespace GymAssistant_API.Handeler.Notifications
             }
             _logger.LogInformation("Deleted notification {NotificationId} for user {UserId}", notificationId, userId);
             return Result.Deleted;
+        }
+
+        public async Task<Result<string>> SubscribeToTopic(
+            string userId,
+            string deviceToken,
+            string topic = "all",
+            CancellationToken ct = default)
+        {
+            try
+            {
+                _logger.LogInformation(
+                    "Subscribing user {UserId} to topic {Topic}",
+                    userId,
+                    topic);
+
+                var result = await _pushNotification.SubscribeToTopicAsync(
+                    deviceToken,
+                    topic,
+                    ct);
+
+                if (result.IsError)
+                {
+                    _logger.LogError(
+                        "Failed to subscribe user {UserId} to topic {Topic}: {Error}",
+                        userId,
+                        topic,
+                        result.TopError.Description);
+
+                    return result.Errors;
+                }
+
+                _logger.LogInformation(
+                    "Successfully subscribed user {UserId} to topic {Topic}",
+                    userId,
+                    topic);
+
+                return result.Value;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error subscribing user {UserId} to topic {Topic}",
+                    userId,
+                    topic);
+
+                return Error.Failure(
+                    "Subscription_Failed",
+                    "An error occurred while subscribing to topic");
+            }
+        }
+
+        public async Task<Result<string>> UnsubscribeFromTopic(
+            string userId,
+            string deviceToken,
+            string topic = "all",
+            CancellationToken ct = default)
+        {
+            try
+            {
+                _logger.LogInformation(
+                    "Unsubscribing user {UserId} from topic {Topic}",
+                    userId,
+                    topic);
+
+                var result = await _pushNotification.UnsubscribeFromTopicAsync(
+                    deviceToken,
+                    topic,
+                    ct);
+
+                if (result.IsError)
+                {
+                    _logger.LogError(
+                        "Failed to unsubscribe user {UserId} from topic {Topic}: {Error}",
+                        userId,
+                        topic,
+                        result.TopError.Description);
+
+                    return result.Errors;
+                }
+
+                _logger.LogInformation(
+                    "Successfully unsubscribed user {UserId} from topic {Topic}",
+                    userId,
+                    topic);
+
+                return result.Value;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error unsubscribing user {UserId} from topic {Topic}",
+                    userId,
+                    topic);
+
+                return Error.Failure(
+                    "Unsubscription_Failed",
+                    "An error occurred while unsubscribing from topic");
+            }
+        }
+        public async Task<Result<string>> SendNotificationToTopic(
+           string topic,
+           string title,
+           string body,
+           Dictionary<string, string>? data = null,
+           IFormFile? image = null,
+           CancellationToken ct = default)
+        {
+            try
+            {
+                _logger.LogInformation(
+                    "Sending notification to topic {Topic}",
+                    topic);
+
+                var result = await _pushNotification.SendToTopicAsync(
+                    topic,
+                    title,
+                    body,
+                    data,
+                    image,
+                    ct);
+
+                if (result.IsError)
+                {
+                    _logger.LogError(
+                        "Failed to send notification to topic {Topic}: {Error}",
+                        topic,
+                        result.TopError.Description);
+
+                    return result.Errors;
+                }
+
+                _logger.LogInformation(
+                    "Successfully sent notification to topic {Topic}",
+                    topic);
+
+                return result.Value;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Error sending notification to topic {Topic}",
+                    topic);
+
+                return Error.Failure(
+                    "Notification_Send_Failed",
+                    "An error occurred while sending notification");
+            }
         }
 
     }
