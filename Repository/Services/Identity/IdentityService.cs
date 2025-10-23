@@ -3,6 +3,7 @@ using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Identity.Dtos;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Identity;
+using GymAssistant_API.Req_Res.Reqeust.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -89,6 +90,91 @@ public class IdentityService(AppDbContext context,
         var user = await _userManager.FindByIdAsync(userId);
 
         return user?.UserName;
+    }
+    public async Task<Result<Updated>> ChangeUserPasswordAsync(string userId, string password, string newPassword, string confirmPassword)
+    {
+        try
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                _logger.LogWarning("User not found: {UserId}", userId);
+                return Error.NotFound("User_Not_Found", $"User with ID {userId} not found");
+            }
+            var IsAuthenticate = await AuthenticateAsync(user.Email!, password);
+            if (IsAuthenticate.IsError)
+            {
+                return Error.Conflict("Invalid_Current_Password", "The provided current password is incorrect");
+            }
+            // Check password confirmation
+            if (string.IsNullOrWhiteSpace(newPassword) || string.IsNullOrWhiteSpace(confirmPassword))
+            {
+                return Error.Validation("Invalid_Passwords", "New password and confirmation are required");
+            }
+
+
+            if (newPassword != confirmPassword)
+            {
+                return Error.Conflict("Passwords_Not_Match", "Passwords do not match");
+            }
+            if (password == newPassword)
+            {
+                return Error.Conflict("Same_Password", "The new password must be different from the current password");
+            }
+
+            _logger.LogInformation("Starting password reset process for user: {UserId}", user.Id);
+
+
+            // استخدم ChangePasswordAsync بدل Remove/Add
+            var result = await _userManager.ChangePasswordAsync(user, password, newPassword);
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors
+                    .Select(e => Error.Validation(e.Code, e.Description))
+                    .ToList();
+
+                _logger.LogError("Failed to change password for user: {ID}, {Errors}", user.Id, errors);
+                return errors;
+            }
+
+            return Result.Updated;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected exception during password change for userId: {UserId}. Exception: {Exception}",
+                userId ?? "NULL", ex.ToString());
+            return Error.Failure("Change_Password_Failed", "An unexpected error occurred while changing the password");
+
+        }
+    }
+    public async Task<Result<Updated>> UpdateSeedingUsers(string id, ChangeSeedingPasswordRequest request)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null)
+        {
+            return Error.NotFound("User_Not_Found", $"User with ID {id} not found");
+        }
+        var removeResult = await _userManager.RemovePasswordAsync(user);
+        if (!removeResult.Succeeded)
+        {
+            var errors = removeResult.Errors.Select(e =>
+              Error.Validation(e.Code, e.Description)).ToList();
+
+            _logger.LogError("Failed to remove password for user: {ID}, {Errors}", user.Id, errors);
+            return errors;
+        }
+        _logger.LogInformation("Old password removed, adding new password...");
+
+        var addResult = await _userManager.AddPasswordAsync(user, request.NewPassword);
+        if (!addResult.Succeeded)
+        {
+            var errors = addResult.Errors.Select(e =>
+              Error.Validation(e.Code, e.Description)).ToList();
+
+            _logger.LogError("Failed to add new password for user: {ID}, {Errors}", user.Id, errors);
+            return errors;
+        }
+        return Result.Updated;
     }
 
     public async Task<Result<string>> ForgotPasswordAsync(string email)
@@ -481,6 +567,7 @@ public class IdentityService(AppDbContext context,
             return Error.Failure("Add_External_Login_Failed", "An error occurred while adding external login");
         }
     }
+
 
 
     #endregion
