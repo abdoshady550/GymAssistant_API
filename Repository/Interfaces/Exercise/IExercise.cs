@@ -7,7 +7,7 @@ namespace GymAssistant_API.Repository.Interfaces.ExerciseExercises
 {
     public interface IExercise
     {
-        Task<Result<List<SectionResponse>>> GetSectionsAsync(CancellationToken ct = default);
+        Task<Result<List<SectionResponse>>> GetSectionsAsync(string userId, CancellationToken ct = default);
         Task<Result<SectionResponse>> GetSectionByIdAsync(string userId, Guid sectionId, CancellationToken ct = default);
         Task<Result<SectionGroupResponse>> CreateSectionGroup(string userId, Guid sectionId, string name, string descripion, CancellationToken ct = default);
         Task<Result<List<SectionGroupResponse>>> AllSectionGroups(string userId, Guid sectionId, CancellationToken ct = default);
