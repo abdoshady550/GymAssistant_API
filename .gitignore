@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /.config/dotnet-tools.json
 /wwwroot/images/custom-exercises
 /Firebase/fitrix-adminsdk.json
+/wwwroot/images/notification
