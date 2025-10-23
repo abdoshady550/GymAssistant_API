@@ -1,4 +1,5 @@
 ﻿using GymAssistant_API.Data;
+using GymAssistant_API.Model.Entities;
 using GymAssistant_API.Model.Entities.Exercise;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Exercise;
@@ -14,7 +15,11 @@ namespace GymAssistant_API.Repository.Services.Exercise
         private readonly AppDbContext _context = context;
         private readonly IPersonalRecordService _personalRecordService = personalRecordService;
 
-        public async Task<Result<WorkoutExerciseRes>> AddExerciseToWorkoutAsync(string userId, Guid sessionId, Guid? exerciseId = null, Guid? userExerciseId = null, CancellationToken ct = default)
+        public async Task<Result<WorkoutExerciseRes>> AddExerciseToWorkoutAsync(string userId,
+                                                                                Guid sessionId,
+                                                                                Guid? exerciseId = null,
+                                                                                Guid? userExerciseId = null,
+                                                                                CancellationToken ct = default)
         {
             var profile = await _context.ClientProfiles
                 .FirstOrDefaultAsync(p => p.AppUserId == userId, ct);
@@ -27,6 +32,10 @@ namespace GymAssistant_API.Repository.Services.Exercise
             var session = await _context.WorkoutSessions
                 .Include(ws => ws.WorkoutExercises)
                     .ThenInclude(we => we.Sets)
+                .Include(ws => ws.WorkoutExercises)
+                    .ThenInclude(we => we.UserExercise)
+                .Include(ws => ws.WorkoutExercises)
+                    .ThenInclude(we => we.Exercise)
                 .FirstOrDefaultAsync(ws => ws.Id == sessionId &&
                     (ws.ClientProfileId == profile.Id || ws.CreatedByTrainerId == profile.Id), ct);
 
@@ -39,7 +48,9 @@ namespace GymAssistant_API.Repository.Services.Exercise
             {
                 return Error.Validation("Session_Completed", "Cannot add exercises to completed session.");
             }
-            var exercis = await _context.Exercises.FirstOrDefaultAsync(e => e.Id == exerciseId, ct);
+            var exercis = await _context.Exercises.Include(e => e.Section).FirstOrDefaultAsync(e => e.Id == exerciseId, ct);
+            var userExercise = await _context.UserExercises.Include(e => e.Section).FirstOrDefaultAsync(e => e.Id == userExerciseId, ct);
+
             if (exerciseId.HasValue)
             {
                 var exerciseExists = await _context.Exercises
@@ -52,6 +63,16 @@ namespace GymAssistant_API.Repository.Services.Exercise
             else if (!userExerciseId.HasValue)
             {
                 return Error.Validation("ExerciseId_Or_UserExerciseId_Required", "Either ExerciseId or UserExerciseId must be provided.");
+            }
+            if (exerciseId.HasValue && session.WorkoutExercises.Any(w => w.ExerciseId == exerciseId))
+            {
+                return Error.Conflict("Exercise_Already_Exist", "Exercise is already in this Workout.");
+
+            }
+            if (userExerciseId.HasValue && session.WorkoutExercises.Any(w => w.UserExerciseId == userExerciseId))
+            {
+                return Error.Conflict("Exercise_Already_Exist", "Exercise is already in this Workout.");
+
             }
 
             var workoutExerciseResult = WorkoutExercise.Create(Guid.NewGuid(), sessionId, exerciseId, userExerciseId);
@@ -68,7 +89,16 @@ namespace GymAssistant_API.Repository.Services.Exercise
             _context.WorkoutExercises.Add(workoutExercise);
 
             await _context.SaveChangesAsync(ct);
-            var dto = WorkoutExerciseRes.FromEntity(workoutExercise);
+
+            var dto = new WorkoutExerciseRes(workoutExercise.Id,
+                workoutExercise.WorkoutSessionId,
+                exercis?.Section.Name ?? userExercise?.Section.Name ?? string.Empty,
+                workoutExercise.ExerciseId,
+                workoutExercise.Exercise?.Name,
+                workoutExercise.UserExerciseId,
+                workoutExercise.UserExercise?.Name,
+                workoutExercise.ClientProfileId,
+                workoutExercise.Sets.Select(ExerciseSetRes.FromEntity).ToList());
             return dto;
         }
 
@@ -82,6 +112,8 @@ namespace GymAssistant_API.Repository.Services.Exercise
 
             var workoutExercise = await _context.WorkoutExercises
                 .Include(we => we.Sets)
+                .Include(we => we.Exercise)
+
                 .FirstOrDefaultAsync(we => we.Id == exerciseId && we.WorkoutSessionId == sessionId, ct);
 
             if (workoutExercise == null)
@@ -193,16 +225,12 @@ namespace GymAssistant_API.Repository.Services.Exercise
             return dto;
         }
 
-        public async Task<Result<ExerciseSetRes>> GetExerciseSetAsync(string userId, Guid sessionId, Guid exerciseId, Guid setId, CancellationToken ct = default)
+        public async Task<Result<ExerciseSetRes>> GetExerciseSetAsync(string userId, Guid setId, CancellationToken ct = default)
         {
-            var workoutExerciseResult = await GetWorkoutExerciseAsync(userId, sessionId, exerciseId, ct);
-            if (workoutExerciseResult.IsError)
-            {
-                return workoutExerciseResult.Errors;
-            }
+
 
             var exerciseSet = await _context.ExerciseSets
-                .FirstOrDefaultAsync(es => es.Id == setId && es.WorkoutExerciseId == exerciseId, ct);
+                .FirstOrDefaultAsync(es => es.Id == setId, ct);
 
             if (exerciseSet == null)
             {
@@ -212,18 +240,15 @@ namespace GymAssistant_API.Repository.Services.Exercise
             return dto;
         }
 
-        public async Task<Result<WorkoutExerciseRes>> GetWorkoutExerciseAsync(string userId, Guid sessionId, Guid exerciseId, CancellationToken ct = default)
+        public async Task<Result<WorkoutExerciseRes>> GetWorkoutExerciseAsync(string userId, Guid exerciseId, CancellationToken ct = default)
         {
-            var sessionResult = await GetWorkoutSessionAsync(userId, sessionId, ct);
-            if (sessionResult.IsError)
-            {
-                return sessionResult.Errors;
-            }
-
             var workoutExercise = await _context.WorkoutExercises
-                .Include(we => we.Sets)
-                .FirstOrDefaultAsync(we => we.Id == exerciseId && we.WorkoutSessionId == sessionId, ct);
-
+              .Include(we => we.UserExercise)
+                .ThenInclude(u => u.Section)
+              .Include(w => w.Exercise)
+                .ThenInclude(w => w.Section)
+              .Include(we => we.Sets)
+              .FirstOrDefaultAsync(we => we.Id == exerciseId, ct);
             if (workoutExercise == null)
             {
                 return Error.NotFound("Exercise_NotFound", "Workout exercise not found.");
@@ -256,6 +281,14 @@ namespace GymAssistant_API.Repository.Services.Exercise
             }
             var sessions = await query
                 .Include(ws => ws.WorkoutExercises)
+                    .ThenInclude(we => we.Exercise)
+                    .ThenInclude(e => e.Section)
+
+                .Include(ws => ws.WorkoutExercises)
+                    .ThenInclude(we => we.UserExercise)
+                    .ThenInclude(ue => ue.Section)
+
+                .Include(ws => ws.WorkoutExercises)
                     .ThenInclude(we => we.Sets)
                 .OrderByDescending(ws => ws.Date)
                 .Skip((pageNumber - 1) * pageSize)
@@ -277,6 +310,14 @@ namespace GymAssistant_API.Repository.Services.Exercise
             }
 
             var session = await _context.WorkoutSessions
+                .Include(ws => ws.WorkoutExercises)
+                    .ThenInclude(we => we.Exercise)
+                    .ThenInclude(e => e.Section)
+
+                 .Include(ws => ws.WorkoutExercises)
+                    .ThenInclude(we => we.UserExercise)
+                    .ThenInclude(ue => ue.Section)
+
                 .Include(ws => ws.WorkoutExercises)
                     .ThenInclude(we => we.Sets)
                 .FirstOrDefaultAsync(ws => ws.Id == sessionId &&
@@ -301,6 +342,10 @@ namespace GymAssistant_API.Repository.Services.Exercise
             }
 
             var session = await _context.WorkoutSessions
+                 .Include(ws => ws.WorkoutExercises)
+                    .ThenInclude(we => we.UserExercise)
+                 .Include(ws => ws.WorkoutExercises)
+                    .ThenInclude(we => we.Exercise)
                 .Include(ws => ws.WorkoutExercises)
                     .ThenInclude(we => we.Sets)
                 .FirstOrDefaultAsync(ws => ws.Id == sessionId &&
@@ -321,22 +366,30 @@ namespace GymAssistant_API.Repository.Services.Exercise
             return Result.Updated;
         }
 
-        public async Task<Result<Updated>> UpdateExerciseSetAsync(string userId,
-                                                                  Guid sessionId,
-                                                                  Guid exerciseId,
+        public async Task<Result<ExerciseSetRes>> UpdateExerciseSetAsync(string userId,
                                                                   Guid setId,
-                                                                  int reps,
-                                                                  decimal weightKg,
+                                                                  int? reps = null,
+                                                                  decimal? weightKg = null,
                                                                   int? restTimeSeconds = null,
                                                                   string? notes = null, CancellationToken ct = default)
         {
-            var setResult = await GetExerciseSetAsync(userId, sessionId, exerciseId, setId, ct);
-            if (setResult.IsError)
+            var profile = await _context.ClientProfiles
+                .FirstOrDefaultAsync(p => p.AppUserId == userId, ct);
+            if (profile == null)
             {
-                return setResult.Errors;
+                return Error.NotFound("Profile_NotFound", "User profile not found.");
             }
 
-            var exerciseSet = setResult.Value;
+            var exerciseSet = await _context.ExerciseSets
+                .Include(es => es.WorkoutExercise)
+                .FirstOrDefaultAsync(es => es.Id == setId, ct);
+
+            if (exerciseSet == null)
+            {
+                return Error.NotFound("Set_NotFound", "Exercise set not found.");
+            }
+            var sessionId = exerciseSet.WorkoutExercise.WorkoutSessionId;
+            var exerciseId = exerciseSet.WorkoutExerciseId;
 
             // Check if session is completed
             var session = await _context.WorkoutSessions
@@ -347,16 +400,29 @@ namespace GymAssistant_API.Repository.Services.Exercise
                 return Error.Validation("Session_Completed", "Cannot modify sets in completed session.");
             }
 
-            // Since ExerciseSet has private setters, we need update methods
-            // For now, creating a new set with updated values
-            var updatedSetResult = ExerciseSet.Create(setId, exerciseId, exerciseSet.SetNumber, reps, weightKg, restTimeSeconds, notes);
-            if (updatedSetResult.IsError)
+            if (reps.HasValue && reps <= 0)
             {
-                return updatedSetResult.Errors;
+                return Error.Validation("Reps_Invalid", "Reps must be greater than zero.");
+            }
+            if (weightKg.HasValue && weightKg < 0)
+            {
+                return Error.Validation("WeightKg_Invalid", "WeightKg cannot be negative.");
+            }
+            if (restTimeSeconds.HasValue && restTimeSeconds < 0)
+            {
+                return Error.Validation("RestTimeSeconds_Invalid", "RestTimeSeconds cannot be negative.");
+            }
+            var set = exerciseSet.Update(reps, weightKg, restTimeSeconds, notes);
+            if (set.IsError)
+            {
+                return set.Errors;
             }
 
             await _context.SaveChangesAsync(ct);
-            return Result.Updated;
+
+
+            var res = await GetExerciseSetAsync(userId, setId, ct);
+            return res;
         }
     }
 }
