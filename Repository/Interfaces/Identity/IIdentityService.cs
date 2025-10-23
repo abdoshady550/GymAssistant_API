@@ -1,5 +1,6 @@
 using GymAssistant_API.Model.Identity.Dtos;
 using GymAssistant_API.Model.Results;
+using GymAssistant_API.Req_Res.Reqeust.User;
 using Microsoft.AspNetCore.Identity;
 
 namespace GymAssistant_API.Repository.Interfaces.Identity;
@@ -11,7 +12,11 @@ public interface IIdentityService
     Task<Result<AppUserDto>> AuthenticateAsync(string email, string password);
     Task<Result<AppUserDto>> GetUserByIdAsync(string userId);
     Task<string?> GetUserNameAsync(string userId);
-
+    Task<Result<Updated>> ChangeUserPasswordAsync(string userId,
+                                                  string password,
+                                                  string newPassword,
+                                                  string confirmPassword);
+    Task<Result<Updated>> UpdateSeedingUsers(string id, ChangeSeedingPasswordRequest request);
     Task<Result<string>> ForgotPasswordAsync(string email);
     Task<Result<string>> ResetPasswordAsync(ResetPasswordDto dto);
 
