@@ -33,6 +33,11 @@ namespace GymAssistant_API.Data.Configurations.Notifications
             builder.Property(e => e.CreatedAtUtc)
                 .IsRequired();
 
+            builder.HasOne(e => e.User)
+        .WithMany()
+        .HasForeignKey(e => e.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+
             // Indexes
             builder.HasIndex(e => e.UserId);
             builder.HasIndex(e => e.Token);
