@@ -1,6 +1,8 @@
 ﻿using GymAssistant_API.Data;
+using GymAssistant_API.Model.Entities.Exercise;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Exercise;
+using GymAssistant_API.Repository.Interfaces.ExerciseExercises;
 using GymAssistant_API.Req_Res.Response.Progress;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,32 +26,55 @@ namespace GymAssistant_API.Repository.Services.Progress
             {
                 return Error.NotFound("Profile_NotFound", "User profile not found.");
             }
+            var fromDate = DateTime.UtcNow.AddDays(-days);
 
             var exercise = await _context.Exercises
-                .Include(e => e.Section)
+                          .Include(e => e.Section)
+                           .FirstOrDefaultAsync(e => e.Id == exerciseId, ct);
+            var userExercise = await _context.UserExercises
                 .FirstOrDefaultAsync(e => e.Id == exerciseId, ct);
 
-            if (exercise == null)
+            List<WorkoutExercise> workoutData = new List<WorkoutExercise>();
+            if (exercise == null && userExercise == null)
             {
                 return Error.NotFound("Exercise_NotFound", "Exercise not found.");
             }
+            else if (exercise != null && userExercise == null)
+            {
+                workoutData = await _context.WorkoutExercises
+                 .Where(we => we.ExerciseId == exerciseId &&
+                             we.ClientProfileId == profile.Id &&
+                             we.Sets.Any(s => s.CreatedAtUtc >= fromDate))
+                 .Include(we => we.Sets)
+                 .Include(we => we.WorkoutSession)
+                 .OrderBy(we => we.CreatedAtUtc)
+                 .ToListAsync(ct);
+            }
+            else
+            {
+                workoutData = await _context.WorkoutExercises
+               .Where(we => we.UserExerciseId == exerciseId &&
+                           we.ClientProfileId == profile.Id &&
+                           we.Sets.Any(s => s.CreatedAtUtc >= fromDate))
+               .Include(we => we.Sets)
+               .Include(we => we.WorkoutSession)
+               .OrderBy(we => we.WorkoutSession.Date)
+               .ToListAsync(ct);
+            }
 
-            var fromDate = DateTime.UtcNow.AddDays(-days);
 
-            var workoutData = await _context.WorkoutExercises
-                .Where(we => we.ExerciseId == exerciseId &&
-                            we.ClientProfileId == profile.Id &&
-                            we.Sets.Any(s => s.CreatedAtUtc >= fromDate))
-                .Include(we => we.Sets)
-                .Include(we => we.WorkoutSession)
-                .OrderBy(we => we.CreatedAtUtc)
-                .ToListAsync(ct);
+            if (!workoutData.Any())
+            {
+                return null;
+            }
+
+
 
             var progressData = new ExerciseProgressData
             {
                 ExerciseId = exerciseId,
-                ExerciseName = exercise.Name,
-                SectionName = exercise.Section.Name,
+                ExerciseName = exercise?.Name ?? userExercise?.Name ?? "Unknown Exercise",
+                SectionName = exercise?.Section?.Name ?? userExercise?.Section?.Name ?? "Custom Exercises",
                 Sessions = workoutData.Select(we => new ExerciseSessionData
                 {
                     Date = we.WorkoutSession.Date,
@@ -140,8 +165,43 @@ namespace GymAssistant_API.Repository.Services.Progress
                 .Where(e => e.SectionId == sectionId)
                 .Include(e => e.Section)
                 .ToListAsync(ct);
+            var sectionUserExercises = await _context.UserExercises
+               .Where(e => e.SectionId == sectionId)
+               .Include(e => e.Section)
+               .ToListAsync(ct);
 
             var progressData = new List<SectionProgressData>();
+
+            foreach (var customExercise in sectionUserExercises)
+            {
+                var workoutData = await _context.WorkoutExercises
+                    .Where(we => we.UserExerciseId == customExercise.Id &&
+                                we.ClientProfileId == profile.Id &&
+                                we.Sets.Any(s => s.CreatedAtUtc >= fromDate))
+                    .Include(we => we.Sets)
+                    .ToListAsync(ct);
+
+                if (workoutData.Any())
+                {
+                    var totalVolume = workoutData.SelectMany(we => we.Sets).Sum(s => s.Reps * s.WeightKg);
+                    var totalSets = workoutData.SelectMany(we => we.Sets).Count();
+                    var maxWeight = workoutData.SelectMany(we => we.Sets).Max(s => s.WeightKg);
+                    var sessionsCount = workoutData.Count;
+
+                    progressData.Add(new SectionProgressData
+                    {
+                        ExerciseId = null,
+                        ExerciseName = null,
+                        customExerciseId = customExercise.Id,
+                        customExerciseName = customExercise.Name,
+                        TotalVolume = totalVolume,
+                        TotalSets = totalSets,
+                        MaxWeight = maxWeight,
+                        SessionsCount = sessionsCount,
+                        LastWorkoutDate = workoutData.Max(we => we.CreatedAtUtc)
+                    });
+                }
+            }
 
             foreach (var exercise in sectionExercises)
             {
@@ -163,6 +223,8 @@ namespace GymAssistant_API.Repository.Services.Progress
                     {
                         ExerciseId = exercise.Id,
                         ExerciseName = exercise.Name,
+                        customExerciseId = null,
+                        customExerciseName = null,
                         TotalVolume = totalVolume,
                         TotalSets = totalSets,
                         MaxWeight = maxWeight,
@@ -242,14 +304,45 @@ namespace GymAssistant_API.Repository.Services.Progress
 
             var fromDate = DateTime.UtcNow.AddDays(-days);
 
-            var workoutData = await _context.WorkoutExercises
-                .Where(we => we.ExerciseId == exerciseId &&
-                            we.ClientProfileId == profile.Id &&
-                            we.Sets.Any(s => s.CreatedAtUtc >= fromDate))
-                .Include(we => we.Sets)
-                .Include(we => we.WorkoutSession)
-                .OrderBy(we => we.WorkoutSession.Date)
-                .ToListAsync(ct);
+            var exercise = await _context.Exercises
+                .FirstOrDefaultAsync(e => e.Id == exerciseId, ct);
+            var userExercise = await _context.UserExercises
+                .FirstOrDefaultAsync(e => e.Id == exerciseId, ct);
+
+            List<WorkoutExercise> workoutData = new List<WorkoutExercise>();
+
+            if (exercise == null && userExercise == null)
+            {
+                return Error.NotFound("Exercise_NotFound", "Exercise not found.");
+            }
+            else if (exercise != null && userExercise == null)
+            {
+                workoutData = await _context.WorkoutExercises
+               .Where(we => we.ExerciseId == exerciseId &&
+                           we.ClientProfileId == profile.Id &&
+                           we.Sets.Any(s => s.CreatedAtUtc >= fromDate))
+               .Include(we => we.Sets)
+               .Include(we => we.WorkoutSession)
+               .OrderBy(we => we.WorkoutSession.Date)
+               .ToListAsync(ct);
+            }
+            else
+            {
+                workoutData = await _context.WorkoutExercises
+               .Where(we => we.UserExerciseId == exerciseId &&
+                           we.ClientProfileId == profile.Id &&
+                           we.Sets.Any(s => s.CreatedAtUtc >= fromDate))
+               .Include(we => we.Sets)
+               .Include(we => we.WorkoutSession)
+               .OrderBy(we => we.WorkoutSession.Date)
+               .ToListAsync(ct);
+            }
+
+
+            if (!workoutData.Any())
+            {
+                return null;
+            }
 
             var chartData = new ExerciseChartData
             {
@@ -295,11 +388,22 @@ namespace GymAssistant_API.Repository.Services.Progress
 
             if (sectionId.HasValue)
             {
-                query = query.Where(ws => ws.WorkoutExercises.Any(we =>
-                    we.ExerciseId.HasValue &&
-                    _context.Exercises.Any(e => e.Id == we.ExerciseId && e.SectionId == sectionId)));
-            }
 
+                var exercisesInSection = await _context.Exercises
+                    .Where(e => e.SectionId == sectionId)
+                    .Select(e => e.Id)
+                    .ToListAsync(ct);
+
+                var userExercisesInSection = await _context.UserExercises
+                    .Where(ue => ue.SectionId == sectionId)
+                    .Select(ue => ue.Id)
+                    .ToListAsync(ct);
+
+                query = query.Where(ws =>
+      ws.WorkoutExercises.Any(we => we.ExerciseId.HasValue && exercisesInSection.Contains(we.ExerciseId.Value)) ||
+      ws.WorkoutExercises.Any(we => we.UserExerciseId.HasValue && userExercisesInSection.Contains(we.UserExerciseId.Value))
+  );
+            }
             var workoutSessions = await query.ToListAsync(ct);
 
             var dailyVolume = workoutSessions.GroupBy(ws => ws.Date.Date)
