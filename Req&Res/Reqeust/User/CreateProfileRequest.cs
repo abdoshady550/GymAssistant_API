@@ -21,12 +21,19 @@ namespace GymAssistant_API.Req_Res.Reqeust
     public record MeasurementRequest(
         [Required(ErrorMessage = "Weight is required")]
         [Range(20, 400, ErrorMessage = "Weight must be between 20 and 400 kg")]
-        decimal WeightKg,
+        decimal? WeightKg,
+        [Required(ErrorMessage = "Weight is required")]
+        [Range(20, 400, ErrorMessage = "Weight must be between 20 and 400 kg")]
+        decimal WeightGoal,
 
         [Range(0, 100, ErrorMessage = "Body fat percentage must be between 0 and 100")]
         decimal? BodyFatPercent = null,
+        [Range(0, 100, ErrorMessage = "Body fat percentage must be between 0 and 100")]
+        decimal? BodyFatGoal = null,
 
         [Range(10, 200, ErrorMessage = "Muscle mass must be between 10 and 200 kg")]
-        decimal? MuscleMassKg = null
+        decimal? MuscleMassKg = null,
+        [Range(10, 200, ErrorMessage = "Muscle mass must be between 10 and 200 kg")]
+        decimal? MuscleMassGoal = null
     );
 }
