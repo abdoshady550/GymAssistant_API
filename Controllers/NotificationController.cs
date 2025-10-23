@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection.Metadata;
 using System.Security.Claims;
 
 namespace GymAssistant_API.Controllers
@@ -50,8 +51,8 @@ namespace GymAssistant_API.Controllers
         {
             var result = await _notification.UnregisterDevice(GetCurrentUserId(), token, ct);
             return result.Match(
-            _ => Ok(),
-            Problem);
+           response => Ok(response),
+           Problem);
         }
         [HttpGet("my-notifications")]
         [Authorize]
@@ -105,8 +106,8 @@ namespace GymAssistant_API.Controllers
         {
             var result = await _notification.MarkAsRead(GetCurrentUserId(), notificationId, ct);
             return result.Match(
-            _ => Ok(),
-            Problem);
+           response => Ok(response),
+           Problem);
         }
         [HttpPut("mark-all-read")]
         [Authorize]
@@ -122,8 +123,8 @@ namespace GymAssistant_API.Controllers
         {
             var result = await _notification.MarkAllAsRead(GetCurrentUserId(), ct);
             return result.Match(
-            _ => Ok(),
-            Problem);
+           response => Ok(response),
+           Problem);
         }
         [HttpDelete("{notificationId}")]
         [Authorize]
@@ -140,9 +141,10 @@ namespace GymAssistant_API.Controllers
         {
             var result = await _notification.DeleteNotification(GetCurrentUserId(), notificationId, ct);
             return result.Match(
-            _ => Ok(),
-            Problem);
+           response => Ok(response),
+           Problem);
         }
+
         [HttpPost("send")]
         [Authorize(Roles = "Admin,Trainer")]
         [Consumes("multipart/form-data")]
@@ -152,8 +154,29 @@ namespace GymAssistant_API.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [EndpointSummary("Send Notification")]
-        [EndpointDescription("Send a notification to a specific user.")]
+        [EndpointDescription("Send a notification to a Device.")]
         [EndpointName("SendNotification")]
+        public async Task<ActionResult> SendToDeviceToken([FromForm] SendToTokenPushNotificationRequest request,
+                                                               CancellationToken ct = default)
+        {
+            var result = await _notification.SendToTokenAsync(
+               request,
+                ct);
+            return result.Match(
+          response => Ok(response),
+          Problem);
+        }
+        [HttpPost("send-by-id")]
+        [Authorize(Roles = "Admin,Trainer")]
+        [Consumes("multipart/form-data")]
+        [ProducesResponseType(typeof(PushNotificationResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [EndpointSummary("Send Notification By UserId")]
+        [EndpointDescription("Send a notification to a specific user.")]
+        [EndpointName("SendNotificationById")]
         public async Task<ActionResult> SendNotification([FromForm] SendPushNotificationRequest request,
 CancellationToken ct = default)
         {
@@ -166,8 +189,8 @@ CancellationToken ct = default)
                 request.Image,
                 ct);
             return result.Match(
-            _ => Ok(),
-            Problem);
+           response => Ok(response),
+           Problem);
         }
         [HttpPost("send-bulk")]
         [Authorize(Roles = "Admin")]
@@ -192,13 +215,81 @@ CancellationToken ct = default)
                 request.Image,
                 ct);
             return result.Match(
-            _ => Ok(),
-            Problem);
+           response => Ok(response),
+           Problem);
+        }
+        [HttpPost("subscribe")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [EndpointSummary("Subscribe to a notification topic")]
+        [EndpointDescription("Subscribes the user's device to receive notifications for a specific topic. Default topic is 'all'.")]
+        [EndpointName("SubscribeToTopic")]
+        public async Task<ActionResult> SubscribeToTopic(
+            [FromBody] SubscribeRequest request,
+            CancellationToken ct = default)
+        {
+            var result = await _notification.SubscribeToTopic(
+                GetCurrentUserId(),
+                request.DeviceToken,
+                request.Topic ?? "all",
+                ct);
+
+            return result.Match(
+                response => Ok(new { message = response }),
+                Problem);
+        }
+        [HttpPost("unsubscribe")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [EndpointSummary("Unsubscribe from a notification topic")]
+        [EndpointDescription("Unsubscribes the user's device from receiving notifications for a specific topic.")]
+        [EndpointName("UnsubscribeFromTopic")]
+        public async Task<ActionResult> UnsubscribeFromTopic(
+           [FromBody] SubscribeRequest request,
+           CancellationToken ct = default)
+        {
+            var result = await _notification.UnsubscribeFromTopic(
+                GetCurrentUserId(),
+                request.DeviceToken,
+                request.Topic ?? "all",
+                ct);
+            return result.Match(
+                response => Ok(new { message = response }),
+                Problem);
+        }
+        [HttpPost("send-to-topic")]
+        [Authorize(Roles = "Admin,Trainer")]
+        [Consumes("multipart/form-data")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [EndpointSummary("Send notification to topic")]
+        [EndpointDescription("Sends a push notification to all devices subscribed to a specific topic. Only available for Admin and Trainer roles.")]
+        [EndpointName("SendNotificationToTopic")]
+        public async Task<ActionResult> SendToTopic(
+            [FromForm] SendNotificationToTopicRequest request,
+            CancellationToken ct = default)
+        {
+            var result = await _notification.SendNotificationToTopic(
+                request.Topic,
+                request.Title,
+                request.Body,
+                request.Data,
+                request.Image,
+                ct);
+
+            return result.Match(
+                response => Ok(new { message = response }),
+                Problem);
         }
 
-
-
-        private string GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
+        private string? GetCurrentUserId() => User?.FindFirstValue(ClaimTypes.NameIdentifier);
 
     }
 }
