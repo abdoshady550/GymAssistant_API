@@ -78,51 +78,56 @@ namespace GymAssistant_API.Model.Entities.User
 
 
         }
-        public Result<Updated> UpdateProfile(string firstName, string lastName, Gender gender, string? phoneNumber, DateTime? birthDate, int? heightCm)
+        public Result<Updated> UpdateProfile(string? firstName = default, string? lastName = default, Gender? gender = default, string? phoneNumber = default, DateTime? birthDate = default, int? heightCm = default)
         {
-            if (string.IsNullOrWhiteSpace(firstName))
-            {
-                return UserErrors.FirstNameRequired;
-            }
-            if (string.IsNullOrWhiteSpace(lastName))
-            {
-                return UserErrors.LastNameRequired;
-            }
-            if (birthDate is null)
-            {
-                return UserErrors.BirthDayRequired;
-            }
-            if (birthDate >= DateTime.UtcNow || birthDate > DateTime.UtcNow.AddYears(-10))
+
+
+
+            if (birthDate.HasValue && (birthDate >= DateTime.UtcNow || birthDate > DateTime.UtcNow.AddYears(-10)))
             {
                 return UserErrors.BirthDayRequired;
             }
 
-            if (heightCm is < 100 or > 250)
+            if (heightCm.HasValue && heightCm is < 100 or > 250)
             {
                 return UserErrors.HeightInvalid;
             }
-            if (gender != Gender.Female && gender != Gender.Male)
+            if (gender.HasValue && gender != Gender.Female && gender != Gender.Male)
             {
                 return UserErrors.GenderInvalid;
             }
             //  Phone number validation 
-            if (!string.IsNullOrWhiteSpace(phoneNumber) &&
-                !Regex.IsMatch(phoneNumber, @"^(?:\+20|0)?1[0125][0-9]{8}$"))
-            {
-                return Error.Validation("Invalid_PhoneNumber", "Phone number format is not valid.");
-            }
-            else
+            if (!string.IsNullOrWhiteSpace(phoneNumber))
+                if (!Regex.IsMatch(phoneNumber, @"^(?:\+20|0)?1[0125][0-9]{8}$"))
+                {
+                    return Error.Validation("Invalid_PhoneNumber", "Phone number format is not valid.");
+
+                }
             {
                 AppUser.PhoneNumber = phoneNumber;
+
+            }
+            if (!string.IsNullOrWhiteSpace(firstName))
+            {
+                FirstName = firstName;
+            }
+            if (!string.IsNullOrWhiteSpace(lastName))
+            {
+                LastName = lastName;
+            }
+            if (birthDate.HasValue)
+            {
+                BirthDate = birthDate.Value;
+            }
+            if (heightCm.HasValue)
+            {
+                HeightCm = heightCm.Value;
+            }
+            if (gender.HasValue)
+            {
+                Gender = gender.Value;
             }
 
-            AppUser.PhoneNumber = phoneNumber;
-
-            FirstName = firstName;
-            LastName = lastName;
-            BirthDate = birthDate;
-            HeightCm = heightCm;
-            Gender = gender;
             return Result.Updated;
 
         }
