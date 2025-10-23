@@ -52,7 +52,7 @@ namespace GymAssistant_API.Handeler.Identity
             {
                 return new { Token = generateTokenResult.Value };
             }
-            if (string.IsNullOrWhiteSpace(generateTokenResult.Value.AccessToken))
+            if (string.IsNullOrWhiteSpace(query.fcmToken))
             {
                 return new
                 {
@@ -60,7 +60,7 @@ namespace GymAssistant_API.Handeler.Identity
                     Profile = profile.Value
                 };
             }
-            var registerDevice = await _pushNotification.RegisterDeviceTokenAsync(userResponse.Value.UserId, generateTokenResult.Value.AccessToken, DevicePlatform.Android, ct);
+            var registerDevice = await _pushNotification.RegisterDeviceTokenAsync(userResponse.Value.UserId, query.fcmToken, DevicePlatform.Android, ct);
             if (registerDevice.IsError)
             {
                 _logger.LogError("Failed to register device token for user {UserId}: {TopError}", userResponse.Value.UserId, registerDevice.TopError.Description);
