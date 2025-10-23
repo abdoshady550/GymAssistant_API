@@ -60,6 +60,42 @@ namespace GymAssistant_API.Model.Entities.Exercise
             }
             return new ExerciseSet(id, workoutExerciseId, setNumber, reps, weightKg, restTimeSeconds, notes);
         }
+        public Result<Updated> Update(int? reps = null, decimal? weightKg = null, int? restTimeSeconds = null, string? notes = null)
+        {
+            if (reps.HasValue && reps <= 0)
+            {
+                return ExerciseErrors.RepsInvalid;
+            }
+            if (weightKg.HasValue && weightKg < 0)
+            {
+                return ExerciseErrors.WeightKgInvalid;
+            }
+            if (restTimeSeconds != null && restTimeSeconds < 0)
+            {
+                return ExerciseErrors.RestTimeSecondsInvalid;
+            }
+            if (reps.HasValue)
+            {
+                Reps = reps.Value;
+
+            }
+            if (weightKg.HasValue)
+            {
+                WeightKg = weightKg.Value;
+
+            }
+            if (restTimeSeconds.HasValue)
+            {
+
+                RestTimeSeconds = restTimeSeconds.Value;
+            }
+            if (!string.IsNullOrEmpty(notes))
+            {
+                Notes = notes;
+
+            }
+            return Result.Updated;
+        }
 
         public void MarkAsPersonalRecord() => IsPersonalRecord = true;
         public void UnMarkedAsPersonalRecord() => IsPersonalRecord = false;
