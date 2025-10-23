@@ -2,8 +2,8 @@
 {
     public class SectionAchievement
     {
-        public string SectionName { get; set; } = string.Empty;
-        public int RecordCount { get; set; }
-        public DateTimeOffset LatestRecord { get; set; }
+        public string? SectionName { get; set; } = string.Empty;
+        public int? RecordCount { get; set; }
+        public DateTimeOffset? LatestRecord { get; set; }
     }
 }
