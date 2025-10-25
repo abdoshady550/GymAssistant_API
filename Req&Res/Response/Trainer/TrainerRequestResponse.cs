@@ -29,6 +29,22 @@ namespace GymAssistant_API.Req_Res.Response.Trainer
                 RespondedAtUtc = request.RespondedAtUtc
             };
         }
+
+        public static TrainerRequestResponse FromEntity(UserRequest request)
+        {
+            return new TrainerRequestResponse
+            {
+                RequestId = request.Id,
+                TrainerId = request.TrainerId,
+                TrainerFullName = request.Trainer?.FullName ?? string.Empty,
+                TraineeId = request.TraineeId,
+                TraineeFullName = request.Trainee?.FullName ?? string.Empty,
+                Status = request.Status,
+                Message = request.Message,
+                CreatedAtUtc = request.CreatedAtUtc,
+                RespondedAtUtc = request.RespondedAtUtc
+            };
+        }
     }
 
     public class TrainerRequestListResponse
@@ -37,4 +53,6 @@ namespace GymAssistant_API.Req_Res.Response.Trainer
         public int PendingCount { get; set; }
         public List<TrainerRequestResponse> Requests { get; set; } = new();
     }
+
+
 }
