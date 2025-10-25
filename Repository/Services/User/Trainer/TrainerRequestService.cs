@@ -1,5 +1,6 @@
 ﻿using GymAssistant_API.Data;
 using GymAssistant_API.Model.Entities.User;
+using GymAssistant_API.Model.Identity.Dtos;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.User.Trainer;
 using GymAssistant_API.Req_Res.Response.Trainer;
@@ -20,7 +21,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
         public async Task<Result<TrainerRequestResponse>> SendRequestAsync(
             string trainerId,
-            Guid traineeId,
+            string traineeId,
             string? message = null,
             CancellationToken ct = default)
         {
@@ -35,7 +36,8 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             // Verify trainee exists
             var traineeProfile = await _context.ClientProfiles
-                .FirstOrDefaultAsync(p => p.Id == traineeId, ct);
+                .Include(p => p.AppUser)
+                .FirstOrDefaultAsync(p => p.AppUserId == traineeId, ct);
 
             if (traineeProfile == null)
             {
@@ -44,7 +46,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             // Check if relationship already exists
             var existingRelation = await _context.TrainerTrainees
-                .AnyAsync(tt => tt.TrainerId == trainerProfile.Id && tt.TraineeId == traineeId, ct);
+                .AnyAsync(tt => tt.TrainerId == trainerProfile.Id && tt.TraineeId == traineeProfile.Id, ct);
 
             if (existingRelation)
             {
@@ -52,18 +54,21 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
             }
 
             // Check if pending request already exists
-            var existingRequest = await _context.TrainerRequests
+            var existingUserRequest = await _context.UserRequests
+                   .AnyAsync(tr => tr.TrainerId == trainerProfile.Id &&
+                                  tr.TraineeId == traineeProfile.Id &&
+                                  tr.Status == RequestStatus.Pending, ct);
+            var existingTrainerRequest = await _context.TrainerRequests
                 .AnyAsync(tr => tr.TrainerId == trainerProfile.Id &&
-                               tr.TraineeId == traineeId &&
+                               tr.TraineeId == traineeProfile.Id &&
                                tr.Status == RequestStatus.Pending, ct);
 
-            if (existingRequest)
+            if (existingUserRequest || existingTrainerRequest)
             {
                 return TrainerRequestErrors.RequestAlreadyExists;
             }
-
             // Create the request
-            var requestResult = TrainerRequest.Create(Guid.NewGuid(), trainerProfile.Id, traineeId, message);
+            var requestResult = TrainerRequest.Create(Guid.NewGuid(), trainerProfile.Id, traineeProfile.Id, message);
 
             if (requestResult.IsError)
             {
@@ -83,7 +88,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
                 .LoadAsync(ct);
 
             _logger.LogInformation("Trainer {TrainerId} sent request to trainee {TraineeId}",
-                trainerProfile.Id, traineeId);
+                trainerProfile.Id, traineeProfile.Id);
 
             return TrainerRequestResponse.FromEntity(request);
         }
@@ -159,22 +164,21 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
             return Result.Deleted;
         }
 
-        public async Task<Result<TrainerRequestListResponse>> GetReceivedRequestsAsync(
-            string traineeId,
-            int pageSize,
-            int pageNumber,
-            CancellationToken ct = default)
+        public async Task<Result<TrainerRequestListResponse>> GetReceivedRequestsAsync(string trainerId,
+                                                                                       int pageSize,
+                                                                                       int pageNumber,
+                                                                                       CancellationToken ct = default)
         {
-            var traineeProfile = await _context.ClientProfiles
-                .FirstOrDefaultAsync(p => p.AppUserId == traineeId, ct);
+            var trainerProfile = await _context.ClientProfiles
+                .FirstOrDefaultAsync(p => p.AppUserId == trainerId, ct);
 
-            if (traineeProfile == null)
+            if (trainerProfile == null)
             {
-                return Error.NotFound("Trainee_NotFound", "User profile not found.");
+                return Error.NotFound("Trainer_NotFound", "Trainer profile not found.");
             }
 
-            var query = _context.TrainerRequests
-                .Where(tr => tr.TraineeId == traineeProfile.Id)
+            var query = _context.UserRequests
+                .Where(tr => tr.TrainerId == trainerProfile.Id)
                 .Include(tr => tr.Trainer)
                 .Include(tr => tr.Trainee);
 
@@ -196,22 +200,22 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
         }
 
         public async Task<Result<TrainerRequestResponse>> AcceptRequestAsync(
-            string traineeId,
+            string trainerId,
             Guid requestId,
             CancellationToken ct = default)
         {
-            var traineeProfile = await _context.ClientProfiles
-                .FirstOrDefaultAsync(p => p.AppUserId == traineeId, ct);
+            var trainerProfile = await _context.ClientProfiles
+                .FirstOrDefaultAsync(p => p.AppUserId == trainerId, ct);
 
-            if (traineeProfile == null)
+            if (trainerProfile == null)
             {
-                return Error.NotFound("Trainee_NotFound", "User profile not found.");
+                return Error.NotFound("Trainer_NotFound", "Trainer profile not found.");
             }
 
-            var request = await _context.TrainerRequests
+            var request = await _context.UserRequests
                 .Include(tr => tr.Trainer)
                 .Include(tr => tr.Trainee)
-                .FirstOrDefaultAsync(tr => tr.Id == requestId && tr.TraineeId == traineeProfile.Id, ct);
+                .FirstOrDefaultAsync(tr => tr.Id == requestId && tr.TrainerId == trainerProfile.Id, ct);
 
             if (request == null)
             {
@@ -234,29 +238,29 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
             _context.TrainerTrainees.Add(relationResult.Value);
             await _context.SaveChangesAsync(ct);
 
-            _logger.LogInformation("Trainee {TraineeId} accepted request {RequestId} from trainer {TrainerId}",
-                traineeProfile.Id, requestId, request.TrainerId);
+            _logger.LogInformation("Trainer {TrainerId} accepted request {RequestId} from trainee {TraineeId}",
+                trainerProfile.Id, requestId, request.TraineeId);
 
             return TrainerRequestResponse.FromEntity(request);
         }
 
         public async Task<Result<TrainerRequestResponse>> RejectRequestAsync(
-            string traineeId,
+            string trainerId,
             Guid requestId,
             CancellationToken ct = default)
         {
-            var traineeProfile = await _context.ClientProfiles
-                .FirstOrDefaultAsync(p => p.AppUserId == traineeId, ct);
+            var trainerProfile = await _context.ClientProfiles
+                .FirstOrDefaultAsync(p => p.AppUserId == trainerId, ct);
 
-            if (traineeProfile == null)
+            if (trainerProfile == null)
             {
                 return Error.NotFound("Trainee_NotFound", "User profile not found.");
             }
 
-            var request = await _context.TrainerRequests
+            var request = await _context.UserRequests
                 .Include(tr => tr.Trainer)
                 .Include(tr => tr.Trainee)
-                .FirstOrDefaultAsync(tr => tr.Id == requestId && tr.TraineeId == traineeProfile.Id, ct);
+                .FirstOrDefaultAsync(tr => tr.Id == requestId && tr.TrainerId == trainerProfile.Id, ct);
 
             if (request == null)
             {
@@ -271,8 +275,8 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             await _context.SaveChangesAsync(ct);
 
-            _logger.LogInformation("Trainee {TraineeId} rejected request {RequestId} from trainer {TrainerId}",
-                traineeProfile.Id, requestId, request.TrainerId);
+            _logger.LogInformation("Trainer {TrainerId} rejected request {RequestId} from trainer {TraineeId}",
+                trainerProfile.Id, requestId, request.TraineeId);
 
             return TrainerRequestResponse.FromEntity(request);
         }
@@ -294,7 +298,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
                 .Include(tr => tr.Trainer)
                 .Include(tr => tr.Trainee)
                 .FirstOrDefaultAsync(tr => tr.Id == requestId &&
-                    (tr.TrainerId == userProfile.Id || tr.TraineeId == userProfile.Id), ct);
+                    (tr.TrainerId == userProfile.Id), ct);
 
             if (request == null)
             {
@@ -302,6 +306,84 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
             }
 
             return TrainerRequestResponse.FromEntity(request);
+        }
+        public async Task<Result<List<UserDto>>> GetAllUserAsync(
+          string? searchTerm,
+          int pageSize,
+          int pageNumber,
+          CancellationToken ct = default)
+        {
+            if (pageSize <= 0 || pageNumber <= 0)
+                return Error.Validation("Invalid_Pagination", "Invalid pagination parameters.");
+
+            var query = _context.ClientProfiles
+                .AsNoTracking()
+                .Include(u => u.AppUser)
+                .Where(u => u.Role == UserRole.User);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var search = searchTerm.Trim().ToLower();
+                query = query.Where(u =>
+                (u.FirstName.ToLower().Contains(search)) ||
+                (u.LastName.ToLower().Contains(search)) ||
+                (u.AppUser != null && u.AppUser.Email != null &&
+                u.AppUser.Email.ToLower().Contains(search)) ||
+                (u.AppUser != null && u.AppUser.PhoneNumber != null &&
+                u.AppUser.PhoneNumber.ToLower().Contains(search)));
+            }
+            var users = await query
+           .OrderBy(u => u.FirstName)
+           .Skip((pageNumber - 1) * pageSize)
+           .Take(pageSize)
+           .Select(u => new UserDto(
+               u.AppUserId,
+               u.FullName,
+               u.AppUser.Email,
+               u.Gender,
+               u.AppUser.PhoneNumber
+           ))
+           .ToListAsync(ct);
+            return users;
+        }
+        public async Task<Result<List<UserDto>>> GetAllTrainerAsync(
+         string? searchTerm,
+         int pageSize,
+         int pageNumber,
+         CancellationToken ct = default)
+        {
+            if (pageSize <= 0 || pageNumber <= 0)
+                return Error.Validation("Invalid_Pagination", "Invalid pagination parameters.");
+
+            var query = _context.ClientProfiles
+                .AsNoTracking()
+                .Include(u => u.AppUser)
+                .Where(u => u.Role == UserRole.Trainer);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var search = searchTerm.Trim().ToLower();
+                query = query.Where(u =>
+                (u.FirstName.ToLower().Contains(search)) ||
+                (u.LastName.ToLower().Contains(search)) ||
+                (u.AppUser != null && u.AppUser.Email != null &&
+                u.AppUser.Email.ToLower().Contains(search)) ||
+                (u.AppUser != null && u.AppUser.PhoneNumber != null &&
+                u.AppUser.PhoneNumber.ToLower().Contains(search)));
+            }
+            var users = await query
+             .OrderBy(u => u.FirstName)
+             .Skip((pageNumber - 1) * pageSize)
+             .Take(pageSize)
+             .Select(u => new UserDto(
+                 u.AppUserId,
+                 u.FullName,
+                 u.AppUser.Email,
+                 u.Gender,
+                 u.AppUser.PhoneNumber
+             ))
+             .ToListAsync(ct);
+            return users;
         }
     }
 }
