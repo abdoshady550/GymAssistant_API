@@ -170,6 +170,7 @@ builder.Services.AddScoped<ProgressHandler>();             // Handler
 builder.Services.AddScoped<RecordsHandler>();             // Handler
 builder.Services.AddScoped<TrainerHandler>();            // Handler
 builder.Services.AddScoped<TrainerRequestHandler>();    // Handler
+builder.Services.AddScoped<UserRequestHandler>();    // Handler
 builder.Services.AddScoped<ExternalLoginHandler>();    // Handler
 builder.Services.AddScoped<ChangePasswordHandler>();  // Handler
 builder.Services.AddScoped<NotificationsHandler>();  // Handler
@@ -186,6 +187,7 @@ builder.Services.AddScoped<IPersonalRecordService, PersonalRecordService>();    
 builder.Services.AddScoped<IProgressService, ProgressService>();               // Service
 builder.Services.AddScoped<IRecordsService, RecordsService>();                // Service
 builder.Services.AddScoped<ITrainerService, TrainerService>();               // Service
+builder.Services.AddScoped<IUserRequestService, UserRequestService>();// Service
 builder.Services.AddScoped<ITrainerRequestService, TrainerRequestService>();// Service
 builder.Services.AddScoped<IPushNotificationService, PushNotificationService>();// Service
 
