@@ -17,6 +17,8 @@ namespace GymAssistant_API.Data
         public DbSet<BodyMeasurement> BodyMeasurements => Set<BodyMeasurement>();
         public DbSet<TrainerTrainee> TrainerTrainees => Set<TrainerTrainee>();
         public DbSet<TrainerRequest> TrainerRequests => Set<TrainerRequest>();
+        public DbSet<UserRequest> UserRequests => Set<UserRequest>();
+
 
         public DbSet<WorkoutSession> WorkoutSessions => Set<WorkoutSession>();
         public DbSet<WorkoutExercise> WorkoutExercises => Set<WorkoutExercise>();
