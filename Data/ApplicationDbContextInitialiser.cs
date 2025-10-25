@@ -19,11 +19,13 @@ public class ApplicationDbContextInitialiser(
     // Fixed GUIDs to ensure consistency in relationships
     private static readonly Guid AdminUserId = Guid.Parse("11111111-1111-1111-1111-111111111111");
     private static readonly Guid TrainerUserId = Guid.Parse("22222222-2222-2222-2222-222222222222");
+    private static readonly Guid Trainer2UserId = Guid.Parse("22222223-2223-2223-2222-222222222223");
     private static readonly Guid ClientUserId = Guid.Parse("33333333-3333-3333-3333-333333333333");
     private static readonly Guid Client2UserId = Guid.Parse("44444444-4444-4444-4444-444444444444");
 
     private static readonly Guid AdminProfileId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
     private static readonly Guid TrainerProfileId = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
+    private static readonly Guid Trainer2ProfileId = Guid.Parse("bbbbbbbc-bbbc-bbbc-bbbc-bbbbbbbbbbbc");
     private static readonly Guid ClientProfileId = Guid.Parse("cccccccc-cccc-cccc-cccc-cccccccccccc");
     private static readonly Guid Client2ProfileId = Guid.Parse("dddddddd-dddd-dddd-dddd-dddddddddddd");
 
@@ -172,6 +174,30 @@ public class ApplicationDbContextInitialiser(
             }
         }
 
+        var trainer2User = await _userManager.FindByEmailAsync("trainer2@gymassistant.com");
+        if (trainer2User == null)
+        {
+            trainer2User = new AppUser
+            {
+                Id = Trainer2UserId.ToString(),
+                UserName = "trainer2@gymassistant.com",
+                Email = "trainer2@gymassistant.com",
+                EmailConfirmed = true,
+                PhoneNumber = "+201234567891",
+                PhoneNumberConfirmed = true
+            };
+            var result = await _userManager.CreateAsync(trainer2User, "Trainer2123!");
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(trainer2User, "Trainer");
+                _logger.LogInformation("Created trainer user: {Email}", trainerUser.Email);
+            }
+            else
+            {
+                _logger.LogError("Failed to create trainer user: {Errors}", string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+        }
+
         // First client user
         var clientUser = await _userManager.FindByEmailAsync("client@gymassistant.com");
         if (clientUser == null)
@@ -263,6 +289,26 @@ public class ApplicationDbContextInitialiser(
                 var profile = trainerProfile.Value;
                 profile.AppUserId = TrainerUserId.ToString();
                 var updateResult = profile.UpdateProfile("Sarah", "Johnson", Gender.Female, profile.AppUser.PhoneNumber, new DateTime(1990, 8, 22), 165);
+                if (updateResult.IsSuccess)
+                {
+                    profiles.Add(profile);
+                }
+            }
+
+
+            var trainer2Profile = ClientProfile.CreateProfile(
+              Trainer2ProfileId,
+              Trainer2UserId.ToString(),
+              "ahmed",
+              "Johnson",
+              Gender.Male,
+              UserRole.Trainer
+          );
+            if (trainer2Profile.IsSuccess)
+            {
+                var profile = trainer2Profile.Value;
+                profile.AppUserId = Trainer2UserId.ToString();
+                var updateResult = profile.UpdateProfile("Ahmed", "Johnson", Gender.Male, profile.AppUser.PhoneNumber, new DateTime(1990, 8, 22), 165);
                 if (updateResult.IsSuccess)
                 {
                     profiles.Add(profile);
