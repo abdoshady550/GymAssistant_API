@@ -25,7 +25,10 @@ namespace GymAssistant_API.Model.Entities.User
             CreatedAtUtc = DateTimeOffset.UtcNow;
         }
 
-        public static Result<TrainerRequest> Create(Guid id, Guid trainerId, Guid traineeId, string? message = null)
+        public static Result<TrainerRequest> Create(Guid id,
+                                                    Guid trainerId,
+                                                    Guid traineeId,
+                                                    string? message = null)
         {
             if (trainerId == Guid.Empty)
             {
