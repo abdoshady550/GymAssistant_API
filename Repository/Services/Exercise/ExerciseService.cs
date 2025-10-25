@@ -405,7 +405,11 @@ namespace GymAssistant_API.Repository.Services.Exercises
             var dto = ExerciseResponse.FromEntity(exercise);
             return dto;
         }
-        public async Task<Result<ExercisesResponse>> GetExercisesBySectionAsync(string userId, Guid sectionId, string? searchTerm = null, DifficultyLevel? difficulty = null, CancellationToken ct = default)
+        public async Task<Result<ExercisesResponse>> GetExercisesBySectionAsync(string userId,
+                                                                                Guid sectionId,
+                                                                                string? searchTerm = null,
+                                                                                DifficultyLevel? difficulty = null,
+                                                                                CancellationToken ct = default)
         {
             var query = _context.Exercises.Include(e => e.Section)
         .Where(e => e.SectionId == sectionId);
