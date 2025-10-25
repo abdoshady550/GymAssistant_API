@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using GymAssistant_API.Handeler.Identity.Trainer;
+using GymAssistant_API.Model.Identity.Dtos;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Req_Res.Reqeust.User.Trainer;
 using GymAssistant_API.Req_Res.Response.Trainer;
@@ -77,15 +78,15 @@ namespace GymAssistant_API.Controllers
                Problem);
         }
         [HttpGet("received")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Trainer")]
         [ProducesResponseType(typeof(TrainerRequestListResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [EndpointSummary("Trainee gets all received requests")]
-        [EndpointDescription("Retrieves all requests received by the authenticated trainee.")]
+        [EndpointSummary("Trainer gets all received requests")]
+        [EndpointDescription("Retrieves all requests received by the authenticated trainer.")]
         [EndpointName("GetReceivedRequests")]
         public async Task<ActionResult> GetReceivedRequests(
             [FromQuery] int pageSize = 10,
@@ -98,15 +99,15 @@ namespace GymAssistant_API.Controllers
                Problem);
         }
         [HttpPost("accept/{requestId:guid}")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Trainer")]
         [ProducesResponseType(typeof(TrainerRequestResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [EndpointSummary("Trainee accepts a received request")]
-        [EndpointDescription("Allows a trainee to accept a received trainer request.")]
+        [EndpointSummary("Trainer accepts a received request")]
+        [EndpointDescription("Allows a trainer to accept a received trainee request.")]
         [EndpointName("AcceptRequest")]
         public async Task<ActionResult> AcceptRequest(
             [FromRoute] Guid requestId,
@@ -118,15 +119,15 @@ namespace GymAssistant_API.Controllers
                Problem);
         }
         [HttpPost("reject/{requestId:guid}")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Trainer")]
         [ProducesResponseType(typeof(TrainerRequestResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [EndpointSummary("Trainee rejects a received request")]
-        [EndpointDescription("Allows a trainee to reject a received trainer request.")]
+        [EndpointSummary("Trainer rejects a received request")]
+        [EndpointDescription("Allows a trainer to reject a received trainee request.")]
         [EndpointName("RejectRequest")]
         public async Task<ActionResult> RejectRequest(
             [FromRoute] Guid requestId,
@@ -138,7 +139,7 @@ namespace GymAssistant_API.Controllers
                Problem);
         }
         [HttpGet("{requestId:guid}")]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Trainer")]
         [ProducesResponseType(typeof(TrainerRequestResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -146,7 +147,7 @@ namespace GymAssistant_API.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [EndpointSummary("Get request by ID")]
-        [EndpointDescription("Retrieves a specific trainer request by its ID.")]
+        [EndpointDescription("Retrieves a specific trainee request by its ID.")]
         [EndpointName("GetRequestById")]
         public async Task<ActionResult> GetRequestById(
             [FromRoute] Guid requestId,
@@ -157,6 +158,28 @@ namespace GymAssistant_API.Controllers
                response => Ok(response),
                Problem);
         }
+        [HttpGet("all-users")]
+        [Authorize]
+        [ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [EndpointSummary("Get all users")]
+        [EndpointDescription("Retrieves a list of all users with optional search term and pagination.")]
+        [EndpointName("GetAllUsers")]
+        public async Task<ActionResult> GetAllUser(
+            [FromQuery] string? searchTerm,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageNumber = 1,
+            CancellationToken ct = default)
+        {
+            var result = await _trainerRequest.GetAllUser(searchTerm, pageSize, pageNumber, ct);
+            return result.Match(
+               response => Ok(response),
+               Problem);
+        }
+
 
         private string GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
