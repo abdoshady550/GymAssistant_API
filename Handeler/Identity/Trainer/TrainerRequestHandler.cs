@@ -1,4 +1,5 @@
-﻿using GymAssistant_API.Model.Results;
+﻿using GymAssistant_API.Model.Identity.Dtos;
+using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.User.Trainer;
 using GymAssistant_API.Req_Res.Reqeust.User.Trainer;
 using GymAssistant_API.Req_Res.Response.Trainer;
@@ -111,6 +112,21 @@ namespace GymAssistant_API.Handeler.Identity.Trainer
                 return result.Errors;
             }
             _logger.LogInformation("Retrieved trainer request by ID successfully: {RequestId}", requestId);
+            return result.Value;
+        }
+        public async Task<Result<List<UserDto>>> GetAllUser(string? searchTerm, int pageSize, int pageNumber, CancellationToken ct)
+        {
+            var result = await _requestService.GetAllUserAsync(
+               searchTerm,
+               pageSize,
+               pageNumber,
+               ct);
+            if (result.IsError)
+            {
+                _logger.LogError("Error retrieving all users: {Errors}", string.Join(", ", result.Errors.Select(e => e.Description)));
+                return result.Errors;
+            }
+            _logger.LogInformation("Retrieved {Count} users", result.Value.Count);
             return result.Value;
         }
 
