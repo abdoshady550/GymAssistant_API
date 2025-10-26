@@ -17,6 +17,7 @@ namespace GymAssistant_API.Controllers
     public class UserRequestController(UserRequestHandler userRequest) : ApiController
     {
         private readonly UserRequestHandler _userRequest = userRequest;
+
         [HttpPost("send")]
         [Authorize(Roles = "User")]
         [ProducesResponseType(typeof(TrainerRequestResponse), StatusCodes.Status200OK)]
@@ -28,11 +29,11 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Trainee sends a request to a trainer")]
         [EndpointDescription("Allows a trainee to send a request to a trainer with an optional message.")]
         [EndpointName("SendRequestToTrainer")]
-        public async Task<IActionResult> SendRequestToTrainer(
-            [FromQuery] SendUserRequestDto request,
-            CancellationToken ct)
+        public async Task<IActionResult> SendRequestToTrainer([FromQuery] string TrainerId,
+                                                              [FromBody] SendRequestDto req,
+                                                              CancellationToken ct = default)
         {
-            var result = await _userRequest.SendRequest(GetCurrentUserId(), request, ct);
+            var result = await _userRequest.SendRequest(GetCurrentUserId(), TrainerId, req, ct);
             return result.Match(
                response => Ok(response),
                Problem);

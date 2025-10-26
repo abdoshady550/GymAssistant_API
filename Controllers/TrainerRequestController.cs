@@ -28,10 +28,10 @@ namespace GymAssistant_API.Controllers
         [EndpointDescription("Allows a trainer to send a request to a trainee with an optional message.")]
         [EndpointName("SendRequest")]
         public async Task<IActionResult> SendRequest(
-            [FromBody] SendTrainerRequestDto request,
+          [FromQuery] string traineeId, [FromBody] SendRequestDto request,
             CancellationToken ct)
         {
-            var result = await _trainerRequest.SendRequest(GetCurrentUserId(), request, ct);
+            var result = await _trainerRequest.SendRequest(GetCurrentUserId(), traineeId, request, ct);
             return result.Match(
                response => Ok(response),
                Problem);
