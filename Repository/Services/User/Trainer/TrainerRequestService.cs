@@ -1,7 +1,10 @@
 ﻿using GymAssistant_API.Data;
+using GymAssistant_API.Extensions;
 using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Identity.Dtos;
 using GymAssistant_API.Model.Results;
+using GymAssistant_API.Repository.Interfaces.Identity;
+using GymAssistant_API.Repository.Interfaces.Notifications;
 using GymAssistant_API.Repository.Interfaces.User.Trainer;
 using GymAssistant_API.Req_Res.Response.Trainer;
 using Microsoft.EntityFrameworkCore;
@@ -12,11 +15,14 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
     {
         private readonly AppDbContext _context;
         private readonly ILogger<TrainerRequestService> _logger;
-
-        public TrainerRequestService(AppDbContext context, ILogger<TrainerRequestService> logger)
+        private readonly IPushNotificationService _notificationService;
+        public TrainerRequestService(AppDbContext context, ILogger<TrainerRequestService> logger
+            , IPushNotificationService notificationService)
         {
             _context = context;
             _logger = logger;
+            _notificationService = notificationService;
+
         }
 
         public async Task<Result<TrainerRequestResponse>> SendRequestAsync(
@@ -88,7 +94,8 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             _logger.LogInformation("Trainer {TrainerId} sent request to trainee {TraineeId}",
                 trainerProfile.Id, traineeProfile.Id);
-
+            // Send notification to trainee
+            await _notificationService.SendTrainingRequestNotification(trainerId, traineeProfile.FullName, traineeProfile.Image, ct);
             return TrainerRequestResponse.FromEntity(request);
         }
 
@@ -239,7 +246,8 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             _logger.LogInformation("Trainer {TrainerId} accepted request {RequestId} from trainee {TraineeId}",
                 trainerProfile.Id, requestId, request.TraineeId);
-
+            // Send notification to trainee
+            await _notificationService.SendAcceptedRequestNotification(trainerId, request.Trainee.FullName, request.Trainee.Image, ct);
             return TrainerRequestResponse.FromEntity(request);
         }
 
@@ -276,7 +284,8 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             _logger.LogInformation("Trainer {TrainerId} rejected request {RequestId} from trainer {TraineeId}",
                 trainerProfile.Id, requestId, request.TraineeId);
-
+            // Send notification to trainee
+            await _notificationService.SendRejectedRequestNotification(trainerId, request.Trainee.FullName, request.Trainee.Image, ct);
             return TrainerRequestResponse.FromEntity(request);
         }
 
