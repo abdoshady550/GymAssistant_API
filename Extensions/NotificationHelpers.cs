@@ -1,10 +1,113 @@
 ﻿using GymAssistant_API.Model.Entities.Notifications;
 using GymAssistant_API.Repository.Interfaces.Notifications;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace GymAssistant_API.Extensions
 {
     public static class NotificationHelpers
     {
+        private static IFormFile ConvertToIFormFile(string imagePath)
+        {
+            var fileName = Path.GetFileName(imagePath);
+            var bytes = File.ReadAllBytes(imagePath);
+            var stream = new MemoryStream(bytes);
+            return new FormFile(stream, 0, stream.Length, "file", fileName)
+            {
+                Headers = new HeaderDictionary(),
+                ContentType = "image/jpeg"
+            };
+        }
+        /// <summary>
+        /// إشعار عند إرسال المستخدم طلب تدريب لمدرب
+        /// </summary>
+        public static async Task SendTrainingRequestNotification(
+            this IPushNotificationService service,
+            string userId,
+            string Name,
+            string img,
+            CancellationToken ct = default)
+        {
+            IFormFile imgage = null;
+            if (!string.IsNullOrEmpty(img))
+            {
+                imgage = ConvertToIFormFile(img);
+            }
+            await service.SendNotificationAsync(
+                userId,
+                "New Training Request 💪",
+                $"{Name} sent you a training request!",
+                NotificationType.TrainerRequest,
+                new Dictionary<string, string>
+                {
+                    { "trainee_name", Name },
+                    { "action", "open_requests" }
+                },
+                imgage,
+                ct
+            );
+        }
+        /// <summary>
+        /// إشعار عند قبول المدرب لطلب المستخدم
+        /// </summary>
+        public static async Task SendAcceptedRequestNotification(
+            this IPushNotificationService service,
+            string userId,
+            string Name,
+            string img,
+            CancellationToken ct = default)
+        {
+            IFormFile imgage = null;
+            if (!string.IsNullOrEmpty(img))
+            {
+                imgage = ConvertToIFormFile(img);
+            }
+            await service.SendNotificationAsync(
+                userId,
+                "Request Accepted ✅",
+                $"{Name} accepted your training request! Welcome to the team!",
+                NotificationType.TrainerRequest,
+                new Dictionary<string, string>
+                {
+                    { "trainer_name", Name },
+                    { "action", "view_profile" }
+                },
+                imgage,
+                ct
+            );
+        }
+        /// <summary>
+        /// إشعار عند رفض المدرب لطلب المستخدم
+        /// </summary>
+        public static async Task SendRejectedRequestNotification(
+            this IPushNotificationService service,
+            string userId,
+            string Name,
+            string img,
+            CancellationToken ct = default)
+        {
+            IFormFile imgage = null;
+            if (!string.IsNullOrEmpty(img))
+            {
+                imgage = ConvertToIFormFile(img);
+            }
+            await service.SendNotificationAsync(
+                userId,
+                "Request Rejected ❌",
+                $"{Name} has declined your training request.",
+                NotificationType.TrainerRequest,
+                new Dictionary<string, string>
+                {
+                    { "trainer_name", Name },
+                    { "action", "open_requests" }
+                },
+                imgage,
+                ct
+            );
+        }
+
+
+
+
         /// <summary>
         /// Send workout completed notification
         /// </summary>
