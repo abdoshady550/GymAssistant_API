@@ -268,7 +268,7 @@ public class ApplicationDbContextInitialiser(
             {
                 var profile = adminProfile.Value;
                 profile.AppUserId = AdminUserId.ToString();
-                var updateResult = profile.UpdateProfile("John", "Administrator", Gender.Male, profile.AppUser.PhoneNumber, new DateTime(1985, 5, 15), 180);
+                var updateResult = profile.UpdateProfile("John", "Administrator", null, Gender.Male, profile.AppUser.PhoneNumber, new DateTime(1985, 5, 15), 180);
                 if (updateResult.IsSuccess)
                 {
                     profiles.Add(profile);
@@ -288,7 +288,7 @@ public class ApplicationDbContextInitialiser(
             {
                 var profile = trainerProfile.Value;
                 profile.AppUserId = TrainerUserId.ToString();
-                var updateResult = profile.UpdateProfile("Sarah", "Johnson", Gender.Female, profile.AppUser.PhoneNumber, new DateTime(1990, 8, 22), 165);
+                var updateResult = profile.UpdateProfile("Sarah", "Johnson", null, Gender.Female, profile.AppUser.PhoneNumber, new DateTime(1990, 8, 22), 165);
                 if (updateResult.IsSuccess)
                 {
                     profiles.Add(profile);
@@ -308,7 +308,7 @@ public class ApplicationDbContextInitialiser(
             {
                 var profile = trainer2Profile.Value;
                 profile.AppUserId = Trainer2UserId.ToString();
-                var updateResult = profile.UpdateProfile("Ahmed", "Johnson", Gender.Male, profile.AppUser.PhoneNumber, new DateTime(1990, 8, 22), 165);
+                var updateResult = profile.UpdateProfile("Ahmed", "Johnson", null, Gender.Male, profile.AppUser.PhoneNumber, new DateTime(1990, 8, 22), 165);
                 if (updateResult.IsSuccess)
                 {
                     profiles.Add(profile);
@@ -328,7 +328,7 @@ public class ApplicationDbContextInitialiser(
             {
                 var profile = clientProfile.Value;
                 profile.AppUserId = ClientUserId.ToString();
-                var updateResult = profile.UpdateProfile("Michael", "Smith", Gender.Male, profile.AppUser.PhoneNumber, new DateTime(1995, 3, 10), 175);
+                var updateResult = profile.UpdateProfile("Michael", "Smith", null, Gender.Male, profile.AppUser.PhoneNumber, new DateTime(1995, 3, 10), 175);
                 if (updateResult.IsSuccess)
                 {
                     profiles.Add(profile);
@@ -348,7 +348,7 @@ public class ApplicationDbContextInitialiser(
             {
                 var profile = client2Profile.Value;
                 profile.AppUserId = Client2UserId.ToString();
-                var updateResult = profile.UpdateProfile("Emma", "Davis", Gender.Female, profile.AppUser.PhoneNumber, new DateTime(1992, 12, 5), 160);
+                var updateResult = profile.UpdateProfile("Emma", "Davis", null, Gender.Female, profile.AppUser.PhoneNumber, new DateTime(1992, 12, 5), 160);
                 if (updateResult.IsSuccess)
                 {
                     profiles.Add(profile);
