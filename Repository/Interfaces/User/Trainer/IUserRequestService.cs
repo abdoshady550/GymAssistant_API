@@ -7,35 +7,35 @@ namespace GymAssistant_API.Repository.Interfaces.User.Trainer
     public interface IUserRequestService
     {
         Task<Result<TrainerRequestResponse>> SendRequestAsync(
-            string trainerId,
             string traineeId,
+            string trainerId,
             string? message = null,
             CancellationToken ct = default);
 
         Task<Result<TrainerRequestListResponse>> GetSentRequestsAsync(
-            string trainerId,
+            string traineeId,
             int pageSize,
             int pageNumber,
             CancellationToken ct = default);
 
         Task<Result<Deleted>> CancelRequestAsync(
-            string trainerId,
+            string traineeId,
             Guid requestId,
             CancellationToken ct = default);
 
         Task<Result<TrainerRequestListResponse>> GetReceivedRequestsAsync(
-            string trainerId,
+            string traineeId,
             int pageSize,
             int pageNumber,
             CancellationToken ct = default);
 
         Task<Result<TrainerRequestResponse>> AcceptRequestAsync(
-            string trainerId,
+            string traineeId,
             Guid requestId,
             CancellationToken ct = default);
 
         Task<Result<TrainerRequestResponse>> RejectRequestAsync(
-            string trainerId,
+            string traineeId,
             Guid requestId,
             CancellationToken ct = default);
 
