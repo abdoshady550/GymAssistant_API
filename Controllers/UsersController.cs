@@ -45,7 +45,7 @@ namespace GymAssistant_API.Controllers
                 Problem);
         }
         [HttpPatch("update-profile")]
-        [Consumes("application/x-www-form-urlencoded")]
+        [Consumes("multipart/form-data")]
         [Authorize]
         [ProducesResponseType(typeof(Result<ProfileResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
