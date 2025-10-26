@@ -33,7 +33,7 @@ namespace GymAssistant_API.Repository.Interfaces.Notifications
             string userId,
             string title,
             string body,
-            NotificationType type = NotificationType.General,
+            NotificationType? type = NotificationType.General,
             Dictionary<string, string>? data = null,
             IFormFile? ImageFile = null,
             CancellationToken ct = default);
@@ -45,7 +45,7 @@ namespace GymAssistant_API.Repository.Interfaces.Notifications
             List<string> userIds,
             string title,
             string body,
-            NotificationType type = NotificationType.General,
+            NotificationType? type = NotificationType.General,
             Dictionary<string, string>? data = null,
             IFormFile? ImageFile = null,
             CancellationToken ct = default);

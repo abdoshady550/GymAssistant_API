@@ -8,7 +8,7 @@
         Guid Id,
         string Title,
         string Body,
-        NotificationType Type,
+        NotificationType? Type,
         bool IsRead,
         DateTimeOffset CreatedAtUtc,
         DateTimeOffset? ReadAtUtc,

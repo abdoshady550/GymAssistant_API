@@ -11,7 +11,7 @@ namespace GymAssistant_API.Model.Entities.Notifications
         public string UserId { get; private set; }
         public string Title { get; private set; }
         public string Body { get; private set; }
-        public NotificationType Type { get; private set; }
+        public NotificationType? Type { get; private set; } = NotificationType.General;
         public string? Data { get; private set; } // JSON data
         public string? Image { get; private set; }
         public bool IsRead { get; private set; } = false;
@@ -22,7 +22,7 @@ namespace GymAssistant_API.Model.Entities.Notifications
         private Notification() { }
 
         private Notification(Guid id, string userId, string title, string body,
-                            NotificationType type, string? data = null, string? image = null) : base(id)
+                            NotificationType? type, string? data = null, string? image = null) : base(id)
         {
             UserId = userId;
             Title = title;
@@ -35,7 +35,7 @@ namespace GymAssistant_API.Model.Entities.Notifications
         }
 
         public static Result<Notification> Create(Guid id, string userId, string title,
-                                                 string body, NotificationType type, string? data = null, string? image = null)
+                                                 string body, NotificationType? type, string? data = null, string? image = null)
         {
             if (string.IsNullOrWhiteSpace(userId))
                 return Error.Validation("UserId_Required", "User ID is required");
