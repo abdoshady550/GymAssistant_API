@@ -17,6 +17,8 @@ namespace GymAssistant_API.Model.Entities.User
         public string AppUserId { get; set; }
         public AppUser AppUser { get; set; } = default!;
 
+        public string? Image { get; private set; } = null;
+
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
         public string FullName => $"{FirstName} {LastName}";
@@ -78,7 +80,7 @@ namespace GymAssistant_API.Model.Entities.User
 
 
         }
-        public Result<Updated> UpdateProfile(string? firstName = default, string? lastName = default, Gender? gender = default, string? phoneNumber = default, DateTime? birthDate = default, int? heightCm = default)
+        public Result<Updated> UpdateProfile(string? image = null, string? firstName = default, string? lastName = default, Gender? gender = default, string? phoneNumber = default, DateTime? birthDate = default, int? heightCm = default)
         {
 
 
@@ -106,6 +108,10 @@ namespace GymAssistant_API.Model.Entities.User
             {
                 AppUser.PhoneNumber = phoneNumber;
 
+            }
+            if (!string.IsNullOrWhiteSpace(image))
+            {
+                Image = image;
             }
             if (!string.IsNullOrWhiteSpace(firstName))
             {

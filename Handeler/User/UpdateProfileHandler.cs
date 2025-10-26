@@ -31,6 +31,7 @@ namespace GymAssistant_API.Handeler.User
                                    .UpdateProfileAsync(updateProfile.Id,
                                     request.FirstName,
                                     request.LastName,
+                                    request.imageFile,
                                     request.Gender,
                                     request.PhoneNumber,
                                     request.BirthDate,

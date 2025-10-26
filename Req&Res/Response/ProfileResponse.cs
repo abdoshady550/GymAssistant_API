@@ -8,6 +8,8 @@ namespace GymAssistant_API.Req_Res.Response
     {
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
+        public string? Image { get; set; }
+
         public string? phoneNumber { get; set; } = default;
         public DateTime? DateOfBirth { get; set; }
         public Gender? Gender { get; set; } = default;

@@ -1,21 +1,25 @@
 ﻿using GymAssistant_API.Data;
+using GymAssistant_API.Model.Entities.Exercise;
 using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.User;
 using GymAssistant_API.Req_Res.Response;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 
 namespace GymAssistant_API.Repository.Services.User
 {
     public class ProfileService(ILogger<ProfileService> logger,
                                 AppDbContext context,
-                                UserManager<AppUser> userManager) : IProfile
+                                UserManager<AppUser> userManager,
+                                IWebHostEnvironment environment) : IProfile
     {
         private readonly ILogger<ProfileService> _logger = logger;
         private readonly AppDbContext _context = context;
         private readonly UserManager<AppUser> _user = userManager;
+        private readonly IWebHostEnvironment _environment = environment;
 
         public async Task<Result<BodyMeasurement>> AddBodyMeasurementAsync(string userId,
                                                                            decimal? weightKg = default,
@@ -268,6 +272,7 @@ namespace GymAssistant_API.Repository.Services.User
         public async Task<Result<Updated>> UpdateProfileAsync(Guid Id,
                                                               string? firstName = default,
                                                               string? lastName = default,
+                                                              IFormFile? imageFile = default,
                                                               Gender? gender = default,
                                                               string? phoneNumber = default,
                                                               DateTime? birthDate = default,
@@ -281,7 +286,37 @@ namespace GymAssistant_API.Repository.Services.User
 
                 return Error.NotFound("Profile_NotFound", "User profile not found.");
             }
-            profile.UpdateProfile(firstName, lastName, gender, phoneNumber, birthDate, heightCm);
+            // 🖼️ حفظ الصورة في wwwroot (لو موجودة)
+            string? imageUrl = profile.Image;
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                // 🗑️ امسح الصورة القديمة من wwwroot لو موجودة
+                if (!string.IsNullOrEmpty(profile.Image))
+                {
+                    var oldImagePath = Path.Combine(_environment.WebRootPath, profile.Image.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+                    if (File.Exists(oldImagePath))
+                    {
+                        File.Delete(oldImagePath);
+                    }
+                }
+                var uploadsFolder = Path.Combine(_environment.WebRootPath, "images", "profile");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream, ct);
+                }
+
+                const string baseUrl = "https://gymassistantapi.runasp.net";
+                imageUrl = $"{baseUrl}/images/profile/{uniqueFileName}";
+            }
+            profile.UpdateProfile(imageUrl, firstName, lastName, gender, phoneNumber, birthDate, heightCm);
 
             _context.ClientProfiles.Update(profile);
             await _context.SaveChangesAsync();
@@ -319,6 +354,7 @@ namespace GymAssistant_API.Repository.Services.User
             {
                 FirstName = profile.FirstName,
                 LastName = profile.LastName,
+                Image = profile.Image,
                 phoneNumber = profile.AppUser?.PhoneNumber,
                 Gender = profile.Gender,
                 Role = profile.Role,

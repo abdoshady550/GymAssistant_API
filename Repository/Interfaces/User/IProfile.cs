@@ -7,7 +7,7 @@ namespace GymAssistant_API.Repository.Interfaces.User
     {
         Task<Result<ClientProfile>> CreateProfileAsync(string userId, string firstName, string lastName, Gender gender, CancellationToken ct = default);
         Task<Result<ProfileResponse>> GetProfileAsync(string userId, CancellationToken ct = default);
-        Task<Result<Updated>> UpdateProfileAsync(Guid userId, string? firstName = default, string? lastName = default, Gender? gender = default, string? phoneNumber = default, DateTime? birthDate = default, int? heightCm = default, CancellationToken ct = default);
+        Task<Result<Updated>> UpdateProfileAsync(Guid userId, string? firstName = default, string? lastName = default, IFormFile? imageFile = default, Gender? gender = default, string? phoneNumber = default, DateTime? birthDate = default, int? heightCm = default, CancellationToken ct = default);
         Task<Result<BodyMeasurement>> AddBodyMeasurementAsync(string userId, decimal? weightKg = default, decimal? weightGoal = default, decimal? bodyFatPercent = default, decimal? bodyFatGoal = default, decimal? muscleMassKg = default, decimal? muscleMassGoal = default, CancellationToken ct = default);
         Task<Result<Updated>> UpdateBodyMeasurementAsync(Guid Id,
                                                                       decimal? weightKg = default,

@@ -12,6 +12,7 @@ namespace GymAssistant_API.Req_Res.Reqeust
         [StringLength(50)]
         string ? LastName=default,
 
+        IFormFile? imageFile = default,
 
         [EnumDataType(typeof(Gender))]
         Gender ?Gender=default,
