@@ -11,19 +11,20 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
     public class UserRequestService : IUserRequestService
     {
         private readonly AppDbContext _context;
-        private readonly ILogger<TrainerRequestService> _logger;
+        private readonly ILogger<UserRequestService> _logger;
 
-        public UserRequestService(AppDbContext context, ILogger<TrainerRequestService> logger)
+        public UserRequestService(AppDbContext context, ILogger<UserRequestService> logger)
         {
             _context = context;
             _logger = logger;
         }
 
         public async Task<Result<TrainerRequestResponse>> SendRequestAsync(string traineeId,
-                                                                                    string trainerId,
-                                                                                    string? message = null,
-                                                                                    CancellationToken ct = default)
+                                                                           string trainerId,
+                                                                           string? message = null,
+                                                                           CancellationToken ct = default)
         {
+            _logger.LogInformation($"SendRequest called: traineeId={traineeId}, trainerId={trainerId}");
 
             // Verify trainer profile exists and has trainer role
             var traineeProfile = await _context.ClientProfiles
@@ -31,18 +32,20 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             if (traineeProfile == null)
             {
+                _logger.LogWarning($"Trainee not found: {traineeId}");
+
                 return Error.NotFound("Trainee_NotFound", "Trainee not found.");
             }
 
-            // Verify trainee exists
             var trainerProfile = await _context.ClientProfiles
-                .Include(p => p.AppUser)
-                .FirstOrDefaultAsync(p => p.AppUserId == trainerId, ct);
+                .FirstOrDefaultAsync(p => p.AppUserId == trainerId && p.Role == UserRole.Trainer, ct);
 
+            _logger.LogInformation($"Trainer lookup: trainerId={trainerId}, found={trainerProfile != null}, role={trainerProfile?.Role}");
             if (trainerProfile == null)
             {
-                return Error.Validation("Trainer_NotFound", "Trainer profile not found or user is not a trainer.");
-
+                _logger.LogWarning($"Trainer not found or not trainer: {trainerId}");
+                return Error.Validation("Trainer_NotFound",
+                    "Trainer profile not found or user is not a trainer.");
             }
 
             // Check if relationship already exists

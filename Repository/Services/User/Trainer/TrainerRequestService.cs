@@ -36,8 +36,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             // Verify trainee exists
             var traineeProfile = await _context.ClientProfiles
-                .Include(p => p.AppUser)
-                .FirstOrDefaultAsync(p => p.AppUserId == traineeId, ct);
+                .FirstOrDefaultAsync(p => p.AppUserId == traineeId && p.Role == UserRole.User, ct);
 
             if (traineeProfile == null)
             {
