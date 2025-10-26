@@ -19,10 +19,10 @@ namespace GymAssistant_API.Req_Res.Reqeust
     );
 
     public record MeasurementRequest(
-        [Required(ErrorMessage = "Weight is required")]
+
         [Range(20, 400, ErrorMessage = "Weight must be between 20 and 400 kg")]
         decimal? WeightKg,
-        [Required(ErrorMessage = "Weight is required")]
+
         [Range(20, 400, ErrorMessage = "Weight must be between 20 and 400 kg")]
         decimal WeightGoal,
 
