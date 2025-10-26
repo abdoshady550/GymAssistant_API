@@ -7,18 +7,20 @@ using GymAssistant_API.Req_Res.Response.Trainer;
 namespace GymAssistant_API.Handeler.Identity.Trainer
 {
     public sealed class UserRequestHandler(ILogger<UserRequestHandler> logger,
-                                       ITrainerRequestService requestService)
+                                       IUserRequestService requestService)
     {
         private readonly ILogger<UserRequestHandler> _logger = logger;
-        private readonly ITrainerRequestService _requestService = requestService;
+        private readonly IUserRequestService _requestService = requestService;
 
-        public async Task<Result<TrainerRequestResponse>> SendRequest(string userId, SendUserRequestDto request, CancellationToken ct)
+        public async Task<Result<TrainerRequestResponse>> SendRequest(string userId,
+                                                                      string TrainerId,
+                                                                      SendRequestDto req,
+                                                                      CancellationToken ct = default)
         {
-            var result = await _requestService.SendRequestAsync(
-               userId,
-               request.TrainerId,
-               request.Message,
-               ct);
+            var result = await _requestService.SendRequestAsync(userId,
+                                                                TrainerId,
+                                                                req.Message,
+                                                                ct);
             if (result.IsError)
             {
                 _logger.LogError("Error sending trainer request: {Errors}", string.Join(", ", result.Errors.Select(e => e.Description)));

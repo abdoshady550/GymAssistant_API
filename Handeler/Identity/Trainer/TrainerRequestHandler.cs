@@ -12,11 +12,11 @@ namespace GymAssistant_API.Handeler.Identity.Trainer
         private readonly ILogger<TrainerRequestHandler> _logger = logger;
         private readonly ITrainerRequestService _requestService = requestService;
 
-        public async Task<Result<TrainerRequestResponse>> SendRequest(string userId, SendTrainerRequestDto request, CancellationToken ct)
+        public async Task<Result<TrainerRequestResponse>> SendRequest(string userId, string traineeId, SendRequestDto request, CancellationToken ct)
         {
             var result = await _requestService.SendRequestAsync(
                userId,
-               request.TraineeId,
+               traineeId,
                request.Message,
                ct);
             if (result.IsError)
