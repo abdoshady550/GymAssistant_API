@@ -65,7 +65,14 @@ namespace GymAssistant_API.Repository.Services.Progress
 
             if (!workoutData.Any())
             {
-                return null;
+                var progressDataEmpty = new ExerciseProgressData
+                {
+                    ExerciseId = exerciseId,
+                    ExerciseName = exercise?.Name ?? userExercise?.Name ?? "Unknown Exercise",
+                    SectionName = exercise?.Section?.Name ?? userExercise?.Section?.Name ?? "Custom Exercises",
+                    Sessions = null
+                };
+                return progressDataEmpty;
             }
 
 
