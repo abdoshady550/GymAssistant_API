@@ -174,7 +174,7 @@ namespace GymAssistant_API.Controllers
             [FromQuery] int pageNumber = 1,
             CancellationToken ct = default)
         {
-            var result = await _trainerRequest.GetAllUser(searchTerm, pageSize, pageNumber, ct);
+            var result = await _trainerRequest.GetAllUser(GetCurrentUserId(), searchTerm, pageSize, pageNumber, ct);
             return result.Match(
                response => Ok(response),
                Problem);

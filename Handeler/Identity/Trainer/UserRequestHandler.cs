@@ -116,9 +116,10 @@ namespace GymAssistant_API.Handeler.Identity.Trainer
             _logger.LogInformation("Retrieved trainer request by ID successfully: {RequestId}", requestId);
             return result.Value;
         }
-        public async Task<Result<List<UserDto>>> GetAllTrainer(string? searchTerm, int pageSize, int pageNumber, CancellationToken ct)
+        public async Task<Result<List<UserDto>>> GetAllTrainer(string currentUserId,
+string? searchTerm, int pageSize, int pageNumber, CancellationToken ct)
         {
-            var result = await _requestService.GetAllTrainerAsync(
+            var result = await _requestService.GetAllTrainerAsync(currentUserId,
                searchTerm,
                pageSize,
                pageNumber,

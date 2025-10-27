@@ -40,12 +40,14 @@ namespace GymAssistant_API.Repository.Interfaces.User.Trainer
             string userId,
             Guid requestId,
             CancellationToken ct = default);
-        Task<Result<List<UserDto>>> GetAllUserAsync(
+        Task<Result<List<UserDto>>> GetAllUserAsync(string currentUserId,
+
           string? searchTerm,
           int pageSize,
           int pageNumber,
           CancellationToken ct = default);
-        Task<Result<List<UserDto>>> GetAllTrainerAsync(
+        Task<Result<List<UserDto>>> GetAllTrainerAsync(string currentUserId,
+
           string? searchTerm,
           int pageSize,
           int pageNumber,

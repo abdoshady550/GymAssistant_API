@@ -99,7 +99,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
             _logger.LogInformation("Trainer {TrainerId} sent request to trainee {TraineeId}",
                 trainerProfile.Id, traineeId);
             // Send notification to trainer
-            await _notificationService.SendTrainingRequestNotification(traineeId, trainerProfile.FullName, trainerProfile.Image, ct);
+            await _notificationService.SendTrainingRequestNotification(trainerId, traineeProfile.FullName, trainerProfile.Image, ct);
 
             return TrainerRequestResponse.FromEntity(request);
         }
@@ -214,7 +214,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
                 traineeProfile.Id, requestId, request.TrainerId);
 
             // Send notification to trainer
-            await _notificationService.SendAcceptedRequestNotification(traineeId, request.Trainer.FullName, request.Trainer.Image, ct);
+            await _notificationService.SendAcceptedRequestNotification(request.Trainer.AppUserId, traineeProfile.FullName, request.Trainer.Image, ct);
 
             return TrainerRequestResponse.FromEntity(request);
         }
@@ -252,7 +252,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
             _logger.LogInformation("Trainee {TraineeId} rejected request {RequestId} from trainer {TrainerId}",
                 traineeProfile.Id, requestId, request.TrainerId);
             // Send notification to trainer
-            await _notificationService.SendRejectedRequestNotification(traineeId, request.Trainer.FullName, request.Trainer.FullName, ct);
+            await _notificationService.SendRejectedRequestNotification(request.Trainer.AppUserId, traineeProfile.FullName, request.Trainer.FullName, ct);
 
             return TrainerRequestResponse.FromEntity(request);
         }
@@ -318,45 +318,65 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
             return TrainerRequestResponse.FromEntity(request);
         }
         public async Task<Result<List<UserDto>>> GetAllUserAsync(
-        string? searchTerm,
-        int pageSize,
-        int pageNumber,
-        CancellationToken ct = default)
+            string currentUserId,
+          string? searchTerm,
+          int pageSize,
+          int pageNumber,
+          CancellationToken ct = default)
         {
             if (pageSize <= 0 || pageNumber <= 0)
                 return Error.Validation("Invalid_Pagination", "Invalid pagination parameters.");
+            // الحصول على الـ current user profile
+            var currentUserProfile = await _context.ClientProfiles
+                .FirstOrDefaultAsync(cp => cp.AppUserId == currentUserId, ct);
+            if (currentUserProfile == null)
+                return Error.NotFound("User_not_found", "Current user not found");
 
             var query = _context.ClientProfiles
                 .AsNoTracking()
                 .Include(u => u.AppUser)
-                .Where(u => u.Role == UserRole.User);
+                .Where(u => u.Role == UserRole.User && u.AppUserId != currentUserId); // استبعاد المستخدم الحالي
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 var search = searchTerm.Trim().ToLower();
                 query = query.Where(u =>
-                (u.FirstName.ToLower().Contains(search)) ||
-                (u.LastName.ToLower().Contains(search)) ||
-                (u.AppUser != null && u.AppUser.Email != null &&
-                u.AppUser.Email.ToLower().Contains(search)) ||
-                (u.AppUser != null && u.AppUser.PhoneNumber != null &&
-                u.AppUser.PhoneNumber.ToLower().Contains(search)));
+                    (u.FirstName.ToLower().Contains(search)) ||
+                    (u.LastName.ToLower().Contains(search)) ||
+                    (u.AppUser != null && u.AppUser.Email != null &&
+                    u.AppUser.Email.ToLower().Contains(search)) ||
+                    (u.AppUser != null && u.AppUser.PhoneNumber != null &&
+                    u.AppUser.PhoneNumber.ToLower().Contains(search)));
             }
+
             var users = await query
-           .OrderBy(u => u.FirstName)
-           .Skip((pageNumber - 1) * pageSize)
-           .Take(pageSize)
-           .Select(u => new UserDto(
-               u.AppUserId,
-               u.FullName,
-               u.AppUser.Email,
-               u.Gender,
-               u.AppUser.PhoneNumber
-           ))
-           .ToListAsync(ct);
-            return users;
+                .OrderBy(u => u.FirstName)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(u => new
+                {
+                    User = u,
+                    IsInRelation = _context.TrainerTrainees
+                        .Any(tt =>
+                            (tt.TrainerId == currentUserProfile.Id && tt.TraineeId == u.Id) ||
+                            (tt.TraineeId == currentUserProfile.Id && tt.TrainerId == u.Id))
+                })
+                .ToListAsync(ct);
+
+            var userDtos = users.Select(x => new UserDto(
+                x.User.AppUserId,
+                x.IsInRelation, // إضافة الـ IsInRelation
+                x.User.FullName,
+                x.User.AppUser.Email,
+                x.User.Gender,
+                x.User.AppUser.PhoneNumber,
+                x.User.Image
+            )).ToList();
+
+            return userDtos;
         }
         public async Task<Result<List<UserDto>>> GetAllTrainerAsync(
+            string userId,
          string? searchTerm,
          int pageSize,
          int pageNumber,
@@ -365,35 +385,55 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
             if (pageSize <= 0 || pageNumber <= 0)
                 return Error.Validation("Invalid_Pagination", "Invalid pagination parameters.");
 
+            // الحصول على الـ current user profile
+            var currentUserProfile = await _context.ClientProfiles
+                .FirstOrDefaultAsync(cp => cp.AppUserId == userId, ct);
+
+            if (currentUserProfile == null)
+                return Error.NotFound("User_not_found", "Current user not found");
+
             var query = _context.ClientProfiles
                 .AsNoTracking()
                 .Include(u => u.AppUser)
-                .Where(u => u.Role == UserRole.Trainer);
+                .Where(u => u.Role == UserRole.Trainer && u.AppUserId != userId); // استبعاد المستخدم الحالي
+
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 var search = searchTerm.Trim().ToLower();
                 query = query.Where(u =>
-                (u.FirstName.ToLower().Contains(search)) ||
-                (u.LastName.ToLower().Contains(search)) ||
-                (u.AppUser != null && u.AppUser.Email != null &&
-                u.AppUser.Email.ToLower().Contains(search)) ||
-                (u.AppUser != null && u.AppUser.PhoneNumber != null &&
-                u.AppUser.PhoneNumber.ToLower().Contains(search)));
+                    (u.FirstName.ToLower().Contains(search)) ||
+                    (u.LastName.ToLower().Contains(search)) ||
+                    (u.AppUser != null && u.AppUser.Email != null &&
+                    u.AppUser.Email.ToLower().Contains(search)) ||
+                    (u.AppUser != null && u.AppUser.PhoneNumber != null &&
+                    u.AppUser.PhoneNumber.ToLower().Contains(search)));
             }
             var users = await query
-             .OrderBy(u => u.FirstName)
-             .Skip((pageNumber - 1) * pageSize)
-             .Take(pageSize)
-             .Select(u => new UserDto(
-                 u.AppUserId,
-                 u.FullName,
-                 u.AppUser.Email,
-                 u.Gender,
-                 u.AppUser.PhoneNumber
-             ))
-             .ToListAsync(ct);
-            return users;
+                .OrderBy(u => u.FirstName)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(u => new
+                {
+                    User = u,
+                    IsInRelation = _context.TrainerTrainees
+                        .Any(tt =>
+                            (tt.TrainerId == currentUserProfile.Id && tt.TraineeId == u.Id) ||
+                            (tt.TraineeId == currentUserProfile.Id && tt.TrainerId == u.Id))
+                })
+                .ToListAsync(ct);
+
+            var userDtos = users.Select(x => new UserDto(
+                x.User.AppUserId,
+                x.IsInRelation,
+                x.User.FullName,
+                x.User.AppUser.Email,
+                x.User.Gender,
+                x.User.AppUser.PhoneNumber,
+                x.User.Image
+            )).ToList();
+
+            return userDtos;
         }
 
 
