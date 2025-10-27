@@ -1,3 +1,4 @@
+using GymAssistant_API.Model.Entities.Chat;
 using GymAssistant_API.Model.Entities.Exercise;
 using GymAssistant_API.Model.Entities.Notifications;
 using GymAssistant_API.Model.Entities.User;
@@ -19,6 +20,9 @@ namespace GymAssistant_API.Data
         public DbSet<TrainerRequest> TrainerRequests => Set<TrainerRequest>();
         public DbSet<UserRequest> UserRequests => Set<UserRequest>();
 
+
+        public DbSet<ChatConversation> ChatConversations { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
 
         public DbSet<WorkoutSession> WorkoutSessions => Set<WorkoutSession>();
         public DbSet<WorkoutExercise> WorkoutExercises => Set<WorkoutExercise>();

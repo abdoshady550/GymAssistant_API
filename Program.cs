@@ -7,9 +7,11 @@ using GymAssistant_API.Handeler.Identity.Trainer;
 using GymAssistant_API.Handeler.Notifications;
 using GymAssistant_API.Handeler.Progress;
 using GymAssistant_API.Handeler.User;
+using GymAssistant_API.Hubs;
 using GymAssistant_API.Infrastructure;
 using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Identity;
+using GymAssistant_API.Repository.Interfaces.Chat;
 using GymAssistant_API.Repository.Interfaces.Exercise;
 using GymAssistant_API.Repository.Interfaces.ExerciseExercises;
 using GymAssistant_API.Repository.Interfaces.Exercises;
@@ -17,6 +19,7 @@ using GymAssistant_API.Repository.Interfaces.Identity;
 using GymAssistant_API.Repository.Interfaces.Notifications;
 using GymAssistant_API.Repository.Interfaces.User;
 using GymAssistant_API.Repository.Interfaces.User.Trainer;
+using GymAssistant_API.Repository.Services.Chat;
 using GymAssistant_API.Repository.Services.Exercise;
 using GymAssistant_API.Repository.Services.Exercises;
 using GymAssistant_API.Repository.Services.Identity;
@@ -43,6 +46,13 @@ builder.Services.AddControllers()
             options.JsonSerializerOptions.WriteIndented = true;
             options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
         });
+
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+});
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -176,7 +186,6 @@ builder.Services.AddScoped<ChangePasswordHandler>();  // Handler
 builder.Services.AddScoped<NotificationsHandler>();  // Handler
 
 
-
 builder.Services.AddScoped<IIdentityService, IdentityService>();                      // Service
 builder.Services.AddScoped<ITokenProvider, TokenProvider>();                         // Service
 builder.Services.AddScoped<IUserCreate, UserCreateService>();                       // Service
@@ -190,6 +199,8 @@ builder.Services.AddScoped<ITrainerService, TrainerService>();               // 
 builder.Services.AddScoped<IUserRequestService, UserRequestService>();// Service
 builder.Services.AddScoped<ITrainerRequestService, TrainerRequestService>();// Service
 builder.Services.AddScoped<IPushNotificationService, PushNotificationService>();// Service
+builder.Services.AddScoped<IChatService, ChatService>();
+
 
 
 /// Background service for scheduled notifications
@@ -244,6 +255,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.UseStaticFiles(); // لازم يكون موجود
+app.MapHub<ChatHub>("/chathub");
 
 
 app.Run();
