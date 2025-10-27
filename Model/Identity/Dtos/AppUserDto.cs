@@ -7,8 +7,10 @@ namespace GymAssistant_API.Model.Identity.Dtos
                                     string Email,
                                     IList<string> Roles);
     public sealed record UserDto(string UserId,
+                                 bool IsInRelation,
                                  string UserName,
                                  string? Email,
                                  Gender? Gender,
-                                 string? PhoneNumber);
+                                 string? PhoneNumber,
+                                 string? Image);
 }
