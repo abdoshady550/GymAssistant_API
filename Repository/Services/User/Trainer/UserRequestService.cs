@@ -99,7 +99,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
             _logger.LogInformation("Trainer {TrainerId} sent request to trainee {TraineeId}",
                 trainerProfile.Id, traineeId);
             // Send notification to trainer
-            await _notificationService.SendTrainingRequestNotification(trainerId, traineeProfile.FullName, trainerProfile.Image, ct);
+            await _notificationService.SendTrainingRequestNotification(trainerId, traineeProfile.FullName, trainerProfile.Image ?? string.Empty, ct);
 
             return TrainerRequestResponse.FromEntity(request);
         }
@@ -214,7 +214,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
                 traineeProfile.Id, requestId, request.TrainerId);
 
             // Send notification to trainer
-            await _notificationService.SendAcceptedRequestNotification(request.Trainer.AppUserId, traineeProfile.FullName, request.Trainer.Image, ct);
+            await _notificationService.SendAcceptedRequestNotification(request.Trainer.AppUserId, traineeProfile.FullName, request.Trainer.Image ?? string.Empty, ct);
 
             return TrainerRequestResponse.FromEntity(request);
         }
@@ -252,7 +252,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
             _logger.LogInformation("Trainee {TraineeId} rejected request {RequestId} from trainer {TrainerId}",
                 traineeProfile.Id, requestId, request.TrainerId);
             // Send notification to trainer
-            await _notificationService.SendRejectedRequestNotification(request.Trainer.AppUserId, traineeProfile.FullName, request.Trainer.FullName, ct);
+            await _notificationService.SendRejectedRequestNotification(request.Trainer.AppUserId, traineeProfile.FullName, traineeProfile.Image ?? string.Empty, ct);
 
             return TrainerRequestResponse.FromEntity(request);
         }
@@ -318,7 +318,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
             return TrainerRequestResponse.FromEntity(request);
         }
         public async Task<Result<List<UserDto>>> GetAllUserAsync(
-            string currentUserId,
+          string currentUserId,
           string? searchTerm,
           int pageSize,
           int pageNumber,
@@ -435,7 +435,5 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             return userDtos;
         }
-
-
     }
 }

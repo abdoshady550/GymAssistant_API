@@ -105,9 +105,6 @@ namespace GymAssistant_API.Extensions
             );
         }
 
-
-
-
         /// <summary>
         /// Send workout completed notification
         /// </summary>

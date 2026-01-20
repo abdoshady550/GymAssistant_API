@@ -2,7 +2,6 @@
 using GymAssistant_API.Model.Entities.Notifications.Dtos.Req;
 using GymAssistant_API.Model.Entities.Notifications.Dtos.Res;
 using GymAssistant_API.Model.Results;
-using GymAssistant_API.Repository.Interfaces.Identity;
 using GymAssistant_API.Repository.Interfaces.Notifications;
 
 namespace GymAssistant_API.Handeler.Notifications

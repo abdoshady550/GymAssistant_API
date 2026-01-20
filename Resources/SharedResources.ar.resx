@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <!-- رسائل عامة -->
+  <data name="Success" xml:space="preserve">
+    <value>تم بنجاح</value>
+  </data>
+  <data name="Created" xml:space="preserve">
+    <value>تم الإنشاء بنجاح</value>
+  </data>
+  <data name="Updated" xml:space="preserve">
+    <value>تم التحديث بنجاح</value>
+  </data>
+  <data name="Deleted" xml:space="preserve">
+    <value>تم الحذف بنجاح</value>
+  </data>
+  
+  <!-- رسائل الأخطاء -->
+  <data name="User_NotFound" xml:space="preserve">
+    <value>المستخدم غير موجود</value>
+  </data>
+  <data name="Profile_NotFound" xml:space="preserve">
+    <value>الملف الشخصي غير موجود</value>
+  </data>
+  <data name="Exercise_NotFound" xml:space="preserve">
+    <value>التمرين غير موجود</value>
+  </data>
+  <data name="Session_NotFound" xml:space="preserve">
+    <value>جلسة التمرين غير موجودة</value>
+  </data>
+  <data name="Invalid_Email" xml:space="preserve">
+    <value>صيغة البريد الإلكتروني غير صحيحة</value>
+  </data>
+  <data name="Invalid_Password" xml:space="preserve">
+    <value>كلمة المرور غير صحيحة</value>
+  </data>
+  <data name="Email_Already_Exists" xml:space="preserve">
+    <value>البريد الإلكتروني مسجل بالفعل</value>
+  </data>
+  <data name="Passwords_Not_Match" xml:space="preserve">
+    <value>كلمات المرور غير متطابقة</value>
+  </data>
+  <data name="Invalid_Credentials" xml:space="preserve">
+    <value>البريد الإلكتروني أو كلمة المرور غير صحيحة</value>
+  </data>
+  
+  <!-- رسائل التحقق -->
+  <data name="Required_Field" xml:space="preserve">
+    <value>{0} مطلوب</value>
+  </data>
+  <data name="Invalid_Range" xml:space="preserve">
+    <value>{0} يجب أن يكون بين {1} و {2}</value>
+  </data>
+  <data name="Min_Length" xml:space="preserve">
+    <value>{0} يجب أن يكون على الأقل {1} حرفًا</value>
+  </data>
+  
+  <!-- رسائل التمارين -->
+  <data name="Exercise_Created" xml:space="preserve">
+    <value>تم إنشاء التمرين بنجاح</value>
+  </data>
+  <data name="Exercise_Updated" xml:space="preserve">
+    <value>تم تحديث التمرين بنجاح</value>
+  </data>
+  <data name="Exercise_Deleted" xml:space="preserve">
+    <value>تم حذف التمرين بنجاح</value>
+  </data>
+  
+  <!-- رسائل التدريب -->
+  <data name="Workout_Started" xml:space="preserve">
+    <value>تم بدء التدريب بنجاح</value>
+  </data>
+  <data name="Workout_Completed" xml:space="preserve">
+    <value>تم إنهاء التدريب بنجاح</value>
+  </data>
+  <data name="Set_Added" xml:space="preserve">
+    <value>تم إضافة المجموعة بنجاح</value>
+  </data>
+  
+  <!-- رسائل الإشعارات -->
+  <data name="Notification_Sent" xml:space="preserve">
+    <value>تم إرسال الإشعار بنجاح</value>
+  </data>
+  <data name="Notification_Marked_Read" xml:space="preserve">
+    <value>تم تعليم الإشعار كمقروء</value>
+  </data>
+  
+  <!-- رسائل المدرب -->
+  <data name="Request_Sent" xml:space="preserve">
+    <value>تم إرسال الطلب بنجاح</value>
+  </data>
+  <data name="Request_Accepted" xml:space="preserve">
+    <value>تم قبول الطلب بنجاح</value>
+  </data>
+  <data name="Request_Rejected" xml:space="preserve">
+    <value>تم رفض الطلب بنجاح</value>
+  </data>
+  <data name="Trainer_NotFound" xml:space="preserve">
+    <value>المدرب غير موجود</value>
+  </data>
+  <data name="Trainee_NotFound" xml:space="preserve">
+    <value>المتدرب غير موجود</value>
+  </data>
+  
+  <!-- رسائل الملف الشخصي -->
+  <data name="Profile_Created" xml:space="preserve">
+    <value>تم إنشاء الملف الشخصي بنجاح</value>
+  </data>
+  <data name="Profile_Updated" xml:space="preserve">
+    <value>تم تحديث الملف الشخصي بنجاح</value>
+  </data>
+  <data name="Measurement_Added" xml:space="preserve">
+    <value>تم إضافة القياس بنجاح</value>
+  </data>
+  
+  <!-- رسائل المصادقة -->
+  <data name="Password_Reset_Email_Sent" xml:space="preserve">
+    <value>تم إرسال بريد إعادة تعيين كلمة المرور بنجاح</value>
+  </data>
+  <data name="Password_Reset_Success" xml:space="preserve">
+    <value>تم إعادة تعيين كلمة المرور بنجاح</value>
+  </data>
+  <data name="Password_Changed" xml:space="preserve">
+    <value>تم تغيير كلمة المرور بنجاح</value>
+  </data>
+  <data name="Login_Success" xml:space="preserve">
+    <value>تم تسجيل الدخول بنجاح</value>
+  </data>
+  <data name="Logout_Success" xml:space="preserve">
+    <value>تم تسجيل الخروج بنجاح</value>
+  </data>
+  <data name="Register_Success" xml:space="preserve">
+    <value>تم التسجيل بنجاح</value>
+  </data>
+</root>

@@ -299,7 +299,10 @@ namespace GymAssistant_API.Repository.Services.Progress
             };
         }
 
-        public async Task<Result<ExerciseChartData>> GetExerciseChartDataAsync(string userId, Guid exerciseId, int days, CancellationToken ct = default)
+        public async Task<Result<ExerciseChartData>> GetExerciseChartDataAsync(string userId,
+                                                                               Guid exerciseId,
+                                                                               int days,
+                                                                               CancellationToken ct = default)
         {
             var profile = await _context.ClientProfiles
                 .FirstOrDefaultAsync(p => p.AppUserId == userId, ct);
@@ -345,32 +348,46 @@ namespace GymAssistant_API.Repository.Services.Progress
                .ToListAsync(ct);
             }
 
-
             if (!workoutData.Any())
             {
-                return null;
+                var chartDataEmpty = new ExerciseChartData
+                {
+                    WeightProgression = new List<ChartPoint>(),
+                    VolumeProgression = new List<ChartPoint>(),
+                    RepsProgression = new List<ChartPoint>()
+                };
+                return chartDataEmpty;
             }
 
             var chartData = new ExerciseChartData
             {
-                WeightProgression = workoutData.Select(we => new ChartPoint
-                {
-                    Date = we.WorkoutSession.Date,
-                    Value = we.Sets.Max(s => s.WeightKg)
-                }).ToList(),
-                VolumeProgression = workoutData.Select(we => new ChartPoint
-                {
-                    Date = we.WorkoutSession.Date,
-                    Value = we.Sets.Sum(s => s.Reps * s.WeightKg)
-                }).ToList(),
-                RepsProgression = workoutData.Select(we => new ChartPoint
-                {
-                    Date = we.WorkoutSession.Date,
-                    Value = we.Sets.Max(s => s.Reps)
-                }).ToList()
+                WeightProgression = workoutData
+                    .Where(we => we.WorkoutSession != null)
+                    .Select(we => new ChartPoint
+                    {
+                        Date = we.WorkoutSession.Date,
+                        Value = we.Sets.Any() ? we.Sets.Max(s => s.WeightKg) : 0
+                    }).ToList(),
+
+                VolumeProgression = workoutData
+                    .Where(we => we.WorkoutSession != null)
+                    .Select(we => new ChartPoint
+                    {
+                        Date = we.WorkoutSession.Date,
+                        Value = we.Sets.Any() ? we.Sets.Sum(s => s.Reps * s.WeightKg) : 0
+                    }).ToList(),
+
+                RepsProgression = workoutData
+                    .Where(we => we.WorkoutSession != null)
+                    .Select(we => new ChartPoint
+                    {
+                        Date = we.WorkoutSession.Date,
+                        Value = we.Sets.Any() ? we.Sets.Max(s => s.Reps) : 0
+                    }).ToList()
             };
 
             return chartData;
+
         }
 
         public async Task<Result<VolumeChartData>> GetVolumeChartDataAsync(string userId, int days, Guid? sectionId = null, CancellationToken ct = default)

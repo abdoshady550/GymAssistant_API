@@ -5,7 +5,7 @@ namespace GymAssistant_API.Req_Res.Response.Chat
     public class ChatConversationDto
     {
         public Guid Id { get; set; }
-        public Guid OtherUserId { get; set; }
+        public string OtherUserId { get; set; }
         public string OtherUserName { get; set; } = string.Empty;
         public string? OtherUserImage { get; set; }
         public string? LastMessage { get; set; }
@@ -23,7 +23,7 @@ namespace GymAssistant_API.Req_Res.Response.Chat
             return new ChatConversationDto
             {
                 Id = conversation.Id,
-                OtherUserId = otherUser.Id,
+                OtherUserId = otherUser.AppUserId,
                 OtherUserName = otherUser.FullName,
                 OtherUserImage = otherUser.Image,
                 LastMessage = conversation.LastMessageText,
@@ -39,7 +39,7 @@ namespace GymAssistant_API.Req_Res.Response.Chat
     {
         public Guid Id { get; set; }
         public Guid ConversationId { get; set; }
-        public Guid SenderId { get; set; }
+        public string SenderId { get; set; }
         public string SenderName { get; set; } = string.Empty;
         public string? SenderImage { get; set; }
         public string Content { get; set; } = string.Empty;
@@ -57,7 +57,7 @@ namespace GymAssistant_API.Req_Res.Response.Chat
             {
                 Id = message.Id,
                 ConversationId = message.ConversationId,
-                SenderId = message.SenderId,
+                SenderId = message.Sender.AppUserId,
                 SenderName = message.Sender?.FullName ?? "Unknown",
                 SenderImage = message.Sender?.Image,
                 Content = message.Content,

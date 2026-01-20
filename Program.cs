@@ -249,12 +249,14 @@ app.MapScalarApiReference();
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles(); // لازم يكون موجود
+
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllers();
-app.UseStaticFiles(); // لازم يكون موجود
+
 app.MapHub<ChatHub>("/chathub");
 
 

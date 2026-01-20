@@ -95,7 +95,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
             _logger.LogInformation("Trainer {TrainerId} sent request to trainee {TraineeId}",
                 trainerProfile.Id, traineeProfile.Id);
             // Send notification to trainee
-            await _notificationService.SendTrainingRequestNotification(traineeId, trainerProfile.FullName, traineeProfile.Image, ct);
+            await _notificationService.SendTrainingRequestNotification(traineeId, trainerProfile.FullName, traineeProfile.Image ?? string.Empty, ct);
             return TrainerRequestResponse.FromEntity(request);
         }
 
@@ -247,7 +247,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
             _logger.LogInformation("Trainer {TrainerId} accepted request {RequestId} from trainee {TraineeId}",
                 trainerProfile.Id, requestId, request.TraineeId);
             // Send notification to trainee
-            await _notificationService.SendAcceptedRequestNotification(request.Trainee.AppUserId, trainerProfile.FullName, request.Trainee.Image, ct);
+            await _notificationService.SendAcceptedRequestNotification(request.Trainee.AppUserId, trainerProfile.FullName, request.Trainee.Image ?? string.Empty, ct);
             return TrainerRequestResponse.FromEntity(request);
         }
 
@@ -285,7 +285,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
             _logger.LogInformation("Trainer {TrainerId} rejected request {RequestId} from trainer {TraineeId}",
                 trainerProfile.Id, requestId, request.TraineeId);
             // Send notification to trainee
-            await _notificationService.SendRejectedRequestNotification(request.Trainee.AppUserId, trainerProfile.FullName, request.Trainee.Image, ct);
+            await _notificationService.SendRejectedRequestNotification(request.Trainee.AppUserId, trainerProfile.FullName, request.Trainee.Image ?? string.Empty, ct);
             return TrainerRequestResponse.FromEntity(request);
         }
 

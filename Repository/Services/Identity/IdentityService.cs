@@ -218,7 +218,7 @@ public class IdentityService(AppDbContext context,
 
             _logger.LogInformation("Password reset token generated for email:{email}", email);
 
-            var m = "If your email is registered, you can get the link from here.";
+            var m = "If your email is registered, you can get the link from there.";
             return m;
         }
         catch (Exception ex)
