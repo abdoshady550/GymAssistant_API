@@ -97,5 +97,11 @@ namespace GymAssistant_API.Model.Entities.Exercise
 
         public static Error SetNotFound =>
             Error.NotFound(LocalizationKeys.Exercise.SetNotFound);
+
+        public static Error WorkdayNotFound =>
+            Error.NotFound("Workday.NotFound", "Workday not found");
+
+        public static Error PredefinedSessionNotFound =>
+            Error.NotFound("Workout.PredefinedSessionNotFound", "Predefined workout session not found");
     }
 }

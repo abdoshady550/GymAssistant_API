@@ -202,6 +202,8 @@ builder.Services.AddScoped<ExternalLoginHandler>();    // Handler
 builder.Services.AddScoped<ChangePasswordHandler>();  // Handler
 builder.Services.AddScoped<NotificationsHandler>();  // Handler
 builder.Services.AddScoped<DeleteUserHandler>();  // Handler
+builder.Services.AddScoped<AdminPredefinedHandler>();  // Handler
+builder.Services.AddScoped<PredefinedDataHandler>();   // Handler
 
 
 builder.Services.AddScoped<IIdentityService, IdentityService>();                      // Service
@@ -209,6 +211,7 @@ builder.Services.AddScoped<ITokenProvider, TokenProvider>();                    
 builder.Services.AddScoped<IUserCreate, UserCreateService>();                       // Service
 builder.Services.AddScoped<IProfile, ProfileService>();                            // Service
 builder.Services.AddScoped<IExercise, ExerciseService>();                         // Service
+builder.Services.AddScoped<IPredefinedDataService, PredefinedDataService>();       // Service
 builder.Services.AddScoped<IWorkoutService, WorkoutService>();                   // Service
 builder.Services.AddScoped<IPersonalRecordService, PersonalRecordService>();    // Service
 builder.Services.AddScoped<IProgressService, ProgressService>();               // Service

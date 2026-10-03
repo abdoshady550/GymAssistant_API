@@ -36,6 +36,10 @@ namespace GymAssistant_API.Data
         public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
         public DbSet<DeviceToken> DeviceTokens => Set<DeviceToken>();
 
+        public DbSet<PredefinedWorkday> PredefinedWorkdays => Set<PredefinedWorkday>();
+        public DbSet<PredefinedWorkoutSession> PredefinedWorkoutSessions => Set<PredefinedWorkoutSession>();
+        public DbSet<PredefinedSessionExercise> PredefinedSessionExercises => Set<PredefinedSessionExercise>();
+
         public DbSet<Notification> Notifications => Set<Notification>();
 
 

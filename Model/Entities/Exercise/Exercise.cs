@@ -1,6 +1,5 @@
-﻿using GymAssistant_API.Model.Identity;
+using GymAssistant_API.Model.Identity;
 using GymAssistant_API.Model.Results;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace GymAssistant_API.Model.Entities.Exercise
 {
@@ -12,47 +11,76 @@ namespace GymAssistant_API.Model.Entities.Exercise
         public SectionGroup? SectionGroup { get; private set; } = default!;
 
         public string Name { get; private set; }
+        public string? NameEn { get; private set; }
+        public string? NameAr { get; private set; }
         public string? Description { get; private set; }
+        public string? DescriptionEn { get; private set; }
+        public string? DescriptionAr { get; private set; }
         public string? Instructions { get; private set; }
+        public string? InstructionsEn { get; private set; }
+        public string? InstructionsAr { get; private set; }
         public string? ImageUrl { get; private set; }
         public string? Equipment { get; private set; }
+        public string? EquipmentEn { get; private set; }
+        public string? EquipmentAr { get; private set; }
         public DifficultyLevel? DifficultyLevel { get; private set; }
         public int? DefaultSets { get; private set; }
         public int? DefaultReps { get; private set; }
         public bool IsCustomExercise { get; private set; }
 
-
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+#pragma warning disable CS8618
         private Exercise() { }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+#pragma warning restore CS8618
 
         private Exercise(Guid id, Guid sectionId, string name, string? description = null,
                        string? instructions = null, string? imageUrl = null,
                        string? equipment = null, DifficultyLevel? difficultyLevel = null,
-                       int? defaultSets = null, int? defaultReps = null) : base(id)
+                       int? defaultSets = null, int? defaultReps = null,
+                       string? nameAr = null, string? descriptionAr = null,
+                       string? instructionsAr = null, string? equipmentAr = null) : base(id)
         {
             SectionId = sectionId;
             Name = name;
+            NameEn = name;
+            NameAr = nameAr;
             Description = description;
+            DescriptionEn = description;
+            DescriptionAr = descriptionAr;
             Instructions = instructions;
+            InstructionsEn = instructions;
+            InstructionsAr = instructionsAr;
             ImageUrl = imageUrl;
             Equipment = equipment;
+            EquipmentEn = equipment;
+            EquipmentAr = equipmentAr;
             DifficultyLevel = difficultyLevel;
             DefaultSets = defaultSets;
             DefaultReps = defaultReps;
             IsCustomExercise = false;
             CreatedAtUtc = DateTime.UtcNow;
         }
+
         public static Result<Exercise> Create(Guid id, Guid sectionId, string name, string? description = null,
                                             string? instructions = null, string? imageUrl = null,
                                             string? equipment = null, DifficultyLevel? difficultyLevel = null,
+                                            int? defaultSets = null, int? defaultReps = null)
+        {
+            return Create(id, sectionId, name, null, description, null, instructions, null,
+                          imageUrl, equipment, null, difficultyLevel, defaultSets, defaultReps);
+        }
+
+        public static Result<Exercise> Create(Guid id, Guid sectionId, string nameEn, string? nameAr = null,
+                                            string? descriptionEn = null, string? descriptionAr = null,
+                                            string? instructionsEn = null, string? instructionsAr = null,
+                                            string? imageUrl = null, string? equipmentEn = null, string? equipmentAr = null,
+                                            DifficultyLevel? difficultyLevel = null,
                                             int? defaultSets = null, int? defaultReps = null)
         {
             if (sectionId == Guid.Empty)
             {
                 return ExerciseErrors.SectionIdRequired;
             }
-            if (string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(nameEn))
             {
                 return ExerciseErrors.NameRequired;
             }
@@ -64,10 +92,13 @@ namespace GymAssistant_API.Model.Entities.Exercise
             {
                 return ExerciseErrors.DefaultRepsInvalid;
             }
-            var exercise = new Exercise(id, sectionId, name, description, instructions, imageUrl,
-                                        equipment, difficultyLevel, defaultSets, defaultReps);
+
+            var exercise = new Exercise(id, sectionId, nameEn, descriptionEn, instructionsEn, imageUrl,
+                                        equipmentEn, difficultyLevel, defaultSets, defaultReps,
+                                        nameAr, descriptionAr, instructionsAr, equipmentAr);
             return exercise;
         }
+
         public Result<Updated> Update(Guid? sectionId,
                                       string? name,
                                       string? description,
@@ -78,8 +109,24 @@ namespace GymAssistant_API.Model.Entities.Exercise
                                       int? defaultSets,
                                       int? defaultReps)
         {
+            return Update(sectionId, name, null, description, null, instructions, null,
+                          imageUrl, equipment, null, difficultyLevel, defaultSets, defaultReps);
+        }
 
-
+        public Result<Updated> Update(Guid? sectionId,
+                                      string? nameEn,
+                                      string? nameAr,
+                                      string? descriptionEn,
+                                      string? descriptionAr,
+                                      string? instructionsEn,
+                                      string? instructionsAr,
+                                      string? imageUrl,
+                                      string? equipmentEn,
+                                      string? equipmentAr,
+                                      DifficultyLevel? difficultyLevel,
+                                      int? defaultSets,
+                                      int? defaultReps)
+        {
             if (defaultSets != null && defaultSets <= 0)
             {
                 return ExerciseErrors.DefaultSetsInvalid;
@@ -90,32 +137,49 @@ namespace GymAssistant_API.Model.Entities.Exercise
             }
             if (sectionId.HasValue)
                 SectionId = sectionId.Value;
-            if (!string.IsNullOrEmpty(name))
+            if (!string.IsNullOrEmpty(nameEn))
             {
-                Name = name;
+                Name = nameEn;
+                NameEn = nameEn;
             }
-            if (!string.IsNullOrEmpty(description))
+            if (nameAr != null)
             {
-                Description = description;
+                NameAr = nameAr;
             }
-            if (!string.IsNullOrEmpty(instructions))
+            if (descriptionEn != null)
             {
-                Instructions = instructions;
+                Description = descriptionEn;
+                DescriptionEn = descriptionEn;
             }
-            if (!string.IsNullOrEmpty(equipment))
+            if (descriptionAr != null)
             {
-                Equipment = equipment;
-
+                DescriptionAr = descriptionAr;
+            }
+            if (instructionsEn != null)
+            {
+                Instructions = instructionsEn;
+                InstructionsEn = instructionsEn;
+            }
+            if (instructionsAr != null)
+            {
+                InstructionsAr = instructionsAr;
+            }
+            if (equipmentEn != null)
+            {
+                Equipment = equipmentEn;
+                EquipmentEn = equipmentEn;
+            }
+            if (equipmentAr != null)
+            {
+                EquipmentAr = equipmentAr;
             }
             if (!string.IsNullOrEmpty(imageUrl))
             {
                 ImageUrl = imageUrl;
-
             }
             if (difficultyLevel.HasValue)
             {
                 DifficultyLevel = difficultyLevel.Value;
-
             }
             if (defaultSets.HasValue)
             {
@@ -128,8 +192,8 @@ namespace GymAssistant_API.Model.Entities.Exercise
 
             return Result.Updated;
         }
-
     }
+
     public enum DifficultyLevel
     {
         Beginner = 1,

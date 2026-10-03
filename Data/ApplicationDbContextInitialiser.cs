@@ -1,4 +1,4 @@
-﻿using GymAssistant_API.Model.Entities.Exercise;
+using GymAssistant_API.Model.Entities.Exercise;
 using GymAssistant_API.Model.Entities.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -57,11 +57,29 @@ public class ApplicationDbContextInitialiser(
     {
         try
         {
-            await _context.Database.EnsureCreatedAsync();
+            if (_context.Database.IsSqlServer() || _context.Database.IsRelational())
+            {
+                var pendingMigrations = await _context.Database.GetPendingMigrationsAsync();
+                if (pendingMigrations.Any())
+                {
+                    _logger.LogInformation("Applying {Count} pending migration(s): {Migrations}",
+                        pendingMigrations.Count(), string.Join(", ", pendingMigrations));
+                    await _context.Database.MigrateAsync();
+                    _logger.LogInformation("Database migrations applied successfully.");
+                }
+                else
+                {
+                    _logger.LogInformation("No pending database migrations found. Database is up to date.");
+                }
+            }
+            else
+            {
+                await _context.Database.EnsureCreatedAsync();
+            }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred while initialising the database.");
+            _logger.LogError(ex, "An error occurred while initialising/migrating the database.");
             throw;
         }
     }
@@ -91,6 +109,10 @@ public class ApplicationDbContextInitialiser(
         await SeedSectionsAsync();
         // Create exercises
         await SeedExercisesAsync();
+        // Create predefined workdays
+        await SeedPredefinedWorkdaysAsync();
+        // Create predefined workout sessions
+        await SeedPredefinedWorkoutSessionsAsync();
         // Create body measurements
         await SeedBodyMeasurementsAsync();
         // Create user exercises
@@ -366,19 +388,19 @@ public class ApplicationDbContextInitialiser(
         {
             var sections = new List<Section>();
 
-            var chestSection = Section.Create(ChestSectionId, "Chest", "Chest muscle exercises and upper body training");
+            var chestSection = Section.Create(ChestSectionId, "Chest", "صدر", "Chest muscle exercises and upper body training", "تمارين عضلات الصدر والجزء العلوي من الجسم", "/images/sections/chest.jpg");
             if (chestSection.IsSuccess) sections.Add(chestSection.Value);
 
-            var backSection = Section.Create(BackSectionId, "Back", "Back muscle exercises and spine strengthening");
+            var backSection = Section.Create(BackSectionId, "Back", "ظهر", "Back muscle exercises and spine strengthening", "تمارين عضلات الظهر وتقوية العمود الفقري", "/images/sections/back.jpg");
             if (backSection.IsSuccess) sections.Add(backSection.Value);
 
-            var legsSection = Section.Create(LegsSectionId, "Legs", "Leg muscle exercises and lower body training");
+            var legsSection = Section.Create(LegsSectionId, "Legs", "أرجل", "Leg muscle exercises and lower body training", "تمارين عضلات الأرجل والجزء السفلي من الجسم", "/images/sections/legs.jpg");
             if (legsSection.IsSuccess) sections.Add(legsSection.Value);
 
-            var shouldersSection = Section.Create(ShouldersSectionId, "Shoulders", "Shoulder muscle exercises and deltoid training");
+            var shouldersSection = Section.Create(ShouldersSectionId, "Shoulders", "أكتاف", "Shoulder muscle exercises and deltoid training", "تمارين عضلات الكتف وتدريب الدالية", "/images/sections/shoulders.jpg");
             if (shouldersSection.IsSuccess) sections.Add(shouldersSection.Value);
 
-            var armsSection = Section.Create(ArmsSectionId, "Arms", "Arm muscle exercises - biceps and triceps");
+            var armsSection = Section.Create(ArmsSectionId, "Arms", "ذراعين", "Arm muscle exercises - biceps and triceps", "تمارين عضلات الذراع - بايسبس وترايسبس", "/images/sections/arms.jpg");
             if (armsSection.IsSuccess) sections.Add(armsSection.Value);
 
             await _context.Sections.AddRangeAsync(sections);
@@ -396,11 +418,12 @@ public class ApplicationDbContextInitialiser(
             var benchPress = Exercise.Create(
                 BenchPressId,
                 ChestSectionId,
-                "Bench Press",
-                "A fundamental exercise for building chest, shoulder, and arm muscles",
+                "Bench Press", "بنش برس بالبار",
+                "A fundamental exercise for building chest, shoulder, and arm muscles", "تمرين أساسي لبناء عضلات الصدر والكتف والذراعين",
                 "Lie on the bench and keep your feet firmly on the ground. Grip the bar with a medium-width grip and lower it slowly until it touches your chest, then push it up forcefully",
+                "استلقِ على المقعد وضع قدميك بإحكام على الأرض. امسك البار بقبضة متوسطة وانزله ببطء حتى يلمس صدرك، ثم ادفعه للأعلى بقوة",
                 "/images/exercises/bench-press.jpg",
-                "Barbell, flat bench, weight plates",
+                "Barbell, flat bench, weight plates", "بار، مقعد مستوٍ، أوزان",
                 DifficultyLevel.Intermediate,
                 3,
                 8
@@ -411,11 +434,12 @@ public class ApplicationDbContextInitialiser(
             var deadlift = Exercise.Create(
                 DeadliftId,
                 BackSectionId,
-                "Deadlift",
-                "A comprehensive full-body exercise focusing on back and leg muscles",
+                "Deadlift", "ديدلفت بالبار",
+                "A comprehensive full-body exercise focusing on back and leg muscles", "تمرين شامل لكامل الجسم يركز على عضلات الظهر والأرجل",
                 "Stand with feet directly under the bar. Keep your back straight and bend at the hips and knees to grip the bar, then lift it slowly while maintaining a straight back",
+                "قف مع وضع قدميك تحت البار مباشرة. حافظ على استقامة ظهرك واثنِ وركيك وركبتيك للإمساك بالبار، ثم ارفعه ببطء",
                 "/images/exercises/deadlift.jpg",
-                "Barbell, weight plates, lifting platform",
+                "Barbell, weight plates, lifting platform", "بار، أقراص أوزان، منصة رفع",
                 DifficultyLevel.Advanced,
                 3,
                 5
@@ -426,11 +450,12 @@ public class ApplicationDbContextInitialiser(
             var squat = Exercise.Create(
                 SquatId,
                 LegsSectionId,
-                "Squat",
-                "A fundamental exercise for leg, glute, and core muscles",
+                "Squat", "سكوات بالبار",
+                "A fundamental exercise for leg, glute, and core muscles", "تمرين أساسي لعضلات الأرجل والأرداف والجذع",
                 "Place the bar on your upper back and stand with feet shoulder-width apart. Lower slowly as if sitting in a chair until thighs are parallel to the floor, then return to starting position",
+                "ضع البار على أعلى ظهرك وقف بقدمين بعرض الكتفين. انزل ببطء كأنك تجلس على كرسي حتى يتوازى فخذاك مع الأرض، ثم ارجع لوضع البداية",
                 "/images/exercises/squat.jpg",
-                "Barbell, squat rack, weight plates",
+                "Barbell, squat rack, weight plates", "بار، حامل سكوات، أقراص أوزان",
                 DifficultyLevel.Intermediate,
                 4,
                 10
@@ -441,11 +466,12 @@ public class ApplicationDbContextInitialiser(
             var pullUp = Exercise.Create(
                 PullUpId,
                 BackSectionId,
-                "Pull-up",
-                "An excellent exercise for back and arm muscles",
+                "Pull-up", "عقلة",
+                "An excellent exercise for back and arm muscles", "تمرين ممتاز لعضلات الظهر والذراعين",
                 "Hang from the bar with a grip wider than shoulder-width. Pull your body up until your chin passes the bar, then lower slowly to the starting position",
+                "تعلق من البار بقبضة أوسع من عرض الكتفين. اسحب جسمك للأعلى حتى يتجاوز ذقنك البار، ثم انزل ببطء",
                 "/images/exercises/pull-up.jpg",
-                "Pull-up bar or pull-up station",
+                "Pull-up bar or pull-up station", "بار عقلة",
                 DifficultyLevel.Advanced,
                 3,
                 6
@@ -456,11 +482,12 @@ public class ApplicationDbContextInitialiser(
             var shoulderPress = Exercise.Create(
                 ShoulderPressId,
                 ShouldersSectionId,
-                "Shoulder Press",
-                "An exercise for strengthening shoulder and arm muscles",
+                "Shoulder Press", "ضغط أكتاف بالدمبل",
+                "An exercise for strengthening shoulder and arm muscles", "تمرين لتقوية عضلات الكتف والذراعين",
                 "Hold dumbbells in each hand at shoulder level. Push the weights up until arms are straight, then lower slowly",
+                "امسك الدمبل بكل يد عند مستوى الكتف. ادفع الأوزان لأعلى حتى تستقيم ذراعاك، ثم انزل ببطء",
                 "/images/exercises/shoulder-press.jpg",
-                "Dumbbells or barbell",
+                "Dumbbells or barbell", "دمبل أو بار",
                 DifficultyLevel.Beginner,
                 3,
                 10
@@ -471,11 +498,12 @@ public class ApplicationDbContextInitialiser(
             var bicepCurl = Exercise.Create(
                 BicepCurlId,
                 ArmsSectionId,
-                "Bicep Curl",
-                "An isolation exercise for the bicep muscle",
+                "Bicep Curl", "تبادل بايسبس بالدمبل",
+                "An isolation exercise for the bicep muscle", "تمرين عزل لعضلة البايسبس",
                 "Hold dumbbells in each hand with elbows fixed by your sides. Raise the weights toward your shoulders by bending the elbow, then lower slowly",
+                "امسك الدمبل بكل يد مع تثبيت المرفقين بجانبك. ارفع الأوزان نحو كتفيك بثني المرفق، ثم انزل ببطء",
                 "/images/exercises/bicep-curl.jpg",
-                "Dumbbells",
+                "Dumbbells", "دمبل",
                 DifficultyLevel.Beginner,
                 3,
                 12
@@ -484,6 +512,133 @@ public class ApplicationDbContextInitialiser(
 
             await _context.Exercises.AddRangeAsync(exercises);
             _logger.LogInformation("Seeded {Count} exercises", exercises.Count);
+        }
+    }
+
+    private async Task SeedPredefinedWorkdaysAsync()
+    {
+        if (!await _context.PredefinedWorkdays.AnyAsync())
+        {
+            var workdays = new List<PredefinedWorkday>();
+
+            var pushDay = PredefinedWorkday.Create(
+                SeedIds.PushDayId,
+                "Push Day",
+                "يوم الدفع",
+                "Focus on Chest, Shoulders, and Triceps",
+                "التركيز على عضلات الصدر والأكتاف والترايسبس",
+                "/images/workdays/push-day.jpg",
+                dayNumber: 1,
+                isActive: true
+            );
+            if (pushDay.IsSuccess) workdays.Add(pushDay.Value);
+
+            var pullDay = PredefinedWorkday.Create(
+                SeedIds.PullDayId,
+                "Pull Day",
+                "يوم السحب",
+                "Focus on Back and Biceps",
+                "التركيز على عضلات الظهر والبايسبس",
+                "/images/workdays/pull-day.jpg",
+                dayNumber: 2,
+                isActive: true
+            );
+            if (pullDay.IsSuccess) workdays.Add(pullDay.Value);
+
+            var legDay = PredefinedWorkday.Create(
+                SeedIds.LegDayId,
+                "Leg Day",
+                "يوم الأرجل",
+                "Focus on Quads, Hamstrings, Glutes, and Calves",
+                "التركيز على عضلات الفخذ الأمامية والخلفية والأرداف والسمانة",
+                "/images/workdays/leg-day.jpg",
+                dayNumber: 3,
+                isActive: true
+            );
+            if (legDay.IsSuccess) workdays.Add(legDay.Value);
+
+            await _context.PredefinedWorkdays.AddRangeAsync(workdays);
+            _logger.LogInformation("Seeded {Count} predefined workdays", workdays.Count);
+        }
+    }
+
+    private async Task SeedPredefinedWorkoutSessionsAsync()
+    {
+        if (!await _context.PredefinedWorkoutSessions.AnyAsync())
+        {
+            var sessions = new List<PredefinedWorkoutSession>();
+
+            // Push Session Template
+            var pushSession = PredefinedWorkoutSession.Create(
+                SeedIds.PushSessionTemplateId,
+                SeedIds.PushDayId,
+                "Push Power Workout",
+                "تمرين الدفع القوي",
+                "Heavy chest, shoulder, and tricep routine for muscle hypertrophy",
+                "تمرين مكثف لعضلات الصدر والكتف والترايسبس لزيادة الكتلة العضلية",
+                "/images/sessions/push-workout.jpg",
+                DifficultyLevel.Intermediate,
+                estimatedDurationMinutes: 60,
+                isActive: true
+            );
+            if (pushSession.IsSuccess)
+            {
+                var s = pushSession.Value;
+                var pe1 = PredefinedSessionExercise.Create(Guid.NewGuid(), s.Id, SeedIds.BenchPressId, order: 1, defaultSets: 4, defaultReps: 8, defaultRestTimeSeconds: 90);
+                var pe2 = PredefinedSessionExercise.Create(Guid.NewGuid(), s.Id, SeedIds.ShoulderPressId, order: 2, defaultSets: 3, defaultReps: 10, defaultRestTimeSeconds: 60);
+                if (pe1.IsSuccess) s.AddExercise(pe1.Value);
+                if (pe2.IsSuccess) s.AddExercise(pe2.Value);
+                sessions.Add(s);
+            }
+
+            // Pull Session Template
+            var pullSession = PredefinedWorkoutSession.Create(
+                SeedIds.PullSessionTemplateId,
+                SeedIds.PullDayId,
+                "Pull Hypertrophy Workout",
+                "تمرين السحب للبناء العضلي",
+                "Upper back, lats, and bicep routine",
+                "تمرين شامل لعضلات الظهر والبايسبس",
+                "/images/sessions/pull-workout.jpg",
+                DifficultyLevel.Advanced,
+                estimatedDurationMinutes: 55,
+                isActive: true
+            );
+            if (pullSession.IsSuccess)
+            {
+                var s = pullSession.Value;
+                var pe1 = PredefinedSessionExercise.Create(Guid.NewGuid(), s.Id, SeedIds.DeadliftId, order: 1, defaultSets: 4, defaultReps: 6, defaultRestTimeSeconds: 120);
+                var pe2 = PredefinedSessionExercise.Create(Guid.NewGuid(), s.Id, SeedIds.PullUpId, order: 2, defaultSets: 3, defaultReps: 8, defaultRestTimeSeconds: 90);
+                var pe3 = PredefinedSessionExercise.Create(Guid.NewGuid(), s.Id, SeedIds.BicepCurlId, order: 3, defaultSets: 3, defaultReps: 12, defaultRestTimeSeconds: 60);
+                if (pe1.IsSuccess) s.AddExercise(pe1.Value);
+                if (pe2.IsSuccess) s.AddExercise(pe2.Value);
+                if (pe3.IsSuccess) s.AddExercise(pe3.Value);
+                sessions.Add(s);
+            }
+
+            // Leg Session Template
+            var legSession = PredefinedWorkoutSession.Create(
+                SeedIds.LegSessionTemplateId,
+                SeedIds.LegDayId,
+                "Lower Body Strength",
+                "تمرين قوة الجزء السفلي",
+                "Squats and foundational leg power building",
+                "السكوات وبناء القوة الأساسية لعضلات الأرجل",
+                "/images/sessions/leg-workout.jpg",
+                DifficultyLevel.Intermediate,
+                estimatedDurationMinutes: 50,
+                isActive: true
+            );
+            if (legSession.IsSuccess)
+            {
+                var s = legSession.Value;
+                var pe1 = PredefinedSessionExercise.Create(Guid.NewGuid(), s.Id, SeedIds.SquatId, order: 1, defaultSets: 4, defaultReps: 10, defaultRestTimeSeconds: 120);
+                if (pe1.IsSuccess) s.AddExercise(pe1.Value);
+                sessions.Add(s);
+            }
+
+            await _context.PredefinedWorkoutSessions.AddRangeAsync(sessions);
+            _logger.LogInformation("Seeded {Count} predefined workout session templates", sessions.Count);
         }
     }
 

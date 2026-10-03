@@ -1,6 +1,42 @@
 @GymAssistant_API_HostAddress = http://localhost:5151
 
-GET {{GymAssistant_API_HostAddress}}/weatherforecast/
+### 1. Get Predefined Sections (Client - English)
+GET {{GymAssistant_API_HostAddress}}/api/predefined/sections
+Accept: application/json
+Accept-Language: en
+
+### 2. Get Predefined Sections (Client - Arabic)
+GET {{GymAssistant_API_HostAddress}}/api/predefined/sections
+Accept: application/json
+Accept-Language: ar
+
+### 3. Get Predefined Exercises (Client - Arabic)
+GET {{GymAssistant_API_HostAddress}}/api/predefined/exercises
+Accept: application/json
+Accept-Language: ar
+
+### 4. Get Predefined Workdays (Client - Arabic)
+GET {{GymAssistant_API_HostAddress}}/api/predefined/workdays
+Accept: application/json
+Accept-Language: ar
+
+### 5. Get Predefined Sessions (Client - Arabic)
+GET {{GymAssistant_API_HostAddress}}/api/predefined/sessions
+Accept: application/json
+Accept-Language: ar
+
+### 6. Admin Get Sections (Bilingual)
+GET {{GymAssistant_API_HostAddress}}/api/admin/predefined/sections
 Accept: application/json
 
-###
+### 7. Admin Get Exercises (Bilingual)
+GET {{GymAssistant_API_HostAddress}}/api/admin/predefined/exercises
+Accept: application/json
+
+### 8. Admin Get Workdays (Bilingual)
+GET {{GymAssistant_API_HostAddress}}/api/admin/predefined/workdays
+Accept: application/json
+
+### 9. Admin Get Sessions (Bilingual)
+GET {{GymAssistant_API_HostAddress}}/api/admin/predefined/sessions
+Accept: application/json

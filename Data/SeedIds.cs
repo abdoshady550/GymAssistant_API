@@ -37,4 +37,12 @@ public static class SeedIds
     public static readonly Guid WorkoutExercise3Id = Guid.Parse("14141414-1414-1414-1414-141414141414");
     public static readonly Guid WorkoutExercise4Id = Guid.Parse("15151515-1515-1515-1515-151515151515");
     public static readonly Guid WorkoutExercise5Id = Guid.Parse("16161616-1616-1616-1616-161616161616");
+
+    public static readonly Guid PushDayId = Guid.Parse("70707070-7070-7070-7070-707070707070");
+    public static readonly Guid PullDayId = Guid.Parse("80808080-8080-8080-8080-808080808080");
+    public static readonly Guid LegDayId = Guid.Parse("90909090-9090-9090-9090-909090909090");
+
+    public static readonly Guid PushSessionTemplateId = Guid.Parse("a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1");
+    public static readonly Guid PullSessionTemplateId = Guid.Parse("b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2");
+    public static readonly Guid LegSessionTemplateId = Guid.Parse("c3c3c3c3-c3c3-c3c3-c3c3-c3c3c3c3c3c3");
 }
