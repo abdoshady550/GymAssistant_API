@@ -74,8 +74,11 @@ builder.Services.AddScoped<ISeedDataLocalizer, SeedDataLocalizer>();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
-builder.Services.AddDbContext<AppDbContext>
-(option => option.UseSqlServer((builder.Configuration.GetConnectionString("DefaultConnection"))));
+builder.Services.AddDbContext<AppDbContext>(option =>
+{
+    option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    option.ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+});
 builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -228,7 +231,10 @@ builder.Services.AddScoped<IChatService, ChatService>();
 
 
 /// Background service for scheduled notifications
-builder.Services.AddHostedService<NotificationBackgroundService>();
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddHostedService<NotificationBackgroundService>();
+}
 
 builder.Services.AddOpenApi(options =>
 {
@@ -290,3 +296,4 @@ app.MapHub<ChatHub>("/chathub");
 
 app.Run();
 
+public partial class Program { }

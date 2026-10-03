@@ -100,13 +100,15 @@ namespace GymAssistant_API.Model.Entities.User
             }
             //  Phone number validation 
             if (!string.IsNullOrWhiteSpace(phoneNumber))
+            {
                 if (!Regex.IsMatch(phoneNumber, @"^(?:\+20|0)?1[0125][0-9]{8}$"))
                 {
                     return Error.Validation(Resources.LocalizationKeys.Auth.InvalidPhoneNumber);
                 }
-            {
-                AppUser.PhoneNumber = phoneNumber;
-
+                if (AppUser != null)
+                {
+                    AppUser.PhoneNumber = phoneNumber;
+                }
             }
             if (!string.IsNullOrWhiteSpace(image))
             {

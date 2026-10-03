@@ -59,17 +59,57 @@ public class ApplicationDbContextInitialiser(
         {
             if (_context.Database.IsSqlServer() || _context.Database.IsRelational())
             {
-                var pendingMigrations = await _context.Database.GetPendingMigrationsAsync();
-                if (pendingMigrations.Any())
+                // Check if base tables exist (e.g. AppUsers or Sections)
+                bool isFreshDb = false;
+                try
                 {
-                    _logger.LogInformation("Applying {Count} pending migration(s): {Migrations}",
-                        pendingMigrations.Count(), string.Join(", ", pendingMigrations));
-                    await _context.Database.MigrateAsync();
-                    _logger.LogInformation("Database migrations applied successfully.");
+                    await _context.Database.ExecuteSqlRawAsync("SELECT TOP(1) 1 FROM [AppUsers]");
+                }
+                catch
+                {
+                    isFreshDb = true;
+                }
+
+                if (isFreshDb)
+                {
+                    _logger.LogInformation("Database is fresh. Generating and applying complete schema script...");
+                    var fullScript = _context.Database.GenerateCreateScript();
+                    // Execute batches separated by GO
+                    var batches = fullScript.Split(new[] { "\r\nGO\r\n", "\nGO\n", "\r\nGO\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var batch in batches)
+                    {
+                        if (!string.IsNullOrWhiteSpace(batch))
+                        {
+                            await _context.Database.ExecuteSqlRawAsync(batch);
+                        }
+                    }
+
+                    // Ensure __EFMigrationsHistory table exists and mark all migrations as applied
+                    await _context.Database.ExecuteSqlRawAsync(
+                        "IF OBJECT_ID(N'[__EFMigrationsHistory]', N'U') IS NULL " +
+                        "CREATE TABLE [__EFMigrationsHistory] ([MigrationId] nvarchar(150) NOT NULL, [ProductVersion] nvarchar(32) NOT NULL, CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId]));");
+
+                    var allMigrations = _context.Database.GetMigrations();
+                    foreach (var migration in allMigrations)
+                    {
+                        var escaped = migration.Replace("'", "''");
+                        await _context.Database.ExecuteSqlRawAsync(
+                            $"IF NOT EXISTS (SELECT 1 FROM [__EFMigrationsHistory] WHERE [MigrationId] = '{escaped}') " +
+                            $"INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion]) VALUES ('{escaped}', '9.0.10');");
+                    }
+                    _logger.LogInformation("Fresh database schema created and migration history synchronized ({Count} migrations marked).", allMigrations.Count());
+                    _logger.LogInformation("Fresh database schema created and migration history synchronized.");
                 }
                 else
                 {
-                    _logger.LogInformation("No pending database migrations found. Database is up to date.");
+                    var pendingMigrations = await _context.Database.GetPendingMigrationsAsync();
+                    if (pendingMigrations.Any())
+                    {
+                        _logger.LogInformation("Applying {Count} pending migration(s): {Migrations}",
+                            pendingMigrations.Count(), string.Join(", ", pendingMigrations));
+                        await _context.Database.MigrateAsync();
+                        _logger.LogInformation("Database migrations applied successfully.");
+                    }
                 }
             }
             else
@@ -290,7 +330,7 @@ public class ApplicationDbContextInitialiser(
             {
                 var profile = adminProfile.Value;
                 profile.AppUserId = AdminUserId.ToString();
-                var updateResult = profile.UpdateProfile("John", "Administrator", null, Gender.Male, profile.AppUser.PhoneNumber, new DateTime(1985, 5, 15), 180);
+                var updateResult = profile.UpdateProfile("John", "Administrator", null, Gender.Male, "+201234567890", new DateTime(1985, 5, 15), 180);
                 if (updateResult.IsSuccess)
                 {
                     profiles.Add(profile);
@@ -310,7 +350,7 @@ public class ApplicationDbContextInitialiser(
             {
                 var profile = trainerProfile.Value;
                 profile.AppUserId = TrainerUserId.ToString();
-                var updateResult = profile.UpdateProfile("Sarah", "Johnson", null, Gender.Female, profile.AppUser.PhoneNumber, new DateTime(1990, 8, 22), 165);
+                var updateResult = profile.UpdateProfile("Sarah", "Johnson", null, Gender.Female, "+201234567891", new DateTime(1990, 8, 22), 165);
                 if (updateResult.IsSuccess)
                 {
                     profiles.Add(profile);
@@ -330,7 +370,7 @@ public class ApplicationDbContextInitialiser(
             {
                 var profile = trainer2Profile.Value;
                 profile.AppUserId = Trainer2UserId.ToString();
-                var updateResult = profile.UpdateProfile("Ahmed", "Johnson", null, Gender.Male, profile.AppUser.PhoneNumber, new DateTime(1990, 8, 22), 165);
+                var updateResult = profile.UpdateProfile("Ahmed", "Johnson", null, Gender.Male, "+201234567891", new DateTime(1990, 8, 22), 165);
                 if (updateResult.IsSuccess)
                 {
                     profiles.Add(profile);
@@ -350,7 +390,7 @@ public class ApplicationDbContextInitialiser(
             {
                 var profile = clientProfile.Value;
                 profile.AppUserId = ClientUserId.ToString();
-                var updateResult = profile.UpdateProfile("Michael", "Smith", null, Gender.Male, profile.AppUser.PhoneNumber, new DateTime(1995, 3, 10), 175);
+                var updateResult = profile.UpdateProfile("Michael", "Smith", null, Gender.Male, "+201234567892", new DateTime(1995, 3, 10), 175);
                 if (updateResult.IsSuccess)
                 {
                     profiles.Add(profile);
@@ -370,7 +410,7 @@ public class ApplicationDbContextInitialiser(
             {
                 var profile = client2Profile.Value;
                 profile.AppUserId = Client2UserId.ToString();
-                var updateResult = profile.UpdateProfile("Emma", "Davis", null, Gender.Female, profile.AppUser.PhoneNumber, new DateTime(1992, 12, 5), 160);
+                var updateResult = profile.UpdateProfile("Emma", "Davis", null, Gender.Female, "+201234567893", new DateTime(1992, 12, 5), 160);
                 if (updateResult.IsSuccess)
                 {
                     profiles.Add(profile);

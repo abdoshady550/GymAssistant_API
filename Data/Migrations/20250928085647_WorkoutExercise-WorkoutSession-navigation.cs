@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -12,15 +12,18 @@ namespace GymAssistant_API.Data.Migrations
         {
             // نظف البيانات الأول
             migrationBuilder.Sql(@"
-            UPDATE WorkoutExercises 
-            SET ExerciseId = NULL 
-            WHERE ExerciseId IS NOT NULL 
-            AND ExerciseId NOT IN (SELECT Id FROM Exercises);
-            
-            UPDATE WorkoutExercises 
-            SET UserExerciseId = NULL 
-            WHERE UserExerciseId IS NOT NULL 
-            AND UserExerciseId NOT IN (SELECT Id FROM UserExercises);
+            IF OBJECT_ID('WorkoutExercises', 'U') IS NOT NULL
+            BEGIN
+                UPDATE WorkoutExercises 
+                SET ExerciseId = NULL 
+                WHERE ExerciseId IS NOT NULL 
+                AND ExerciseId NOT IN (SELECT Id FROM Exercises);
+                
+                UPDATE WorkoutExercises 
+                SET UserExerciseId = NULL 
+                WHERE UserExerciseId IS NOT NULL 
+                AND UserExerciseId NOT IN (SELECT Id FROM UserExercises);
+            END
         ");
             migrationBuilder.CreateIndex(
                 name: "IX_WorkoutExercises_ExerciseId",
