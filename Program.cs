@@ -84,6 +84,9 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(
     options =>
     {
         options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredUniqueChars=0;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireLowercase = false;
         options.User.RequireUniqueEmail = true;
 
     }
