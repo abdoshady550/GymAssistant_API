@@ -1,4 +1,4 @@
-﻿using GymAssistant_API.Data;
+using GymAssistant_API.Data;
 using GymAssistant_API.Model.Entities.Exercise;
 using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Results;
@@ -39,7 +39,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             if (trainerProfile == null)
             {
-                return Error.Validation("Trainer_NotFound", "Trainer profile not found or user is not a trainer.");
+                return TrainerRequestErrors.TrainerNotFound;
             }
 
             var trainees = await _context.TrainerTrainees
@@ -73,7 +73,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             if (trainerProfile == null)
             {
-                return Error.Validation("Trainer_NotFound", "Trainer profile not found or user is not a trainer.");
+                return TrainerRequestErrors.TrainerNotFound;
             }
 
             var relation = await _context.TrainerTrainees
@@ -88,7 +88,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             if (relation == null)
             {
-                return Error.NotFound("Relationship_NotFound", "This trainee is not assigned to you.");
+                return TrainerRequestErrors.NoRelationship;
             }
 
             var traineeData = new TraineeData
@@ -118,7 +118,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             if (trainerProfile == null)
             {
-                return Error.Validation("Trainer_NotFound", "Trainer profile not found or user is not a trainer.");
+                return TrainerRequestErrors.TrainerNotFound;
             }
 
             var relation = await _context.TrainerTrainees
@@ -126,7 +126,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             if (relation == null)
             {
-                return Error.NotFound("Relationship_NotFound", "This trainee is not assigned to you.");
+                return TrainerRequestErrors.NoRelationship;
             }
 
             _context.TrainerTrainees.Remove(relation);
@@ -196,7 +196,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             if (session == null)
             {
-                return Error.NotFound("Session_NotFound", "Workout session not found.");
+                return Error.NotFound(GymAssistant_API.Resources.LocalizationKeys.Workout.SessionNotFound, "Workout session not found.");
             }
             var sessionResponse = WorkoutSessionRes.FromEntity(session);
             return sessionResponse;
@@ -275,7 +275,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             if (trainerProfile == null)
             {
-                return Error.Validation("Trainer_NotFound", "Trainer profile not found or user is not a trainer.");
+                return TrainerRequestErrors.TrainerNotFound;
             }
 
             var today = DateTime.UtcNow.Date;

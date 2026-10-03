@@ -34,6 +34,7 @@ namespace GymAssistant_API.Controllers
         [EndpointSummary("Registers a new user account.")]
         [EndpointDescription("Creates a new user with the provided registration details and returns an access and refresh token if successful.")]
         [EndpointName("RegisterUser")]
+
         public async Task<ActionResult> Register([FromBody] RegisterRequest registerRequest,
                                          CancellationToken ct = default)
         {

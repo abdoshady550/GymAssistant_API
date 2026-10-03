@@ -1,4 +1,4 @@
-﻿using GymAssistant_API.Data;
+using GymAssistant_API.Data;
 using GymAssistant_API.Model.Entities.Exercise;
 using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Results;
@@ -33,7 +33,7 @@ namespace GymAssistant_API.Repository.Services.User
             var user = await _context.ClientProfiles.FirstOrDefaultAsync(p => p.AppUserId == userId);
             if (user == null)
             {
-                return Error.NotFound("User_NotFound", "User profile not found.");
+                return Error.NotFound(Resources.LocalizationKeys.User.NotFound);
             }
             var measurementResult = BodyMeasurement
                 .Create(Guid.NewGuid(), userId, weightKg, weightGoal, bodyFatPercent, bodyFatGoal, muscleMassKg, muscleMassGoal);
@@ -62,7 +62,7 @@ namespace GymAssistant_API.Repository.Services.User
 
             if (measurement == null)
             {
-                return Error.NotFound("Measurement_NotFound", "Body Measurement not found.");
+                return Error.NotFound(Resources.LocalizationKeys.Profile.MeasurementNotFound);
             }
 
             measurement.Update(weightKg, weightGoal, bodyFatPercent, bodyFatGoal, muscleMassKg, muscleMassGoal);
@@ -78,7 +78,7 @@ namespace GymAssistant_API.Repository.Services.User
 
             if (measurement == null)
             {
-                return Error.NotFound("Measurement_NotFound", "Body Measurement not found.");
+                return Error.NotFound(Resources.LocalizationKeys.Profile.MeasurementNotFound);
             }
             _context.BodyMeasurements.Remove(measurement);
             await _context.SaveChangesAsync();
@@ -94,7 +94,7 @@ namespace GymAssistant_API.Repository.Services.User
             var user = await _user.FindByIdAsync(userId);
             if (user == null)
             {
-                return Error.NotFound("User_NotFound", "User not found.");
+                return Error.NotFound(Resources.LocalizationKeys.User.NotFound);
             }
 
             var userRole = await _user.GetRolesAsync(user);
@@ -103,13 +103,13 @@ namespace GymAssistant_API.Repository.Services.User
 
             if (userRole == null || userRole.Count == 0)
             {
-                return Error.Conflict("User_HasNoRole", "User has no assigned role.");
+                return Error.Conflict(Resources.LocalizationKeys.Auth.UserHasNoRole);
             }
 
             // Assuming UserRole is an enum and role names match enum names
             if (!Enum.TryParse<UserRole>(userRole.First(), out var userRoleEnum))
             {
-                return Error.Conflict("Invalid_Role", $"Role '{userRole.First()}' is not valid.");
+                return Error.Conflict(Resources.LocalizationKeys.Auth.InvalidRole, userRole.First());
             }
 
 
@@ -118,7 +118,7 @@ namespace GymAssistant_API.Repository.Services.User
 
             if (existingProfile != null)
             {
-                return Error.Conflict("Profile_Exists", "User profile already exists.");
+                return Error.Conflict(Resources.LocalizationKeys.Profile.AlreadyExists);
             }
 
             var profileResult = ClientProfile
@@ -256,9 +256,9 @@ namespace GymAssistant_API.Repository.Services.User
                                                                                     CancellationToken ct = default)
         {
             if (userId == null)
-                return Error.Validation("UserId_Required", "UserId is required.");
+                return Error.Validation(Resources.LocalizationKeys.User.IdRequired);
             if (pageSize <= 0 || pageNumber <= 0)
-                return Error.Validation("Pagination_Invalid", "PageSize and Page must be greater than zero.");
+                return Error.Validation(Resources.LocalizationKeys.Common.InvalidPagination);
 
             return await _context.BodyMeasurements
          .Where(m => m.UserId == userId)
@@ -284,7 +284,7 @@ namespace GymAssistant_API.Repository.Services.User
             {
                 _logger.LogError("User Profile not found for ProfileID {ProfileId}", Id);
 
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return Error.NotFound(Resources.LocalizationKeys.Profile.NotFound);
             }
             // 🖼️ حفظ الصورة في wwwroot (لو موجودة)
             string? imageUrl = profile.Image;
@@ -332,7 +332,7 @@ namespace GymAssistant_API.Repository.Services.User
             {
                 _logger.LogError("User Profile not found for ProfileID {ProfileId}", id);
 
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return Error.NotFound(Resources.LocalizationKeys.Profile.NotFound);
             }
 
             var profile = await _context.ClientProfiles
@@ -343,7 +343,7 @@ namespace GymAssistant_API.Repository.Services.User
             {
                 _logger.LogError("User Profile not found for ProfileID {ProfileId}", id);
 
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return Error.NotFound(Resources.LocalizationKeys.Profile.NotFound);
             }
 
             var lastMeasurement = profile.Measurements

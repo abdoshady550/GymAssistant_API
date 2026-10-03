@@ -1,6 +1,7 @@
-﻿using GymAssistant_API.Data;
+using GymAssistant_API.Data;
 using GymAssistant_API.Model.Entities;
 using GymAssistant_API.Model.Entities.Exercise;
+using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Exercise;
 using GymAssistant_API.Repository.Interfaces.Exercises;
@@ -26,7 +27,7 @@ namespace GymAssistant_API.Repository.Services.Exercise
 
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
 
             var session = await _context.WorkoutSessions
@@ -41,12 +42,12 @@ namespace GymAssistant_API.Repository.Services.Exercise
 
             if (session == null)
             {
-                return Error.NotFound("Session_NotFound", "Workout session not found.");
+                return ExerciseErrors.SessionNotFound;
             }
 
             if (session.IsCompleted)
             {
-                return Error.Validation("Session_Completed", "Cannot add exercises to completed session.");
+                return ExerciseErrors.SessionCompleted;
             }
             var exercis = await _context.Exercises.Include(e => e.Section).FirstOrDefaultAsync(e => e.Id == exerciseId, ct);
             var userExercise = await _context.UserExercises.Include(e => e.Section).FirstOrDefaultAsync(e => e.Id == userExerciseId, ct);
@@ -57,21 +58,21 @@ namespace GymAssistant_API.Repository.Services.Exercise
                     .AnyAsync(e => e.Id == exerciseId.Value, ct);
                 if (!exerciseExists)
                 {
-                    return Error.NotFound("Exercise_NotFound", "Exercise not found.");
+                    return ExerciseErrors.NotFound;
                 }
             }
             else if (!userExerciseId.HasValue)
             {
-                return Error.Validation("ExerciseId_Or_UserExerciseId_Required", "Either ExerciseId or UserExerciseId must be provided.");
+                return ExerciseErrors.ExerciseIdRequired;
             }
             if (exerciseId.HasValue && session.WorkoutExercises.Any(w => w.ExerciseId == exerciseId))
             {
-                return Error.Conflict("Exercise_Already_Exist", "Exercise is already in this Workout.");
+                return ExerciseErrors.PersonalRecordExerciseIsConflict;
 
             }
             if (userExerciseId.HasValue && session.WorkoutExercises.Any(w => w.UserExerciseId == userExerciseId))
             {
-                return Error.Conflict("Exercise_Already_Exist", "Exercise is already in this Workout.");
+                return ExerciseErrors.PersonalRecordExerciseIsConflict;
 
             }
 
@@ -118,7 +119,7 @@ namespace GymAssistant_API.Repository.Services.Exercise
 
             if (workoutExercise == null)
             {
-                return Error.NotFound("Exercise_NotFound", "Workout exercise not found.");
+                return ExerciseErrors.NotFound;
             }
 
 
@@ -145,7 +146,7 @@ namespace GymAssistant_API.Repository.Services.Exercise
 
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
 
             var session = await _context.WorkoutSessions
@@ -156,17 +157,17 @@ namespace GymAssistant_API.Repository.Services.Exercise
 
             if (session == null)
             {
-                return Error.NotFound("Session_NotFound", "Workout session not found.");
+                return ExerciseErrors.SessionNotFound;
             }
 
             if (session.IsCompleted)
             {
-                return Error.Validation("Session_AlreadyCompleted", "Session is already completed.");
+                return ExerciseErrors.SessionAlreadyCompleted;
             }
 
             if (!session.StartTime.HasValue)
             {
-                return Error.Validation("Session_NotStarted", "Session must be started before it can be completed.");
+                return ExerciseErrors.SessionNotStarted;
             }
 
             session.CompleteWorkout(endTime, notes);
@@ -188,7 +189,7 @@ namespace GymAssistant_API.Repository.Services.Exercise
 
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
 
             Guid clientProfileId = profile.Id;
@@ -203,7 +204,7 @@ namespace GymAssistant_API.Repository.Services.Exercise
 
                 if (relationship == null)
                 {
-                    return Error.Validation("Trainer_Unauthorized", "You are not authorized to create sessions for this trainee.");
+                    return TrainerRequestErrors.UnauthorizedAccess;
                 }
 
                 clientProfileId = traineeId.Value;
@@ -234,7 +235,7 @@ namespace GymAssistant_API.Repository.Services.Exercise
 
             if (exerciseSet == null)
             {
-                return Error.NotFound("Set_NotFound", "Exercise set not found.");
+                return ExerciseErrors.SetNotFound;
             }
             var dto = ExerciseSetRes.FromEntity(exerciseSet);
             return dto;
@@ -251,7 +252,7 @@ namespace GymAssistant_API.Repository.Services.Exercise
               .FirstOrDefaultAsync(we => we.Id == exerciseId, ct);
             if (workoutExercise == null)
             {
-                return Error.NotFound("Exercise_NotFound", "Workout exercise not found.");
+                return ExerciseErrors.NotFound;
             }
             var dto = WorkoutExerciseRes.FromEntity(workoutExercise);
             return dto;
@@ -264,7 +265,7 @@ namespace GymAssistant_API.Repository.Services.Exercise
 
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", " Profile not found");
+                return UserErrors.ProfileNotFound;
             }
 
             var query = _context.WorkoutSessions
@@ -306,7 +307,7 @@ namespace GymAssistant_API.Repository.Services.Exercise
 
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
 
             var session = await _context.WorkoutSessions
@@ -325,7 +326,7 @@ namespace GymAssistant_API.Repository.Services.Exercise
 
             if (session == null)
             {
-                return Error.NotFound("Session_NotFound", "Workout session not found.");
+                return ExerciseErrors.SessionNotFound;
             }
             var dto = WorkoutSessionRes.FromEntity(session);
             return dto;
@@ -338,7 +339,7 @@ namespace GymAssistant_API.Repository.Services.Exercise
 
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
 
             var session = await _context.WorkoutSessions
@@ -353,11 +354,11 @@ namespace GymAssistant_API.Repository.Services.Exercise
 
             if (session == null)
             {
-                return Error.NotFound("Session_NotFound", "Workout session not found.");
+                return ExerciseErrors.SessionNotFound;
             }
             if (session.IsCompleted)
             {
-                return Error.Validation("Session_AlreadyCompleted", "Cannot start a completed session.");
+                return ExerciseErrors.SessionAlreadyCompleted;
             }
 
             session.StartWorkout(startTime);
@@ -377,7 +378,7 @@ namespace GymAssistant_API.Repository.Services.Exercise
                 .FirstOrDefaultAsync(p => p.AppUserId == userId, ct);
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
 
             var exerciseSet = await _context.ExerciseSets
@@ -386,7 +387,7 @@ namespace GymAssistant_API.Repository.Services.Exercise
 
             if (exerciseSet == null)
             {
-                return Error.NotFound("Set_NotFound", "Exercise set not found.");
+                return ExerciseErrors.SetNotFound;
             }
             var sessionId = exerciseSet.WorkoutExercise.WorkoutSessionId;
             var exerciseId = exerciseSet.WorkoutExerciseId;
@@ -397,20 +398,20 @@ namespace GymAssistant_API.Repository.Services.Exercise
 
             if (session?.IsCompleted == true)
             {
-                return Error.Validation("Session_Completed", "Cannot modify sets in completed session.");
+                return ExerciseErrors.SessionCompleted;
             }
 
             if (reps.HasValue && reps <= 0)
             {
-                return Error.Validation("Reps_Invalid", "Reps must be greater than zero.");
+                return ExerciseErrors.RepsInvalid;
             }
             if (weightKg.HasValue && weightKg < 0)
             {
-                return Error.Validation("WeightKg_Invalid", "WeightKg cannot be negative.");
+                return ExerciseErrors.WeightKgInvalid;
             }
             if (restTimeSeconds.HasValue && restTimeSeconds < 0)
             {
-                return Error.Validation("RestTimeSeconds_Invalid", "RestTimeSeconds cannot be negative.");
+                return ExerciseErrors.RestTimeSecondsInvalid;
             }
             var set = exerciseSet.Update(reps, weightKg, restTimeSeconds, notes);
             if (set.IsError)

@@ -1,4 +1,4 @@
-﻿using GymAssistant_API.Model.Entities.Exercise;
+using GymAssistant_API.Model.Entities.Exercise;
 using ExerciseEntity = GymAssistant_API.Model.Entities.Exercise.Exercise;
 
 namespace GymAssistant_API.Req_Res.Response.Exercise
@@ -15,17 +15,25 @@ namespace GymAssistant_API.Req_Res.Response.Exercise
 
    )
     {
-        public static SectionResponse FromEntity(string userId, Section section)
+        public static SectionResponse FromEntity(string userId, Section section, GymAssistant_API.Resources.ISeedDataLocalizer? seedLocalizer = null)
         {
             var userCustomExercises = section.UserExercise
                                     .Where(u => u.UserId == userId)
                                     .Count();
 
+            var name = seedLocalizer != null
+                ? seedLocalizer.SectionName(section.Id, section.Name)
+                : section.Name;
+
+            var description = seedLocalizer != null
+                ? seedLocalizer.SectionDescription(section.Id, section.Description)
+                : section.Description;
+
             return new SectionResponse(
                 section.Id,
-                section.Name,
-                section.Description,
-                section.SectionGroup.Select(SectionGroupResponse.FromEntity).ToList(),
+                name,
+                description,
+                section.SectionGroup.Select(sg => SectionGroupResponse.FromEntity(sg, seedLocalizer)).ToList(),
                 section.CreatedAtUtc,
                 section.Exercises.Count(),
                 userCustomExercises,
@@ -44,14 +52,14 @@ namespace GymAssistant_API.Req_Res.Response.Exercise
        DateTimeOffset? CreatedAtUtc = null
    )
     {
-        public static SectionGroupResponse FromEntity(SectionGroup group)
+        public static SectionGroupResponse FromEntity(SectionGroup group, GymAssistant_API.Resources.ISeedDataLocalizer? seedLocalizer = null)
         {
             return new SectionGroupResponse(
                 group.Id,
                 group.SectionId,
                 group.Name,
                 group.Description,
-                group.Exercises.Select(ExerciseResponse.FromEntity).ToList(),
+                group.Exercises.Select(e => ExerciseResponse.FromEntity(e, seedLocalizer)).ToList(),
                 group.UserExercise.Select(CustomExerciseRes.FromEntity).ToList(),
                 group.CreatedAtUtc
                 );

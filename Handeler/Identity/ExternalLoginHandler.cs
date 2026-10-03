@@ -1,4 +1,4 @@
-﻿using Google.Apis.Auth;
+using Google.Apis.Auth;
 using GymAssistant_API.Model.Identity.Dtos;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Identity;
@@ -34,12 +34,12 @@ namespace GymAssistant_API.Handeler.Identity
                 }
                 else
                 {
-                    return Error.Validation("Invalid_Provider", "Provider must be Google or Facebook");
+                    return Error.Validation(Resources.LocalizationKeys.Auth.InvalidProvider);
                 }
 
                 if (externalInfo == null)
                 {
-                    return Error.Unauthorized("Invalid_Token", "Failed to validate external token");
+                    return Error.Unauthorized(Resources.LocalizationKeys.Auth.InvalidToken);
                 }
 
                 // تسجيل الدخول أو إنشاء حساب جديد
@@ -65,7 +65,7 @@ namespace GymAssistant_API.Handeler.Identity
             catch (Exception ex)
             {
                 _logger.LogError(ex, "External login error for provider: {Provider}", request.Provider);
-                return Error.Failure("External_Login_Failed", "An error occurred during external login");
+                return Error.Failure(Resources.LocalizationKeys.Auth.ExternalLoginFailed);
             }
         }
 

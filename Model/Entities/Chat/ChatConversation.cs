@@ -1,4 +1,4 @@
-﻿using GymAssistant_API.Model.Entities.User;
+using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Results;
 
 namespace GymAssistant_API.Model.Entities.Chat
@@ -34,13 +34,13 @@ namespace GymAssistant_API.Model.Entities.Chat
         public static Result<ChatConversation> Create(Guid id, Guid trainerId, Guid traineeId)
         {
             if (trainerId == Guid.Empty)
-                return Error.Validation("TrainerId_Required", "Trainer ID is required");
+                return Error.Validation(Resources.LocalizationKeys.Trainer.TrainerIdRequired);
 
             if (traineeId == Guid.Empty)
-                return Error.Validation("TraineeId_Required", "Trainee ID is required");
+                return Error.Validation(Resources.LocalizationKeys.Trainer.TraineeIdRequired);
 
             if (trainerId == traineeId)
-                return Error.Validation("Same_User", "Trainer and trainee cannot be the same");
+                return Error.Validation(Resources.LocalizationKeys.Trainer.SameTrainerAndTrainee);
 
             return new ChatConversation(id, trainerId, traineeId);
         }

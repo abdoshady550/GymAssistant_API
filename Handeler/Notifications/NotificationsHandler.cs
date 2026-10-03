@@ -1,4 +1,4 @@
-﻿using GymAssistant_API.Model.Entities.Notifications;
+using GymAssistant_API.Model.Entities.Notifications;
 using GymAssistant_API.Model.Entities.Notifications.Dtos.Req;
 using GymAssistant_API.Model.Entities.Notifications.Dtos.Res;
 using GymAssistant_API.Model.Results;
@@ -217,8 +217,7 @@ namespace GymAssistant_API.Handeler.Notifications
                     topic);
 
                 return Error.Failure(
-                    "Subscription_Failed",
-                    "An error occurred while subscribing to topic");
+                    Resources.LocalizationKeys.Notification.SubscriptionFailed);
             }
         }
 
@@ -267,8 +266,7 @@ namespace GymAssistant_API.Handeler.Notifications
                     topic);
 
                 return Error.Failure(
-                    "Unsubscription_Failed",
-                    "An error occurred while unsubscribing from topic");
+                    Resources.LocalizationKeys.Notification.UnsubscriptionFailed);
             }
         }
         public async Task<Result<string>> SendNotificationToTopic(
@@ -317,8 +315,7 @@ namespace GymAssistant_API.Handeler.Notifications
                     topic);
 
                 return Error.Failure(
-                    "Notification_Send_Failed",
-                    "An error occurred while sending notification");
+                    Resources.LocalizationKeys.Notification.SendFailed);
             }
         }
 

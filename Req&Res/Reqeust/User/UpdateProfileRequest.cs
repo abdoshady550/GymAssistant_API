@@ -1,48 +1,58 @@
-﻿using GymAssistant_API.Model.Entities.User;
+using GymAssistant_API.Model.Entities.User;
+using GymAssistant_API.Resources;
 using System.ComponentModel.DataAnnotations;
 
 namespace GymAssistant_API.Req_Res.Reqeust
 {
     public record UpdateProfileRequest(
-
+        [Display(Name = LocalizationKeys.Fields.FirstName)]
         [StringLength(50)]
-        string? FirstName=default,
+        string? FirstName = default,
 
-
+        [Display(Name = LocalizationKeys.Fields.LastName)]
         [StringLength(50)]
-        string ? LastName=default,
+        string? LastName = default,
 
         IFormFile? imageFile = default,
 
+        [Display(Name = LocalizationKeys.Fields.Gender)]
         [EnumDataType(typeof(Gender))]
-        Gender ?Gender=default,
+        Gender? Gender = default,
+
+        [Display(Name = LocalizationKeys.Fields.PhoneNumber)]
         [StringLength(50)]
-        string? PhoneNumber=default,
+        string? PhoneNumber = default,
 
+        [Display(Name = LocalizationKeys.Fields.BirthDate)]
         [DataType(DataType.Date)]
-        DateTime? BirthDate=default,
+        DateTime? BirthDate = default,
 
-        [Range(50, 300, ErrorMessage = "Height must be between 50 and 300 cm")]
+        [Display(Name = LocalizationKeys.Fields.Height)]
+        [Range(50, 300, ErrorMessage = LocalizationKeys.Validation.Range)]
         int? HeightCm = default,
 
+        [Display(Name = LocalizationKeys.Fields.Weight)]
+        [Range(20, 400, ErrorMessage = LocalizationKeys.Validation.Range)]
+        decimal? WeightKg = default,
 
-        [Range(20, 400, ErrorMessage = "Weight must be between 20 and 400 kg")]
-        decimal? WeightKg    =default,
+        [Display(Name = LocalizationKeys.Fields.Weight)]
+        [Range(20, 400, ErrorMessage = LocalizationKeys.Validation.Range)]
+        decimal? WeightGoal = default,
 
-        [Range(20, 400, ErrorMessage = "Weight must be between 20 and 400 kg")]
-        decimal? WeightGoal   =default,
-
-
-        [Range(0, 100, ErrorMessage = "Body fat percentage must be between 0 and 100")]
+        [Display(Name = LocalizationKeys.Fields.BodyFat)]
+        [Range(0, 100, ErrorMessage = LocalizationKeys.Validation.Range)]
         decimal? BodyFatPercent = default,
-           [Range(0, 100, ErrorMessage = "Body fat percentage must be between 0 and 100")]
+
+        [Display(Name = LocalizationKeys.Fields.BodyFat)]
+        [Range(0, 100, ErrorMessage = LocalizationKeys.Validation.Range)]
         decimal? BodyFatGoal = default,
 
-        [Range(10, 200, ErrorMessage = "Muscle mass must be between 10 and 200 kg")]
+        [Display(Name = LocalizationKeys.Fields.MuscleMass)]
+        [Range(10, 200, ErrorMessage = LocalizationKeys.Validation.Range)]
         decimal? MuscleMassKg = default,
-           [Range(10, 200, ErrorMessage = "Muscle mass must be between 10 and 200 kg")]
+
+        [Display(Name = LocalizationKeys.Fields.MuscleMass)]
+        [Range(10, 200, ErrorMessage = LocalizationKeys.Validation.Range)]
         decimal? MuscleMassGoal = default
-        );
-
-
+    );
 }

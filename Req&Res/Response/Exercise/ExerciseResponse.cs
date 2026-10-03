@@ -1,4 +1,4 @@
-﻿using ExerciseEntity = GymAssistant_API.Model.Entities.Exercise.Exercise;
+using ExerciseEntity = GymAssistant_API.Model.Entities.Exercise.Exercise;
 using GymAssistant_API.Model.Entities.Exercise;
 
 namespace GymAssistant_API.Req_Res.Response
@@ -19,16 +19,36 @@ namespace GymAssistant_API.Req_Res.Response
         bool? IsCustomExercise = false
     )
     {
-        public static ExerciseResponse FromEntity(ExerciseEntity exercise)
+        public static ExerciseResponse FromEntity(ExerciseEntity exercise, GymAssistant_API.Resources.ISeedDataLocalizer? seedLocalizer = null)
         {
+            var sectionName = seedLocalizer != null && exercise.Section != null
+                ? seedLocalizer.SectionName(exercise.SectionId, exercise.Section.Name)
+                : exercise.Section?.Name ?? string.Empty;
+
+            var name = seedLocalizer != null
+                ? seedLocalizer.ExerciseName(exercise.Id, exercise.Name)
+                : exercise.Name;
+
+            var description = seedLocalizer != null
+                ? seedLocalizer.ExerciseDescription(exercise.Id, exercise.Description)
+                : exercise.Description;
+
+            var instructions = seedLocalizer != null
+                ? seedLocalizer.ExerciseInstructions(exercise.Id, exercise.Instructions)
+                : exercise.Instructions;
+
+            var equipment = seedLocalizer != null
+                ? seedLocalizer.ExerciseEquipment(exercise.Id, exercise.Equipment)
+                : exercise.Equipment;
+
             return new ExerciseResponse(
                 exercise.Id,
                 exercise.SectionId,
-                exercise.Section.Name,
-                exercise.Name,
-                exercise.Description,
-                exercise.Instructions,
-                exercise.Equipment,
+                sectionName,
+                name,
+                description,
+                instructions,
+                equipment,
                 exercise.ImageUrl,
                 exercise.DifficultyLevel,
                 exercise.DefaultSets,

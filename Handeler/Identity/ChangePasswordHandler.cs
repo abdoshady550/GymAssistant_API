@@ -1,4 +1,4 @@
-﻿using GymAssistant_API.Model.Results;
+using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Identity;
 using GymAssistant_API.Req_Res.Reqeust.User;
 using Error = GymAssistant_API.Model.Results.Error;
@@ -23,8 +23,7 @@ namespace GymAssistant_API.Handeler.Identity
             if (result.IsError)
             {
                 _logger.LogWarning("Change password failed for UserId: {UserId}, Error: {Error}",
-                    id, result.Errors.Select(e =>
-                  Error.Validation(e.Code, e.Description)).ToList());
+                    id, result.TopError.Code);
 
                 return result.Errors;
             }
@@ -39,8 +38,7 @@ namespace GymAssistant_API.Handeler.Identity
             if (result.IsError)
             {
                 _logger.LogWarning("Change password failed for UserId: {UserId}, Error: {Error}",
-                    id, result.Errors.Select(e =>
-                  Error.Validation(e.Code, e.Description)).ToList());
+                    id, result.TopError.Code);
                 return result.Errors;
             }
 

@@ -1,4 +1,4 @@
-﻿using Azure.Core;
+using Azure.Core;
 using GymAssistant_API.Model.Identity.Dtos;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Identity;
@@ -23,10 +23,9 @@ namespace GymAssistant_API.Handeler.Identity
 
             if (result.IsError)
             {
-                _logger.LogError("User with Email { Email }{ErrorDetails}", request.Email, result.TopError.Description);
+                _logger.LogError("User with Email {Email} {ErrorDetails}", request.Email, result.TopError.Description);
 
-                return Error.NotFound("Some thing wrong", result.TopError.Description);
-
+                return result.Errors;
             }
             return result.Value;
         }

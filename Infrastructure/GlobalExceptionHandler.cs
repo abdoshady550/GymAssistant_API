@@ -1,13 +1,18 @@
+using GymAssistant_API.Resources;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Localization;
 using System.Text.Json;
 
 namespace GymAssistant_API.Infrastructure;
 
-public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
+public class GlobalExceptionHandler(
+    ILogger<GlobalExceptionHandler> logger,
+    IStringLocalizer<SharedResources> localizer) : IExceptionHandler
 {
     private readonly ILogger<GlobalExceptionHandler> _logger = logger;
+    private readonly IStringLocalizer<SharedResources> _localizer = localizer;
 
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
@@ -48,7 +53,9 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         {
             // Generic error handling
             var errorCode = exception.GetType().Name.Replace("Exception", "");
-            modelStateDictionary.AddModelError(errorCode, exception.Message);
+            var localized = _localizer[LocalizationKeys.Common.UnexpectedError];
+            var message = localized.ResourceNotFound ? "An unexpected error occurred. Please try again later." : localized.Value;
+            modelStateDictionary.AddModelError(errorCode, message);
         }
 
         return new ValidationProblemDetails(modelStateDictionary)
@@ -61,9 +68,6 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
 
     private void ParseIdentityErrors(string message, ModelStateDictionary modelState)
     {
-        // Parse identity error messages like:
-        // "PasswordRequiresDigit: Passwords must have at least one digit ('0'-'9'). | PasswordRequiresUpper: Passwords must have at least one uppercase ('A'-'Z')."
-
         var errors = message.Split(" | ");
         foreach (var error in errors)
         {
@@ -72,7 +76,11 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
             {
                 var code = parts[0].Trim();
                 var description = parts[1].Trim();
-                modelState.AddModelError(code, description);
+
+                // Look up localized Identity error if available
+                var localized = _localizer[LocalizationKeys.Identity.Prefix + code];
+                var finalDesc = localized.ResourceNotFound ? description : localized.Value;
+                modelState.AddModelError(code, finalDesc);
             }
         }
     }
@@ -90,16 +98,19 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         };
     }
 
-    private static string GetDefaultTitle(int statusCode)
+    private string GetDefaultTitle(int statusCode)
     {
-        return statusCode switch
+        var key = statusCode switch
         {
-            400 => "One or more validation errors occurred.",
-            401 => "Unauthorized access.",
-            404 => "Resource not found.",
-            409 => "Conflict occurred.",
-            500 => "An internal server error occurred.",
-            _ => "One or more validation errors occurred."
+            400 => LocalizationKeys.Common.ValidationTitle,
+            401 => LocalizationKeys.Common.UnauthorizedTitle,
+            404 => LocalizationKeys.Common.NotFoundTitle,
+            409 => LocalizationKeys.Common.ConflictTitle,
+            500 => LocalizationKeys.Common.ServerErrorTitle,
+            _ => LocalizationKeys.Common.ValidationTitle
         };
+
+        var localized = _localizer[key];
+        return localized.ResourceNotFound ? "One or more validation errors occurred." : localized.Value;
     }
 }

@@ -1,5 +1,6 @@
-﻿using GymAssistant_API.Data;
+using GymAssistant_API.Data;
 using GymAssistant_API.Model.Entities.Exercise;
+using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Exercise;
 using GymAssistant_API.Repository.Interfaces.ExerciseExercises;
@@ -24,7 +25,7 @@ namespace GymAssistant_API.Repository.Services.Progress
 
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
             var fromDate = DateTime.UtcNow.AddDays(-days);
 
@@ -37,7 +38,7 @@ namespace GymAssistant_API.Repository.Services.Progress
             List<WorkoutExercise> workoutData = new List<WorkoutExercise>();
             if (exercise == null && userExercise == null)
             {
-                return Error.NotFound("Exercise_NotFound", "Exercise not found.");
+                return ExerciseErrors.NotFound;
             }
             else if (exercise != null && userExercise == null)
             {
@@ -109,7 +110,7 @@ namespace GymAssistant_API.Repository.Services.Progress
 
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
 
             var userExercise = await _context.UserExercises
@@ -117,7 +118,7 @@ namespace GymAssistant_API.Repository.Services.Progress
 
             if (userExercise == null)
             {
-                return Error.NotFound("Exercise_NotFound", "Custom exercise not found.");
+                return ExerciseErrors.CustomExerciseNotFound;
             }
 
             var fromDate = DateTime.UtcNow.AddDays(-days);
@@ -163,7 +164,7 @@ namespace GymAssistant_API.Repository.Services.Progress
 
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
 
             var fromDate = DateTime.UtcNow.AddDays(-days);
@@ -251,7 +252,7 @@ namespace GymAssistant_API.Repository.Services.Progress
 
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
 
             var fromDate = DateTime.UtcNow.AddDays(-days);
@@ -309,7 +310,7 @@ namespace GymAssistant_API.Repository.Services.Progress
 
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
 
             var fromDate = DateTime.UtcNow.AddDays(-days);
@@ -323,7 +324,7 @@ namespace GymAssistant_API.Repository.Services.Progress
 
             if (exercise == null && userExercise == null)
             {
-                return Error.NotFound("Exercise_NotFound", "Exercise not found.");
+                return ExerciseErrors.NotFound;
             }
             else if (exercise != null && userExercise == null)
             {
@@ -397,7 +398,7 @@ namespace GymAssistant_API.Repository.Services.Progress
 
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
 
             var fromDate = DateTime.UtcNow.AddDays(-days);

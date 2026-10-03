@@ -1,4 +1,4 @@
-﻿using GymAssistant_API.Data;
+using GymAssistant_API.Data;
 using GymAssistant_API.Model.Entities.Chat;
 using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Results;
@@ -33,7 +33,7 @@ namespace GymAssistant_API.Repository.Services.Chat
                     .FirstOrDefaultAsync(p => p.AppUserId == otherUserId, ct);
 
                 if (currentProfile == null || otherProfile == null)
-                    return Error.NotFound("Profile_NotFound", "User profile not found");
+                    return UserErrors.ProfileNotFound;
 
                 // Check if conversation exists
                 var conversation = await _context.ChatConversations
@@ -53,7 +53,7 @@ namespace GymAssistant_API.Repository.Services.Chat
                             (tt.TrainerId == otherProfile.Id && tt.TraineeId == currentProfile.Id), ct);
 
                     if (!relationship)
-                        return Error.Validation("No_Relationship", "No trainer-trainee relationship exists");
+                        return TrainerRequestErrors.NoRelationship;
 
                     // Determine who is trainer
                     var trainerId = currentProfile.Role == UserRole.Trainer ? currentProfile.Id : otherProfile.Id;
@@ -84,7 +84,7 @@ namespace GymAssistant_API.Repository.Services.Chat
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting/creating conversation");
-                return Error.Failure("Conversation_Error", "Failed to get or create conversation");
+                return Error.Failure(GymAssistant_API.Resources.LocalizationKeys.Chat.FailedToGetOrCreateConversation, "Failed to get or create conversation");
             }
         }
 
@@ -97,7 +97,7 @@ namespace GymAssistant_API.Repository.Services.Chat
                     .FirstOrDefaultAsync(p => p.AppUserId == userId, ct);
 
                 if (profile == null)
-                    return Error.NotFound("Profile_NotFound", "User profile not found");
+                    return UserErrors.ProfileNotFound;
 
                 var conversations = await _context.ChatConversations
                     .Where(c => c.TrainerId == profile.Id || c.TraineeId == profile.Id)
@@ -124,7 +124,7 @@ namespace GymAssistant_API.Repository.Services.Chat
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting user conversations");
-                return Error.Failure("Conversations_Error", "Failed to get conversations");
+                return Error.Failure(GymAssistant_API.Resources.LocalizationKeys.Chat.FailedToGetConversations, "Failed to get conversations");
             }
         }
 
@@ -137,7 +137,7 @@ namespace GymAssistant_API.Repository.Services.Chat
                     .FirstOrDefaultAsync(p => p.AppUserId == userId, ct);
 
                 if (profile == null)
-                    return Error.NotFound("Profile_NotFound", "User profile not found");
+                    return UserErrors.ProfileNotFound;
 
                 // Verify user is part of conversation
                 var conversation = await _context.ChatConversations
@@ -145,7 +145,7 @@ namespace GymAssistant_API.Repository.Services.Chat
                         (c.TrainerId == profile.Id || c.TraineeId == profile.Id), ct);
 
                 if (conversation == null)
-                    return Error.NotFound("Conversation_NotFound", "Conversation not found");
+                    return Error.NotFound(GymAssistant_API.Resources.LocalizationKeys.Chat.ConversationNotFound, "Conversation not found");
 
                 var messages = await _context.ChatMessages
                     .Where(m => m.ConversationId == conversationId)
@@ -160,7 +160,7 @@ namespace GymAssistant_API.Repository.Services.Chat
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting conversation messages");
-                return Error.Failure("Messages_Error", "Failed to get messages");
+                return Error.Failure(GymAssistant_API.Resources.LocalizationKeys.Chat.MessagesError, "Failed to get messages");
             }
         }
 
@@ -173,7 +173,7 @@ namespace GymAssistant_API.Repository.Services.Chat
                     .FirstOrDefaultAsync(p => p.AppUserId == userId, ct);
 
                 if (profile == null)
-                    return Error.NotFound("Profile_NotFound", "User profile not found");
+                    return UserErrors.ProfileNotFound;
 
                 var query = _context.ChatMessages
                     .Where(m => m.SenderId != profile.Id && !m.IsRead);
@@ -198,7 +198,7 @@ namespace GymAssistant_API.Repository.Services.Chat
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting unread count");
-                return Error.Failure("Unread_Count_Error", "Failed to get unread count");
+                return Error.Failure(GymAssistant_API.Resources.LocalizationKeys.Chat.UnreadCountError, "Failed to get unread count");
             }
         }
 
@@ -212,14 +212,14 @@ namespace GymAssistant_API.Repository.Services.Chat
                     .FirstOrDefaultAsync(p => p.AppUserId == userId, ct);
 
                 if (profile == null)
-                    return Error.NotFound("Profile_NotFound", "User profile not found");
+                    return UserErrors.ProfileNotFound;
 
                 var conversation = await _context.ChatConversations
                     .FirstOrDefaultAsync(c => c.Id == conversationId &&
                         (c.TrainerId == profile.Id || c.TraineeId == profile.Id), ct);
 
                 if (conversation == null)
-                    return Error.NotFound("Conversation_NotFound", "Conversation not found");
+                    return Error.NotFound(GymAssistant_API.Resources.LocalizationKeys.Chat.ConversationNotFound, "Conversation not found");
 
                 string? attachmentUrl = null;
                 if (attachment != null && attachment.Length > 0)
@@ -248,7 +248,7 @@ namespace GymAssistant_API.Repository.Services.Chat
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error sending message");
-                return Error.Failure("Send_Message_Error", "Failed to send message");
+                return Error.Failure(GymAssistant_API.Resources.LocalizationKeys.Chat.SendMessageFailed, "Failed to send message");
             }
         }
 

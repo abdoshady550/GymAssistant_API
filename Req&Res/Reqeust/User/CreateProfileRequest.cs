@@ -1,39 +1,49 @@
-﻿using GymAssistant_API.Model.Entities.User;
-using System;
+using GymAssistant_API.Model.Entities.User;
+using GymAssistant_API.Resources;
 using System.ComponentModel.DataAnnotations;
 
 namespace GymAssistant_API.Req_Res.Reqeust
 {
     public record CreateProfileRequest(
-        [Required(ErrorMessage = "First name is required")]
-        [StringLength(50, ErrorMessage = "First name cannot exceed 50 characters")]
+        [Display(Name = LocalizationKeys.Fields.FirstName)]
+        [Required(ErrorMessage = LocalizationKeys.Validation.Required)]
+        [StringLength(50)]
         string FirstName,
 
-        [Required(ErrorMessage = "Last name is required")]
-        [StringLength(50, ErrorMessage = "Last name cannot exceed 50 characters")]
+        [Display(Name = LocalizationKeys.Fields.LastName)]
+        [Required(ErrorMessage = LocalizationKeys.Validation.Required)]
+        [StringLength(50)]
         string LastName,
 
-        [Required(ErrorMessage = "Gender is required")]
+        [Display(Name = LocalizationKeys.Fields.Gender)]
+        [Required(ErrorMessage = LocalizationKeys.Validation.Required)]
         [EnumDataType(typeof(Gender))]
         Gender Gender
     );
 
     public record MeasurementRequest(
-
-        [Range(20, 400, ErrorMessage = "Weight must be between 20 and 400 kg")]
+        [Display(Name = LocalizationKeys.Fields.Weight)]
+        [Range(20, 400, ErrorMessage = LocalizationKeys.Validation.Range)]
         decimal? WeightKg,
 
-        [Range(20, 400, ErrorMessage = "Weight must be between 20 and 400 kg")]
+        [Display(Name = LocalizationKeys.Fields.Weight)]
+        [Range(20, 400, ErrorMessage = LocalizationKeys.Validation.Range)]
         decimal WeightGoal,
 
-        [Range(0, 100, ErrorMessage = "Body fat percentage must be between 0 and 100")]
+        [Display(Name = LocalizationKeys.Fields.BodyFat)]
+        [Range(0, 100, ErrorMessage = LocalizationKeys.Validation.Range)]
         decimal? BodyFatPercent = null,
-        [Range(0, 100, ErrorMessage = "Body fat percentage must be between 0 and 100")]
+
+        [Display(Name = LocalizationKeys.Fields.BodyFat)]
+        [Range(0, 100, ErrorMessage = LocalizationKeys.Validation.Range)]
         decimal? BodyFatGoal = null,
 
-        [Range(10, 200, ErrorMessage = "Muscle mass must be between 10 and 200 kg")]
+        [Display(Name = LocalizationKeys.Fields.MuscleMass)]
+        [Range(10, 200, ErrorMessage = LocalizationKeys.Validation.Range)]
         decimal? MuscleMassKg = null,
-        [Range(10, 200, ErrorMessage = "Muscle mass must be between 10 and 200 kg")]
+
+        [Display(Name = LocalizationKeys.Fields.MuscleMass)]
+        [Range(10, 200, ErrorMessage = LocalizationKeys.Validation.Range)]
         decimal? MuscleMassGoal = null
     );
 }

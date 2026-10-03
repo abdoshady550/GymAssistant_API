@@ -1,8 +1,11 @@
-﻿using GymAssistant_API.Data;
+using GymAssistant_API.Data;
+using GymAssistant_API.Extensions;
 using GymAssistant_API.Model.Entities.Chat;
+using GymAssistant_API.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using System.Collections.Concurrent;
 using System.Security.Claims;
 
@@ -13,6 +16,7 @@ namespace GymAssistant_API.Hubs
     {
         private readonly AppDbContext _context;
         private readonly ILogger<ChatHub> _logger;
+        private readonly IStringLocalizer<SharedResources> _localizer;
 
         // Track online users and their connection IDs
         private static readonly ConcurrentDictionary<string, HashSet<string>> UserConnections = new();
@@ -20,16 +24,17 @@ namespace GymAssistant_API.Hubs
         // Track typing indicators
         private static readonly ConcurrentDictionary<Guid, List<TypingIndicator>> TypingIndicators = new();
 
-        public ChatHub(AppDbContext context, ILogger<ChatHub> logger)
+        public ChatHub(AppDbContext context, ILogger<ChatHub> logger, IStringLocalizer<SharedResources> localizer)
         {
             _context = context;
             _logger = logger;
+            _localizer = localizer;
         }
 
         private string GetCurrentUserId()
         {
             return Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                   ?? throw new HubException("User not authenticated");
+                   ?? throw new HubException(_localizer[LocalizationKeys.Chat.UserNotAuthenticated]);
         }
 
         private async Task<Guid> GetUserProfileId(string userId)
@@ -38,7 +43,7 @@ namespace GymAssistant_API.Hubs
                 .FirstOrDefaultAsync(p => p.AppUserId == userId);
 
             if (profile == null)
-                throw new HubException("User profile not found");
+                throw new HubException(_localizer[LocalizationKeys.Chat.UserProfileNotFound]);
 
             return profile.Id;
         }
@@ -123,11 +128,11 @@ namespace GymAssistant_API.Hubs
                     .FirstOrDefaultAsync(c => c.Id == conversationId);
 
                 if (conversation == null)
-                    throw new HubException("Conversation not found");
+                    throw new HubException(_localizer[LocalizationKeys.Chat.ConversationNotFound]);
 
                 if (conversation.TrainerId != senderProfileId &&
                     conversation.TraineeId != senderProfileId)
-                    throw new HubException("You are not part of this conversation");
+                    throw new HubException(_localizer[LocalizationKeys.Chat.NotPartOfConversation]);
 
                 // Create message
                 var messageResult = ChatMessage.Create(
@@ -140,7 +145,7 @@ namespace GymAssistant_API.Hubs
                 );
 
                 if (messageResult.IsError)
-                    throw new HubException(messageResult.TopError.Description);
+                    throw new HubException(_localizer.Localize(messageResult.TopError));
 
                 var message = messageResult.Value;
                 conversation.AddMessage(message);
@@ -176,10 +181,14 @@ namespace GymAssistant_API.Hubs
 
                 _logger.LogInformation("Message sent in conversation {ConversationId}", conversationId);
             }
+            catch (HubException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error sending message");
-                throw new HubException("Failed to send message: " + ex.Message);
+                throw new HubException(_localizer[LocalizationKeys.Chat.SendMessageFailed]);
             }
         }
 
@@ -199,7 +208,7 @@ namespace GymAssistant_API.Hubs
                     .FirstOrDefaultAsync(m => m.Id == messageId);
 
                 if (message == null)
-                    throw new HubException("Message not found");
+                    throw new HubException(_localizer[LocalizationKeys.Chat.MessageNotFound]);
 
                 // Verify user is recipient
                 if (message.SenderId == profileId)
@@ -207,7 +216,7 @@ namespace GymAssistant_API.Hubs
 
                 if (message.Conversation.TrainerId != profileId &&
                     message.Conversation.TraineeId != profileId)
-                    throw new HubException("You are not part of this conversation");
+                    throw new HubException(_localizer[LocalizationKeys.Chat.NotPartOfConversation]);
 
                 if (!message.IsRead)
                 {
@@ -219,10 +228,14 @@ namespace GymAssistant_API.Hubs
                         .SendAsync("MessageRead", new { messageId, readAt = message.ReadAt });
                 }
             }
+            catch (HubException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error marking message as read");
-                throw new HubException("Failed to mark message as read");
+                throw new HubException(_localizer[LocalizationKeys.Chat.MarkReadFailed]);
             }
         }
 
@@ -250,10 +263,14 @@ namespace GymAssistant_API.Hubs
                 await Clients.Group($"conversation_{conversationId}")
                     .SendAsync("ConversationRead", conversationId);
             }
+            catch (HubException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error marking conversation as read");
-                throw new HubException("Failed to mark conversation as read");
+                throw new HubException(_localizer[LocalizationKeys.Chat.ConversationMarkReadFailed]);
             }
         }
 
@@ -339,11 +356,11 @@ namespace GymAssistant_API.Hubs
                     .FirstOrDefaultAsync(m => m.Id == messageId && m.SenderId == profileId);
 
                 if (message == null)
-                    throw new HubException("Message not found or you are not the sender");
+                    throw new HubException(_localizer[LocalizationKeys.Chat.NotSenderOrMessageNotFound]);
 
                 var editResult = message.Edit(newContent);
                 if (editResult.IsError)
-                    throw new HubException(editResult.TopError.Description);
+                    throw new HubException(_localizer.Localize(editResult.TopError));
 
                 await _context.SaveChangesAsync();
 
@@ -356,10 +373,14 @@ namespace GymAssistant_API.Hubs
                         editedAt = message.EditedAt
                     });
             }
+            catch (HubException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error editing message");
-                throw new HubException("Failed to edit message");
+                throw new HubException(_localizer[LocalizationKeys.Chat.EditMessageFailed]);
             }
         }
 
@@ -374,7 +395,7 @@ namespace GymAssistant_API.Hubs
                     .FirstOrDefaultAsync(m => m.Id == messageId && m.SenderId == profileId);
 
                 if (message == null)
-                    throw new HubException("Message not found or you are not the sender");
+                    throw new HubException(_localizer[LocalizationKeys.Chat.NotSenderOrMessageNotFound]);
 
                 var conversationId = message.ConversationId;
                 _context.ChatMessages.Remove(message);
@@ -384,10 +405,14 @@ namespace GymAssistant_API.Hubs
                 await Clients.Group($"conversation_{conversationId}")
                     .SendAsync("MessageDeleted", messageId);
             }
+            catch (HubException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting message");
-                throw new HubException("Failed to delete message");
+                throw new HubException(_localizer[LocalizationKeys.Chat.DeleteMessageFailed]);
             }
         }
 

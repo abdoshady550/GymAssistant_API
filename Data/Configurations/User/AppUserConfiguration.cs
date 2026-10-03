@@ -10,6 +10,10 @@ namespace GymAssistant_API.Data.Configurations
         {
             builder.ToTable("AppUsers");
 
+            builder.Property(u => u.PreferredLanguage)
+                   .HasMaxLength(10)
+                   .HasDefaultValue("en");
+
             builder.HasOne(u => u.Profile)
                    .WithOne(p => p.AppUser)
                    .HasForeignKey<ClientProfile>(p => p.AppUserId)

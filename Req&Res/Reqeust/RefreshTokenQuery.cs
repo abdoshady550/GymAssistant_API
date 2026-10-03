@@ -1,12 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using GymAssistant_API.Resources;
+
 namespace GymAssistant_API.Req_Res.Reqeust
 {
     public record RefreshTokenQuery(
-        [Required(ErrorMessage = "Refresh token is required")]
-        [MinLength(10, ErrorMessage = "Refresh token must be at least 10 characters")]
+        [Display(Name = LocalizationKeys.Fields.RefreshToken)]
+        [Required(ErrorMessage = LocalizationKeys.Validation.Required)]
+        [MinLength(10, ErrorMessage = LocalizationKeys.Validation.MinLength)]
         string RefreshToken,
 
-        [Required(ErrorMessage = "Expired access token is required")]
+        [Display(Name = LocalizationKeys.Fields.Token)]
+        [Required(ErrorMessage = LocalizationKeys.Validation.Required)]
         string ExpiredAccessToken
     );
 }

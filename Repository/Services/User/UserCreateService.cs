@@ -1,4 +1,4 @@
-﻿using GymAssistant_API.Model.Entities.User;
+using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Identity;
 using GymAssistant_API.Model.Identity.Dtos;
 using GymAssistant_API.Model.Results;
@@ -22,26 +22,26 @@ namespace GymAssistant_API.Repository.Services.User
                 var user = await _userManager.FindByEmailAsync(request.Email);
                 if (user != null)
                 {
-                    return Error.Conflict("Unable to create user", "This Email is already exist.");
+                    return Error.Conflict(Resources.LocalizationKeys.Auth.EmailAlreadyExists);
                 }
                 // Email validation
                 if (string.IsNullOrWhiteSpace(request.Email) ||
                     !Regex.IsMatch(request.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.IgnoreCase))
                 {
-                    return Error.Validation("Invalid_Email", "Email format is not valid.");
+                    return Error.Validation(Resources.LocalizationKeys.Auth.InvalidEmail);
                 }
                 //  Phone number validation 
                 if (!string.IsNullOrWhiteSpace(request.PhoneNumber) &&
                     !Regex.IsMatch(request.PhoneNumber, @"^(?:\+20|0)?1[0125][0-9]{8}$"))
                 {
-                    return Error.Validation("Invalid_PhoneNumber", "Phone number format is not valid.");
+                    return Error.Validation(Resources.LocalizationKeys.Auth.InvalidPhoneNumber);
                 }
 
 
                 //  Role validation 
                 if (!Enum.IsDefined(typeof(Role), request.Role))
                 {
-                    return Error.Validation("Invalid_Role", "Role must be one of: User, Trainer");
+                    return Error.Validation(Resources.LocalizationKeys.Auth.InvalidRole, "User, Trainer");
                 }
                 user = new AppUser()
                 {
@@ -56,8 +56,7 @@ namespace GymAssistant_API.Repository.Services.User
                 var result = await _userManager.CreateAsync(user, request.Password);
                 if (!result.Succeeded)
                 {
-                    var errors = result.Errors.Select(e =>
-                                       Error.Validation(e.Code, e.Description)).ToList();
+                    var errors = Extensions.IdentityServiceExtensions.ConvertIdentityErrors(result.Errors);
                     return errors;
                 }
 
@@ -66,7 +65,7 @@ namespace GymAssistant_API.Repository.Services.User
 
                 if (role == null)
                 {
-                    return Error.Validation("No Role", "Role is required.");
+                    return Error.Validation(Resources.LocalizationKeys.Auth.RoleRequired);
                 }
 
                 if (!await _roleManager.RoleExistsAsync(role))
@@ -79,7 +78,7 @@ namespace GymAssistant_API.Repository.Services.User
             }
             catch (Exception ex)
             {
-                return Error.Failure("Registration_Failed", "An error occurred during registration");
+                return Error.Failure(Resources.LocalizationKeys.Auth.RegistrationFailed);
             }
         }
     }

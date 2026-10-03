@@ -1,10 +1,13 @@
-﻿using GymAssistant_API.Data;
+using GymAssistant_API.Data;
 using GymAssistant_API.Model.Entities.Exercise;
+using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Exercise;
 using GymAssistant_API.Req_Res.Response.Progress;
 using GymAssistant_API.Req_Res.Response.Records;
+using GymAssistant_API.Resources;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using System.Threading.Tasks;
 
 namespace GymAssistant_API.Repository.Services.Progress
@@ -12,10 +15,12 @@ namespace GymAssistant_API.Repository.Services.Progress
     public sealed class RecordsService : IRecordsService
     {
         private readonly AppDbContext _context;
+        private readonly IStringLocalizer<SharedResources> _localizer;
 
-        public RecordsService(AppDbContext context)
+        public RecordsService(AppDbContext context, IStringLocalizer<SharedResources> localizer)
         {
             _context = context;
+            _localizer = localizer;
         }
 
         public async Task<Result<List<PersonalRecordResponse>>> GetPersonalRecordsAsync(string userId,
@@ -27,7 +32,7 @@ namespace GymAssistant_API.Repository.Services.Progress
 
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
 
             var query = _context.PersonalRecords
@@ -57,7 +62,7 @@ namespace GymAssistant_API.Repository.Services.Progress
 
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
             var results = await _context.PersonalRecords
                 .Where(pr => pr.ClientProfileId == profile.Id && pr.ExerciseId == exerciseId)
@@ -79,7 +84,7 @@ namespace GymAssistant_API.Repository.Services.Progress
 
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
             var results = await _context.PersonalRecords
                 .Where(pr => pr.ClientProfileId == profile.Id && pr.UserExerciseId == userExerciseId)
@@ -100,7 +105,7 @@ namespace GymAssistant_API.Repository.Services.Progress
 
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
             var results = await _context.PersonalRecords
                 .Where(pr => pr.ClientProfileId == profile.Id)
@@ -125,7 +130,7 @@ namespace GymAssistant_API.Repository.Services.Progress
 
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
 
             var query = _context.PersonalRecords
@@ -180,7 +185,7 @@ namespace GymAssistant_API.Repository.Services.Progress
                 .FirstOrDefaultAsync(p => p.AppUserId == userId, ct);
             if (profile == null)
             {
-                return Error.NotFound("Profile_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
             var workoutsCount = await _context.WorkoutSessions
                 .Where(ws => ws.ClientProfileId == profile.Id)
@@ -253,8 +258,8 @@ namespace GymAssistant_API.Repository.Services.Progress
             {
                 milestones.Add(new Milestone
                 {
-                    Title = "Century Club",
-                    Description = $"Lifted {maxWeight}kg - your first 100kg milestone!",
+                    Title = _localizer[LocalizationKeys.Records.Milestone.CenturyClubTitle],
+                    Description = _localizer[LocalizationKeys.Records.Milestone.CenturyClubDescription, maxWeight],
                     Icon = "💪",
                     Record = records.Where(r => r.RecordType == RecordType.MaxWeight)
                                  .OrderByDescending(r => r.Value)
@@ -275,8 +280,8 @@ namespace GymAssistant_API.Repository.Services.Progress
             {
                 milestones.Add(new Milestone
                 {
-                    Title = "Volume Beast",
-                    Description = $"Achieved {maxVolume}kg total volume in a single exercise!",
+                    Title = _localizer[LocalizationKeys.Records.Milestone.VolumeBeastTitle],
+                    Description = _localizer[LocalizationKeys.Records.Milestone.VolumeBeastDescription, maxVolume],
                     Icon = "🔥",
                     Record = records.Where(r => r.RecordType == RecordType.MaxVolume)
                                  .OrderByDescending(r => r.Value)
@@ -297,8 +302,8 @@ namespace GymAssistant_API.Repository.Services.Progress
             {
                 milestones.Add(new Milestone
                 {
-                    Title = "Reps Breaker",
-                    Description = $"{maxReps} Reps personal records!",
+                    Title = _localizer[LocalizationKeys.Records.Milestone.RepsBreakerTitle],
+                    Description = _localizer[LocalizationKeys.Records.Milestone.RepsBreakerDescription, maxReps],
                     Icon = "🏆",
                     Record = records.Where(r => r.RecordType == RecordType.MaxReps)
                                  .OrderByDescending(r => r.Value)

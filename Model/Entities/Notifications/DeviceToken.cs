@@ -1,4 +1,4 @@
-﻿using GymAssistant_API.Model.Entities.User;
+using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Results;
 
 namespace GymAssistant_API.Model.Entities.Notifications
@@ -29,10 +29,10 @@ namespace GymAssistant_API.Model.Entities.Notifications
         public static Result<DeviceToken> Create(Guid id, string userId, string token, DevicePlatform platform)
         {
             if (string.IsNullOrWhiteSpace(userId))
-                return Error.Validation("UserId_Required", "User ID is required");
+                return Error.Validation(Resources.LocalizationKeys.User.IdRequired);
 
             if (string.IsNullOrWhiteSpace(token))
-                return Error.Validation("Token_Required", "Device token is required");
+                return Error.Validation(Resources.LocalizationKeys.Notification.DeviceTokenRequired);
 
             return new DeviceToken(id, userId, token, platform);
         }

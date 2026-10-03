@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using GymAssistant_API.Handeler.User;
 using GymAssistant_API.Model.Entities.User.Dto;
 using GymAssistant_API.Model.Results;
@@ -17,12 +17,14 @@ namespace GymAssistant_API.Controllers
     public sealed class UsersController(CreateProfileHandler createProfile,
                                         UpdateProfileHandler updateProfile,
                                         GetProfileHandler getProfile,
-                                        GetMeasurementHandler getMeasurement) : ApiController
+                                        GetMeasurementHandler getMeasurement,
+                                        DeleteUserHandler deleteUser) : ApiController
     {
         private readonly CreateProfileHandler _createProfile = createProfile;
         private readonly UpdateProfileHandler _updateProfile = updateProfile;
         private readonly GetProfileHandler _getProfile = getProfile;
         private readonly GetMeasurementHandler _getMeasurement = getMeasurement;
+        private readonly DeleteUserHandler _deleteUser = deleteUser;
 
         [HttpPost("create-profile")]
         [Consumes("application/x-www-form-urlencoded")]
@@ -173,6 +175,24 @@ namespace GymAssistant_API.Controllers
 
 
 
+
+        [HttpDelete("delete-account")]
+        [Authorize]
+        [ProducesResponseType(typeof(Result<Deleted>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [EndpointSummary("Deletes the authenticated user's account.")]
+        [EndpointDescription("Permanently deletes the authenticated user's account and all associated data.")]
+        [EndpointName("DeleteUserAccount")]
+        public async Task<ActionResult> DeleteAccount(CancellationToken ct = default)
+        {
+            var result = await _deleteUser.Handle(GetCurrentUserId(), ct);
+            return result.Match(
+                response => Ok(response),
+                Problem);
+        }
 
         private string GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
     }

@@ -59,744 +59,744 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Auth.AddExternalLoginFailed" xml:space="preserve">
-    <value>حدث خطأ أثناء ربط الحساب الخارجي.</value>
+    <value>An error occurred while linking external login.</value>
   </data>
   <data name="Auth.ChangePasswordFailed" xml:space="preserve">
-    <value>حدث خطأ غير متوقع أثناء تغيير كلمة المرور.</value>
+    <value>An unexpected error occurred while changing password.</value>
   </data>
   <data name="Auth.EmailAlreadyExists" xml:space="preserve">
-    <value>هذا البريد الإلكتروني مسجل بالفعل.</value>
+    <value>This email is already registered.</value>
   </data>
   <data name="Auth.EmailNotConfirmed" xml:space="preserve">
-    <value>البريد الإلكتروني '{0}' غير مؤكد.</value>
+    <value>Email '{0}' is not confirmed.</value>
   </data>
   <data name="Auth.ExpiredAccessToken.Invalid" xml:space="preserve">
-    <value>رمز الوصول المنتهي غير صالح.</value>
+    <value>Expired access token is not valid.</value>
   </data>
   <data name="Auth.ExternalLoginFailed" xml:space="preserve">
-    <value>حدث خطأ أثناء تسجيل الدخول الخارجي.</value>
+    <value>An error occurred during external login.</value>
   </data>
   <data name="Auth.ExternalSignInFailed" xml:space="preserve">
-    <value>فشل إكمال تسجيل الدخول عبر المزود الخارجي.</value>
+    <value>An error occurred during external sign-in.</value>
   </data>
   <data name="Auth.InvalidCredentials" xml:space="preserve">
-    <value>البريد الإلكتروني أو كلمة المرور غير صحيحة.</value>
+    <value>Invalid email or password.</value>
   </data>
   <data name="Auth.InvalidCurrentPassword" xml:space="preserve">
-    <value>كلمة المرور الحالية غير صحيحة.</value>
+    <value>The current password provided is incorrect.</value>
   </data>
   <data name="Auth.InvalidEmail" xml:space="preserve">
-    <value>صيغة البريد الإلكتروني غير صحيحة.</value>
+    <value>Email format is not valid.</value>
   </data>
   <data name="Auth.InvalidPhoneNumber" xml:space="preserve">
-    <value>صيغة رقم الهاتف غير صحيحة.</value>
+    <value>Phone number format is not valid.</value>
   </data>
   <data name="Auth.InvalidProvider" xml:space="preserve">
-    <value>يجب أن يكون المزود Google أو Facebook.</value>
+    <value>Provider must be Google or Facebook.</value>
   </data>
   <data name="Auth.InvalidRole" xml:space="preserve">
-    <value>الدور '{0}' غير صالح.</value>
+    <value>Role '{0}' is not valid.</value>
   </data>
   <data name="Auth.InvalidToken" xml:space="preserve">
-    <value>الرمز المقدم غير صالح.</value>
+    <value>Invalid token provided.</value>
   </data>
   <data name="Auth.PasswordResetEmailSent" xml:space="preserve">
-    <value>تم إرسال بريد إعادة تعيين كلمة المرور بنجاح.</value>
+    <value>Password reset email sent successfully.</value>
   </data>
   <data name="Auth.PasswordsDoNotMatch" xml:space="preserve">
-    <value>كلمات المرور غير متطابقة.</value>
+    <value>Passwords do not match.</value>
   </data>
   <data name="Auth.RefreshToken.Expired" xml:space="preserve">
-    <value>رمز التحديث غير صالح أو منتهي الصلاحية.</value>
+    <value>Refresh token is invalid or has expired.</value>
   </data>
   <data name="Auth.RegistrationFailed" xml:space="preserve">
-    <value>حدث خطأ أثناء عملية التسجيل.</value>
+    <value>An error occurred during registration.</value>
   </data>
   <data name="Auth.ResetFailed" xml:space="preserve">
-    <value>حدث خطأ غير متوقع أثناء إعادة تعيين كلمة المرور.</value>
+    <value>An unexpected error occurred while resetting password.</value>
   </data>
   <data name="Auth.RoleRequired" xml:space="preserve">
-    <value>الدور مطلوب.</value>
+    <value>Role is required.</value>
   </data>
   <data name="Auth.SamePassword" xml:space="preserve">
-    <value>كلمة المرور الجديدة يجب أن تكون مختلفة عن كلمة المرور الحالية.</value>
+    <value>The new password must be different from current password.</value>
   </data>
   <data name="Auth.TokenExpired" xml:space="preserve">
-    <value>رمز إعادة تعيين كلمة المرور منتهي الصلاحية.</value>
+    <value>Password reset token has expired.</value>
   </data>
   <data name="Auth.TokenGeneration.Failed" xml:space="preserve">
-    <value>فشل إنشاء رمز JWT جديد.</value>
+    <value>Failed to generate new JWT token.</value>
   </data>
   <data name="Auth.TokenUsed" xml:space="preserve">
-    <value>تم استخدام رابط إعادة تعيين كلمة المرور مسبقاً.</value>
+    <value>This reset link has already been used.</value>
   </data>
   <data name="Auth.User.NotFound" xml:space="preserve">
-    <value>المستخدم غير موجود.</value>
+    <value>User not found.</value>
   </data>
   <data name="Auth.UserHasNoRole" xml:space="preserve">
-    <value>المستخدم ليس لديه دور محدد.</value>
+    <value>User has no assigned role.</value>
   </data>
   <data name="Auth.UserIdClaim.Invalid" xml:space="preserve">
-    <value>معرف المستخدم في الرمز غير صالح.</value>
+    <value>Invalid userId claim.</value>
   </data>
   <data name="Chat.Attachment.Required" xml:space="preserve">
-    <value>رابط المرفق مطلوب للرسائل غير النصية.</value>
+    <value>Attachment URL is required for non-text messages.</value>
   </data>
   <data name="Chat.CannotEdit" xml:space="preserve">
-    <value>يمكن تعديل الرسائل النصية فقط.</value>
+    <value>Can only edit text messages.</value>
   </data>
   <data name="Chat.Content.Required" xml:space="preserve">
-    <value>محتوى الرسالة مطلوب.</value>
+    <value>Message content is required.</value>
   </data>
   <data name="Chat.Conversation.NotFound" xml:space="preserve">
-    <value>المحادثة غير موجودة.</value>
+    <value>Conversation not found.</value>
   </data>
   <data name="Chat.ConversationId.Required" xml:space="preserve">
-    <value>معرف المحادثة مطلوب.</value>
+    <value>Conversation ID is required.</value>
   </data>
   <data name="Chat.FailedToGetConversations" xml:space="preserve">
-    <value>فشل في جلب المحادثات.</value>
+    <value>Failed to get conversations.</value>
   </data>
   <data name="Chat.FailedToGetOrCreateConversation" xml:space="preserve">
-    <value>فشل في إنشاء أو فتح المحادثة.</value>
+    <value>Failed to get or create conversation.</value>
   </data>
   <data name="Chat.Hub.ConversationMarkReadFailed" xml:space="preserve">
-    <value>فشل تحديد المحادثة كمقروءة.</value>
+    <value>Failed to mark conversation as read.</value>
   </data>
   <data name="Chat.Hub.DeleteMessageFailed" xml:space="preserve">
-    <value>فشل حذف الرسالة.</value>
+    <value>Failed to delete message.</value>
   </data>
   <data name="Chat.Hub.EditMessageFailed" xml:space="preserve">
-    <value>فشل تعديل الرسالة.</value>
+    <value>Failed to edit message.</value>
   </data>
   <data name="Chat.Hub.MarkReadFailed" xml:space="preserve">
-    <value>فشل تحديد الرسالة كمقروءة.</value>
+    <value>Failed to mark message as read.</value>
   </data>
   <data name="Chat.Hub.NotPartOfConversation" xml:space="preserve">
-    <value>أنت لست طرفاً في هذه المحادثة.</value>
+    <value>You are not part of this conversation.</value>
   </data>
   <data name="Chat.Hub.NotSenderOrNotFound" xml:space="preserve">
-    <value>الرسالة غير موجودة أو أنك لست المرسل.</value>
+    <value>Message not found or you are not the sender.</value>
   </data>
   <data name="Chat.Hub.UserNotAuthenticated" xml:space="preserve">
-    <value>المستخدم غير مسجل الدخول.</value>
+    <value>User not authenticated.</value>
   </data>
   <data name="Chat.Hub.UserProfileNotFound" xml:space="preserve">
-    <value>ملف المستخدم غير موجود.</value>
+    <value>User profile not found.</value>
   </data>
   <data name="Chat.Message.NotFound" xml:space="preserve">
-    <value>الرسالة غير موجودة.</value>
+    <value>Message not found.</value>
   </data>
   <data name="Chat.MessagesError" xml:space="preserve">
-    <value>فشل في جلب الرسائل.</value>
+    <value>Failed to get messages.</value>
   </data>
   <data name="Chat.SendMessageFailed" xml:space="preserve">
-    <value>فشل إرسال الرسالة.</value>
+    <value>Failed to send message.</value>
   </data>
   <data name="Chat.SenderId.Required" xml:space="preserve">
-    <value>معرف المرسل مطلوب.</value>
+    <value>Sender ID is required.</value>
   </data>
   <data name="Chat.UnreadCountError" xml:space="preserve">
-    <value>فشل في جلب عدد الرسائل غير المقروءة.</value>
+    <value>Failed to get unread count.</value>
   </data>
   <data name="Common.ConflictTitle" xml:space="preserve">
-    <value>حدث تعارض في البيانات.</value>
+    <value>Conflict occurred.</value>
   </data>
   <data name="Common.InvalidPagination" xml:space="preserve">
-    <value>يجب أن يكون رقم الصفحة وحجمها أكبر من الصفر.</value>
+    <value>PageSize and Page must be greater than zero.</value>
   </data>
   <data name="Common.InvalidRequest" xml:space="preserve">
-    <value>بيانات الطلب مفقودة أو غير صحيحة.</value>
+    <value>Request data is missing or invalid.</value>
   </data>
   <data name="Common.NotFoundTitle" xml:space="preserve">
-    <value>المورد غير موجود.</value>
+    <value>Resource not found.</value>
   </data>
   <data name="Common.ServerErrorTitle" xml:space="preserve">
-    <value>حدث خطأ غير متوقع في الخادم.</value>
+    <value>An internal server error occurred.</value>
   </data>
   <data name="Common.UnauthorizedTitle" xml:space="preserve">
-    <value>وصول غير مصرح به.</value>
+    <value>Unauthorized access.</value>
   </data>
   <data name="Common.UnexpectedError" xml:space="preserve">
-    <value>حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقاً.</value>
+    <value>An unexpected error occurred. Please try again later.</value>
   </data>
   <data name="Common.ValidationTitle" xml:space="preserve">
-    <value>حدث خطأ واحد أو أكثر في التحقق من صحة البيانات.</value>
+    <value>One or more validation errors occurred.</value>
   </data>
   <data name="Data.Exercise.BenchPress.Desc" xml:space="preserve">
-    <value>تمرين أساسي لبناء عضلات الصدر والكتفين والذراعين</value>
+    <value>A fundamental exercise for building chest, shoulder, and arm muscles</value>
   </data>
   <data name="Data.Exercise.BenchPress.Equip" xml:space="preserve">
-    <value>بار، مقعد مستوٍ، أوزان</value>
+    <value>Barbell, flat bench, weight plates</value>
   </data>
   <data name="Data.Exercise.BenchPress.Inst" xml:space="preserve">
-    <value>استلقِ على المقعد وثبت قدميك على الأرض. أمسك البار بقبضة متوسطة وانزله ببطء حتى يلامس صدرك ثم ادفعه للأعلى</value>
+    <value>Lie on the bench and keep your feet firmly on the ground. Grip the bar with a medium-width grip and lower it slowly until it touches your chest, then push it up forcefully</value>
   </data>
   <data name="Data.Exercise.BenchPress.Name" xml:space="preserve">
-    <value>بنش برس</value>
+    <value>Bench Press</value>
   </data>
   <data name="Data.Exercise.BicepCurl.Desc" xml:space="preserve">
-    <value>تمرين عزل لعضلة البايسبس</value>
+    <value>An isolation exercise for the bicep muscle</value>
   </data>
   <data name="Data.Exercise.BicepCurl.Equip" xml:space="preserve">
-    <value>دمبلز</value>
+    <value>Dumbbells</value>
   </data>
   <data name="Data.Exercise.BicepCurl.Inst" xml:space="preserve">
-    <value>امسك دمبل في كل يد مع تثبيت المرفقين بجانبك. ارفع الأوزان باتجاه الكتفين عن طريق ثني المرفق ثم انزل ببطء</value>
+    <value>Hold dumbbells in each hand with elbows fixed by your sides. Raise the weights toward your shoulders by bending the elbow, then lower slowly</value>
   </data>
   <data name="Data.Exercise.BicepCurl.Name" xml:space="preserve">
-    <value>بايسبس كيرل</value>
+    <value>Bicep Curl</value>
   </data>
   <data name="Data.Exercise.Deadlift.Desc" xml:space="preserve">
-    <value>تمرين شامل للجسم كامل يركز على عضلات الظهر والأرجل</value>
+    <value>A comprehensive full-body exercise focusing on back and leg muscles</value>
   </data>
   <data name="Data.Exercise.Deadlift.Equip" xml:space="preserve">
-    <value>بار، أوزان، منصة رفع</value>
+    <value>Barbell, weight plates, lifting platform</value>
   </data>
   <data name="Data.Exercise.Deadlift.Inst" xml:space="preserve">
-    <value>قف وقدميك تحت البار. حافظ على استقامة ظهرك واثنِ الركبتين لتمسك البار، ثم ارفعه لأعلى محافظاً على استقامة الظهر</value>
+    <value>Stand with feet directly under the bar. Keep your back straight and bend at the hips and knees to grip the bar, then lift it slowly while maintaining a straight back</value>
   </data>
   <data name="Data.Exercise.Deadlift.Name" xml:space="preserve">
-    <value>ديدليفت</value>
+    <value>Deadlift</value>
   </data>
   <data name="Data.Exercise.PullUp.Desc" xml:space="preserve">
-    <value>تمرين ممتاز لعضلات الظهر والذراعين</value>
+    <value>An excellent exercise for back and arm muscles</value>
   </data>
   <data name="Data.Exercise.PullUp.Equip" xml:space="preserve">
-    <value>بار عقلة</value>
+    <value>Pull-up bar or pull-up station</value>
   </data>
   <data name="Data.Exercise.PullUp.Inst" xml:space="preserve">
-    <value>تعلق بالبار بقبضة أوسع من الكتفين. اسحب جسمك للأعلى حتى تعبر ذقنك البار ثم انزل ببطء لوضع البداية</value>
+    <value>Hang from the bar with a grip wider than shoulder-width. Pull your body up until your chin passes the bar, then lower slowly to the starting position</value>
   </data>
   <data name="Data.Exercise.PullUp.Name" xml:space="preserve">
-    <value>عقلة</value>
+    <value>Pull-up</value>
   </data>
   <data name="Data.Exercise.ShoulderPress.Desc" xml:space="preserve">
-    <value>تمرين لتقوية عضلات الكتف والذراعين</value>
+    <value>An exercise for strengthening shoulder and arm muscles</value>
   </data>
   <data name="Data.Exercise.ShoulderPress.Equip" xml:space="preserve">
-    <value>دمبلز أو بار</value>
+    <value>Dumbbells or barbell</value>
   </data>
   <data name="Data.Exercise.ShoulderPress.Inst" xml:space="preserve">
-    <value>امسك الدمبلز بمستوى الكتفين. ادفع الأوزان لأعلى حتى تستقيم ذراعاك ثم انزلها ببطء</value>
+    <value>Hold dumbbells in each hand at shoulder level. Push the weights up until arms are straight, then lower slowly</value>
   </data>
   <data name="Data.Exercise.ShoulderPress.Name" xml:space="preserve">
-    <value>شولدر برس</value>
+    <value>Shoulder Press</value>
   </data>
   <data name="Data.Exercise.Squat.Desc" xml:space="preserve">
-    <value>تمرين أساسي لعضلات الأرجل والأرداف والجذع</value>
+    <value>A fundamental exercise for leg, glute, and core muscles</value>
   </data>
   <data name="Data.Exercise.Squat.Equip" xml:space="preserve">
-    <value>بار، قفص سكوات، أوزان</value>
+    <value>Barbell, squat rack, weight plates</value>
   </data>
   <data name="Data.Exercise.Squat.Inst" xml:space="preserve">
-    <value>ضع البار على أعلى الظهر وقف وقدميك باتساع الكتفين. انزل ببطء كأنك تجلس على كرسي حتى يوازي فخذاك الأرض ثم اصعد</value>
+    <value>Place the bar on your upper back and stand with feet shoulder-width apart. Lower slowly as if sitting in a chair until thighs are parallel to the floor, then return to starting position</value>
   </data>
   <data name="Data.Exercise.Squat.Name" xml:space="preserve">
-    <value>سكوات</value>
+    <value>Squat</value>
   </data>
   <data name="Data.Section.Arms.Desc" xml:space="preserve">
-    <value>تمارين عضلات الذراع - البايسبس والترايسبس</value>
+    <value>Arm muscle exercises - biceps and triceps</value>
   </data>
   <data name="Data.Section.Arms.Name" xml:space="preserve">
-    <value>الذراعين</value>
+    <value>Arms</value>
   </data>
   <data name="Data.Section.Back.Desc" xml:space="preserve">
-    <value>تمارين عضلات الظهر وتقوية العمود الفقري</value>
+    <value>Back muscle exercises and spine strengthening</value>
   </data>
   <data name="Data.Section.Back.Name" xml:space="preserve">
-    <value>الظهر</value>
+    <value>Back</value>
   </data>
   <data name="Data.Section.Chest.Desc" xml:space="preserve">
-    <value>تمارين عضلات الصدر وتدريب الجزء العلوي من الجسم</value>
+    <value>Chest muscle exercises and upper body training</value>
   </data>
   <data name="Data.Section.Chest.Name" xml:space="preserve">
-    <value>الصدر</value>
+    <value>Chest</value>
   </data>
   <data name="Data.Section.Legs.Desc" xml:space="preserve">
-    <value>تمارين عضلات الساق وتدريب الجزء السفلي من الجسم</value>
+    <value>Leg muscle exercises and lower body training</value>
   </data>
   <data name="Data.Section.Legs.Name" xml:space="preserve">
-    <value>الأرجل</value>
+    <value>Legs</value>
   </data>
   <data name="Data.Section.Shoulders.Desc" xml:space="preserve">
-    <value>تمارين عضلات الكتف وتدريب العضلة الدالية</value>
+    <value>Shoulder muscle exercises and deltoid training</value>
   </data>
   <data name="Data.Section.Shoulders.Name" xml:space="preserve">
-    <value>الأكتاف</value>
+    <value>Shoulders</value>
   </data>
   <data name="Exercise.AlreadyInGroup" xml:space="preserve">
-    <value>التمرين موجود بالفعل في هذه المجموعة.</value>
+    <value>Exercise is already in the group.</value>
   </data>
   <data name="Exercise.AlreadyInWorkout" xml:space="preserve">
-    <value>التمرين مضاف بالفعل في هذا التدريب.</value>
+    <value>Exercise is already in this workout.</value>
   </data>
   <data name="Exercise.Conflict" xml:space="preserve">
-    <value>يجب تحديد تمرين عام أو مخصص فقط وليس كلاهما.</value>
+    <value>Only one of ExerciseId or UserExerciseId should be provided.</value>
   </data>
   <data name="Exercise.CreatedByTrainerId.Invalid" xml:space="preserve">
-    <value>معرف المدرب المنشئ غير صالح.</value>
+    <value>CreatedByTrainerId must be a valid GUID.</value>
   </data>
   <data name="Exercise.CustomExercise.NotFound" xml:space="preserve">
-    <value>التمرين المخصص غير موجود.</value>
+    <value>Custom exercise not found.</value>
   </data>
   <data name="Exercise.Date.Required" xml:space="preserve">
-    <value>التاريخ مطلوب.</value>
+    <value>Date is required.</value>
   </data>
   <data name="Exercise.DefaultReps.Invalid" xml:space="preserve">
-    <value>عدد التكرارات الافتراضي يجب أن يكون رقماً صحيحاً موجباً.</value>
+    <value>Default reps must be a positive integer.</value>
   </data>
   <data name="Exercise.DefaultSets.Invalid" xml:space="preserve">
-    <value>عدد المجموعات الافتراضي يجب أن يكون رقماً صحيحاً موجباً.</value>
+    <value>Default sets must be a positive integer.</value>
   </data>
   <data name="Exercise.Id.Required" xml:space="preserve">
-    <value>معرف التمرين مطلوب.</value>
+    <value>Exercise ID is required.</value>
   </data>
   <data name="Exercise.InUse" xml:space="preserve">
-    <value>لا يمكن حذف تمرين تم استخدامه في جلسات تدريبية.</value>
+    <value>Cannot delete exercise that has been used in workouts.</value>
   </data>
   <data name="Exercise.Name.Required" xml:space="preserve">
-    <value>اسم التمرين مطلوب.</value>
+    <value>Exercise name is required.</value>
   </data>
   <data name="Exercise.NotFound" xml:space="preserve">
-    <value>التمرين غير موجود.</value>
+    <value>Exercise not found.</value>
   </data>
   <data name="Exercise.Reps.Invalid" xml:space="preserve">
-    <value>التكرارات يجب أن تكون رقماً صحيحاً موجباً.</value>
+    <value>Reps must be a positive integer.</value>
   </data>
   <data name="Exercise.Required" xml:space="preserve">
-    <value>يجب تحديد إما تمرين عام أو تمرين مخصص.</value>
+    <value>Either ExerciseId or UserExerciseId must be provided.</value>
   </data>
   <data name="Exercise.RestTimeSeconds.Invalid" xml:space="preserve">
-    <value>وقت الراحة بالثواني لا يمكن أن يكون سالباً.</value>
+    <value>Rest time must be a non-negative integer.</value>
   </data>
   <data name="Exercise.Set.NotFound" xml:space="preserve">
-    <value>المجموعة التدريبية غير موجودة.</value>
+    <value>Exercise set not found.</value>
   </data>
   <data name="Exercise.SetNumber.Invalid" xml:space="preserve">
-    <value>رقم المجموعة يجب أن يكون رقماً صحيحاً موجباً.</value>
+    <value>Set number must be a positive integer.</value>
   </data>
   <data name="Exercise.Value.Invalid" xml:space="preserve">
-    <value>قيمة الرقم القياسي يجب أن تكون رقماً موجباً.</value>
+    <value>Record value must be a positive number.</value>
   </data>
   <data name="Exercise.WeightKg.Invalid" xml:space="preserve">
-    <value>الوزن لا يمكن أن يكون رقماً سالباً.</value>
+    <value>Weight must be a non-negative number.</value>
   </data>
   <data name="Exercise.WorkoutExercise.NotFound" xml:space="preserve">
-    <value>تمرين التدريب غير موجود.</value>
+    <value>Workout exercise not found.</value>
   </data>
   <data name="Exercise.WorkoutExerciseId.Required" xml:space="preserve">
-    <value>معرف تمرين التدريب مطلوب.</value>
+    <value>Workout exercise ID is required.</value>
   </data>
   <data name="Fields.BirthDate" xml:space="preserve">
-    <value>تاريخ الميلاد</value>
+    <value>Birth Date</value>
   </data>
   <data name="Fields.BodyFat" xml:space="preserve">
-    <value>نسبة الدهون</value>
+    <value>Body Fat Percentage</value>
   </data>
   <data name="Fields.ConfirmPassword" xml:space="preserve">
-    <value>تأكيد كلمة المرور</value>
+    <value>Confirm Password</value>
   </data>
   <data name="Fields.CurrentPassword" xml:space="preserve">
-    <value>كلمة المرور الحالية</value>
+    <value>Current Password</value>
   </data>
   <data name="Fields.DeviceToken" xml:space="preserve">
-    <value>رمز الجهاز</value>
+    <value>Device Token</value>
   </data>
   <data name="Fields.Email" xml:space="preserve">
-    <value>البريد الإلكتروني</value>
+    <value>Email</value>
   </data>
   <data name="Fields.FirstName" xml:space="preserve">
-    <value>الاسم الأول</value>
+    <value>First Name</value>
   </data>
   <data name="Fields.Gender" xml:space="preserve">
-    <value>الجنس</value>
+    <value>Gender</value>
   </data>
   <data name="Fields.Height" xml:space="preserve">
-    <value>الطول</value>
+    <value>Height</value>
   </data>
   <data name="Fields.LastName" xml:space="preserve">
-    <value>اسم العائلة</value>
+    <value>Last Name</value>
   </data>
   <data name="Fields.MuscleMass" xml:space="preserve">
-    <value>الكتلة العضلية</value>
+    <value>Muscle Mass</value>
   </data>
   <data name="Fields.Name" xml:space="preserve">
-    <value>الاسم</value>
+    <value>Name</value>
   </data>
   <data name="Fields.NewPassword" xml:space="preserve">
-    <value>كلمة المرور الجديدة</value>
+    <value>New Password</value>
   </data>
   <data name="Fields.Password" xml:space="preserve">
-    <value>كلمة المرور</value>
+    <value>Password</value>
   </data>
   <data name="Fields.PhoneNumber" xml:space="preserve">
-    <value>رقم الهاتف</value>
+    <value>Phone Number</value>
   </data>
   <data name="Fields.RefreshToken" xml:space="preserve">
-    <value>رمز التحديث</value>
+    <value>Refresh Token</value>
   </data>
   <data name="Fields.Role" xml:space="preserve">
-    <value>الدور</value>
+    <value>Role</value>
   </data>
   <data name="Fields.Target" xml:space="preserve">
-    <value>الهدف</value>
+    <value>Target</value>
   </data>
   <data name="Fields.Token" xml:space="preserve">
-    <value>الرمز</value>
+    <value>Token</value>
   </data>
   <data name="Fields.Topic" xml:space="preserve">
-    <value>القناة</value>
+    <value>Topic</value>
   </data>
   <data name="Fields.UserName" xml:space="preserve">
-    <value>اسم المستخدم</value>
+    <value>Username</value>
   </data>
   <data name="Fields.Weight" xml:space="preserve">
-    <value>الوزن</value>
+    <value>Weight</value>
   </data>
   <data name="Identity.ConcurrencyFailure" xml:space="preserve">
-    <value>فشل في التزامن، تم تعديل البيانات بواسطة عملية أخرى.</value>
+    <value>Optimistic concurrency failure, object has been modified.</value>
   </data>
   <data name="Identity.DefaultError" xml:space="preserve">
-    <value>حدث خطأ غير معروف.</value>
+    <value>An unknown failure has occurred.</value>
   </data>
   <data name="Identity.DuplicateEmail" xml:space="preserve">
-    <value>البريد الإلكتروني مستخدم بالفعل.</value>
+    <value>Email is already taken.</value>
   </data>
   <data name="Identity.DuplicateRoleName" xml:space="preserve">
-    <value>اسم الدور مستخدم بالفعل.</value>
+    <value>Role name is already taken.</value>
   </data>
   <data name="Identity.DuplicateUserName" xml:space="preserve">
-    <value>اسم المستخدم مأخوذ بالفعل.</value>
+    <value>User name is already taken.</value>
   </data>
   <data name="Identity.InvalidEmail" xml:space="preserve">
-    <value>البريد الإلكتروني غير صالح.</value>
+    <value>Email is invalid.</value>
   </data>
   <data name="Identity.InvalidRoleName" xml:space="preserve">
-    <value>اسم الدور غير صالح.</value>
+    <value>Role name is invalid.</value>
   </data>
   <data name="Identity.InvalidToken" xml:space="preserve">
-    <value>الرمز غير صالح.</value>
+    <value>Invalid token.</value>
   </data>
   <data name="Identity.InvalidUserName" xml:space="preserve">
-    <value>اسم المستخدم غير صالح.</value>
+    <value>User name is invalid.</value>
   </data>
   <data name="Identity.LoginAlreadyAssociated" xml:space="preserve">
-    <value>يوجد مستخدم مرتبط بحساب تسجيل الدخول هذا بالفعل.</value>
+    <value>A user with this login already exists.</value>
   </data>
   <data name="Identity.PasswordMismatch" xml:space="preserve">
-    <value>كلمة المرور غير صحيحة.</value>
+    <value>Incorrect password.</value>
   </data>
   <data name="Identity.PasswordRequiresDigit" xml:space="preserve">
-    <value>يجب أن تحتوي كلمة المرور على رقم واحد على الأقل ('0'-'9').</value>
+    <value>Passwords must have at least one digit ('0'-'9').</value>
   </data>
   <data name="Identity.PasswordRequiresLower" xml:space="preserve">
-    <value>يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل ('a'-'z').</value>
+    <value>Passwords must have at least one lowercase ('a'-'z').</value>
   </data>
   <data name="Identity.PasswordRequiresNonAlphanumeric" xml:space="preserve">
-    <value>يجب أن تحتوي كلمة المرور على رمز خاص واحد على الأقل.</value>
+    <value>Passwords must have at least one non alphanumeric character.</value>
   </data>
   <data name="Identity.PasswordRequiresUniqueChars" xml:space="preserve">
-    <value>يجب أن تحتوي كلمة المرور على {0} أحرف فريدة على الأقل.</value>
+    <value>Passwords must have at least {0} unique characters.</value>
   </data>
   <data name="Identity.PasswordRequiresUpper" xml:space="preserve">
-    <value>يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل ('A'-'Z').</value>
+    <value>Passwords must have at least one uppercase ('A'-'Z').</value>
   </data>
   <data name="Identity.PasswordTooShort" xml:space="preserve">
-    <value>يجب أن تكون كلمة المرور مكونة من {0} أحرف على الأقل.</value>
+    <value>Passwords must be at least {0} characters.</value>
   </data>
   <data name="Identity.UserAlreadyHasPassword" xml:space="preserve">
-    <value>المستخدم لديه كلمة مرور بالفعل.</value>
+    <value>User already has a password set.</value>
   </data>
   <data name="Identity.UserAlreadyInRole" xml:space="preserve">
-    <value>المستخدم يمتلك هذا الدور بالفعل.</value>
+    <value>User is already in role.</value>
   </data>
   <data name="Identity.UserLockoutNotEnabled" xml:space="preserve">
-    <value>خاصية حظر الحساب غير مفعلة لهذا المستخدم.</value>
+    <value>Lockout is not enabled for this user.</value>
   </data>
   <data name="Identity.UserNotInRole" xml:space="preserve">
-    <value>المستخدم لا يمتلك هذا الدور.</value>
+    <value>User is not in role.</value>
   </data>
   <data name="Notification.Body.Required" xml:space="preserve">
-    <value>نص الإشعار مطلوب.</value>
+    <value>Body is required.</value>
   </data>
   <data name="Notification.BulkSendFailed" xml:space="preserve">
-    <value>فشل إرسال الإشعارات الجماعية.</value>
+    <value>Failed to send bulk notification.</value>
   </data>
   <data name="Notification.DeleteFailed" xml:space="preserve">
-    <value>فشل حذف الإشعار.</value>
+    <value>Failed to delete notification.</value>
   </data>
   <data name="Notification.DeviceToken.NotFound" xml:space="preserve">
-    <value>رمز الجهاز غير موجود.</value>
+    <value>Device token not found.</value>
   </data>
   <data name="Notification.DeviceToken.RegistrationFailed" xml:space="preserve">
-    <value>فشل تسجيل رمز الجهاز.</value>
+    <value>Failed to register device token.</value>
   </data>
   <data name="Notification.DeviceToken.Required" xml:space="preserve">
-    <value>رمز الجهاز مطلوب.</value>
+    <value>Device token is required.</value>
   </data>
   <data name="Notification.DeviceToken.UnregistrationFailed" xml:space="preserve">
-    <value>فشل إلغاء تسجيل رمز الجهاز.</value>
+    <value>Failed to unregister device token.</value>
   </data>
   <data name="Notification.InvalidBody" xml:space="preserve">
-    <value>النص لا يمكن أن يكون فارغاً.</value>
+    <value>Body cannot be empty.</value>
   </data>
   <data name="Notification.InvalidTitle" xml:space="preserve">
-    <value>العنوان لا يمكن أن يكون فارغاً.</value>
+    <value>Title cannot be empty.</value>
   </data>
   <data name="Notification.InvalidTopic" xml:space="preserve">
-    <value>اسم القناة لا يمكن أن يكون فارغاً.</value>
+    <value>Topic cannot be empty.</value>
   </data>
   <data name="Notification.NotFound" xml:space="preserve">
-    <value>الإشعار غير موجود.</value>
+    <value>Notification not found.</value>
   </data>
   <data name="Notification.Push.Achievement.Body" xml:space="preserve">
     <value>{0}: {1}</value>
   </data>
   <data name="Notification.Push.Achievement.Title" xml:space="preserve">
-    <value>تم فتح إنجاز جديد! 🏅</value>
+    <value>Achievement Unlocked! 🏅</value>
   </data>
   <data name="Notification.Push.InactivityReminder.Body" xml:space="preserve">
-    <value>لم تتدرب منذ عدة أيام. هيا بنا لنستعد النشاط!</value>
+    <value>You haven't worked out in a few days. Let's get moving!</value>
   </data>
   <data name="Notification.Push.InactivityReminder.Title" xml:space="preserve">
-    <value>اشتقنا إليك! 💪</value>
+    <value>We Miss You! 💪</value>
   </data>
   <data name="Notification.Push.NewWorkoutAssigned.Body" xml:space="preserve">
-    <value>عين لك المدرب {0} تدريباً جديداً: {1}</value>
+    <value>{0} assigned you a new workout: {1}</value>
   </data>
   <data name="Notification.Push.NewWorkoutAssigned.Title" xml:space="preserve">
-    <value>تم تعيين تدريب جديد! 💪</value>
+    <value>New Workout Assigned! 💪</value>
   </data>
   <data name="Notification.Push.PersonalRecord.Body" xml:space="preserve">
-    <value>تهانينا! رقم قياسي جديد في {0}: {1}</value>
+    <value>Congratulations! New PR in {0}: {1}</value>
   </data>
   <data name="Notification.Push.PersonalRecord.Title" xml:space="preserve">
-    <value>رقم قياسي جديد! 🏆</value>
+    <value>New Personal Record! 🏆</value>
   </data>
   <data name="Notification.Push.RequestAccepted.Body" xml:space="preserve">
-    <value>وافق {0} على طلب التدريب الخاص بك! مرحباً بك في الفريق!</value>
+    <value>{0} accepted your training request! Welcome to the team!</value>
   </data>
   <data name="Notification.Push.RequestAccepted.Title" xml:space="preserve">
-    <value>تم قبول الطلب ✅</value>
+    <value>Request Accepted ✅</value>
   </data>
   <data name="Notification.Push.RequestRejected.Body" xml:space="preserve">
-    <value>اعتذر {0} عن قبول طلب التدريب الخاص بك.</value>
+    <value>{0} has declined your training request.</value>
   </data>
   <data name="Notification.Push.RequestRejected.Title" xml:space="preserve">
-    <value>تم رفض الطلب ❌</value>
+    <value>Request Declined ❌</value>
   </data>
   <data name="Notification.Push.TrainerMessage.Title" xml:space="preserve">
-    <value>رسالة جديدة من {0}</value>
+    <value>Message from {0}</value>
   </data>
   <data name="Notification.Push.TrainingRequest.Body" xml:space="preserve">
-    <value>أرسل لك {0} طلب تدريب جديد!</value>
+    <value>{0} sent you a training request!</value>
   </data>
   <data name="Notification.Push.TrainingRequest.Title" xml:space="preserve">
-    <value>طلب تدريب جديد 💪</value>
+    <value>New Training Request 💪</value>
   </data>
   <data name="Notification.Push.WorkoutCompleted.Body" xml:space="preserve">
-    <value>عمل رائع! لقد أكملت تدريب {0} بإجمالي {1} تمرين.</value>
+    <value>Great job! You completed {0} with {1} exercises.</value>
   </data>
   <data name="Notification.Push.WorkoutCompleted.Title" xml:space="preserve">
-    <value>اكتمل التمرين! 🎉</value>
+    <value>Workout Completed! 🎉</value>
   </data>
   <data name="Notification.Push.WorkoutReminder.Body" xml:space="preserve">
-    <value>لا تنسَ جلسة التدريب المقررة لليوم!</value>
+    <value>Don't forget your workout scheduled for today!</value>
   </data>
   <data name="Notification.Push.WorkoutReminder.Title" xml:space="preserve">
-    <value>حان وقت التدريب! 🏋️</value>
+    <value>Time to Workout! 🏋️</value>
   </data>
   <data name="Notification.Push.MeasurementReminder.Body" xml:space="preserve">
-    <value>تابع تقدمك! حدّث قياساتك الجسمانية هذا الأسبوع.</value>
+    <value>Track your progress! Update your measurements this week.</value>
   </data>
   <data name="Notification.Push.MeasurementReminder.Title" xml:space="preserve">
-    <value>حان وقت القياسات 📏</value>
+    <value>Time for Measurements 📏</value>
   </data>
   <data name="Notification.RetrievalFailed" xml:space="preserve">
-    <value>فشل في جلب الإشعارات.</value>
+    <value>Failed to retrieve notifications.</value>
   </data>
   <data name="Notification.SendFailed" xml:space="preserve">
-    <value>فشل إرسال الإشعار.</value>
+    <value>Failed to send notification.</value>
   </data>
   <data name="Notification.SubscriptionFailed" xml:space="preserve">
-    <value>فشل الاشتراك في القناة.</value>
+    <value>Failed to subscribe to topic.</value>
   </data>
   <data name="Notification.Title.Required" xml:space="preserve">
-    <value>عنوان الإشعار مطلوب.</value>
+    <value>Title is required.</value>
   </data>
   <data name="Notification.UnreadCountFailed" xml:space="preserve">
-    <value>فشل في جلب عدد الإشعارات غير المقروءة.</value>
+    <value>Failed to get unread notifications count.</value>
   </data>
   <data name="Notification.UnsubscriptionFailed" xml:space="preserve">
-    <value>فشل إلغاء الاشتراك من القناة.</value>
+    <value>Failed to unsubscribe from topic.</value>
   </data>
   <data name="Notification.UpdateFailed" xml:space="preserve">
-    <value>فشل تحديث الإشعار.</value>
+    <value>Failed to update notification.</value>
   </data>
   <data name="Profile.AlreadyExists" xml:space="preserve">
-    <value>الملف الشخصي للمستخدم موجود بالفعل.</value>
+    <value>User profile already exists.</value>
   </data>
   <data name="Profile.Id.Required" xml:space="preserve">
-    <value>معرف الملف الشخصي مطلوب.</value>
+    <value>Profile ID is required.</value>
   </data>
   <data name="Profile.Measurement.NotFound" xml:space="preserve">
-    <value>قياس الجسم غير موجود.</value>
+    <value>Body measurement not found.</value>
   </data>
   <data name="Profile.NotFound" xml:space="preserve">
-    <value>الملف الشخصي غير موجود.</value>
+    <value>User profile not found.</value>
   </data>
   <data name="Progress.CustomExercises" xml:space="preserve">
-    <value>تمارين مخصصة</value>
+    <value>Custom Exercises</value>
   </data>
   <data name="Progress.UnknownExercise" xml:space="preserve">
-    <value>تمرين غير معروف</value>
+    <value>Unknown Exercise</value>
   </data>
   <data name="Records.Milestone.CenturyClub.Description" xml:space="preserve">
-    <value>رفعت {0} كجم - أول إنجاز لك فوق 100 كجم!</value>
+    <value>Lifted {0}kg - your first 100kg milestone!</value>
   </data>
   <data name="Records.Milestone.CenturyClub.Title" xml:space="preserve">
-    <value>نادي المئة</value>
+    <value>Century Club</value>
   </data>
   <data name="Records.Milestone.RepsBreaker.Description" xml:space="preserve">
-    <value>رقم قياسي شخصي بعدد {0} تكرار!</value>
+    <value>{0} Reps personal record!</value>
   </data>
   <data name="Records.Milestone.RepsBreaker.Title" xml:space="preserve">
-    <value>محطم التكرارات</value>
+    <value>Reps Breaker</value>
   </data>
   <data name="Records.Milestone.VolumeBeast.Description" xml:space="preserve">
-    <value>حققت حجماً تدريبياً إجمالياً قدره {0} كجم في تمرين واحد!</value>
+    <value>Achieved {0}kg total volume in a single exercise!</value>
   </data>
   <data name="Records.Milestone.VolumeBeast.Title" xml:space="preserve">
-    <value>وحش الحجم التدريبي</value>
+    <value>Volume Beast</value>
   </data>
   <data name="RefreshToken.Expiry.Invalid" xml:space="preserve">
-    <value>تاريخ الانتهاء يجب أن يكون في المستقبل.</value>
+    <value>Expiry must be in the future.</value>
   </data>
   <data name="RefreshToken.Id.Required" xml:space="preserve">
-    <value>معرف رمز التحديث مطلوب.</value>
+    <value>Refresh token ID is required.</value>
   </data>
   <data name="RefreshToken.Token.Required" xml:space="preserve">
-    <value>قيمة الرمز مطلوبة.</value>
+    <value>Token value is required.</value>
   </data>
   <data name="RefreshToken.UserId.Required" xml:space="preserve">
-    <value>معرف المستخدم مطلوب.</value>
+    <value>User ID is required.</value>
   </data>
   <data name="Section.Group.NotFound" xml:space="preserve">
-    <value>المجموعة التدريبية غير موجودة.</value>
+    <value>Exercise group not found.</value>
   </data>
   <data name="Section.Id.Required" xml:space="preserve">
-    <value>معرف القسم مطلوب.</value>
+    <value>Section ID is required.</value>
   </data>
   <data name="Section.Name.Required" xml:space="preserve">
-    <value>اسم القسم مطلوب.</value>
+    <value>Section name is required.</value>
   </data>
   <data name="Section.NotFound" xml:space="preserve">
-    <value>القسم غير موجود.</value>
+    <value>Section not found.</value>
   </data>
   <data name="Trainer.NoRelationship" xml:space="preserve">
-    <value>لا توجد علاقة تدريب بين المدرب والمتدرب.</value>
+    <value>No trainer-trainee relationship exists.</value>
   </data>
   <data name="Trainer.NotFound" xml:space="preserve">
-    <value>الملف الشخصي للمدرب غير موجود.</value>
+    <value>Trainer profile not found.</value>
   </data>
   <data name="Trainer.Relationship.AlreadyExists" xml:space="preserve">
-    <value>علاقة التدريب قائمة بالفعل بين المستخدمين.</value>
+    <value>Trainer-trainee relationship already exists.</value>
   </data>
   <data name="Trainer.Request.AlreadyExists" xml:space="preserve">
-    <value>يوجد بالفعل طلب معلق بين هذين المستخدمين.</value>
+    <value>A pending request already exists between these users.</value>
   </data>
   <data name="Trainer.Request.NotFound" xml:space="preserve">
-    <value>طلب التدريب غير موجود.</value>
+    <value>Trainer request not found.</value>
   </data>
   <data name="Trainer.Request.NotPending" xml:space="preserve">
-    <value>الطلب ليس في حالة الانتظار.</value>
+    <value>Request is not in pending status.</value>
   </data>
   <data name="Trainer.Request.SameUser" xml:space="preserve">
-    <value>لا يمكن أن يكون المدرب والمتدرب نفس الشخص.</value>
+    <value>Trainer and trainee cannot be the same person.</value>
   </data>
   <data name="Trainer.Trainee.NotFound" xml:space="preserve">
-    <value>الملف الشخصي للمتدرب غير موجود.</value>
+    <value>Trainee profile not found.</value>
   </data>
   <data name="Trainer.TraineeId.Required" xml:space="preserve">
-    <value>معرف المتدرب مطلوب.</value>
+    <value>Trainee ID is required.</value>
   </data>
   <data name="Trainer.TrainerId.Required" xml:space="preserve">
-    <value>معرف المدرب مطلوب.</value>
+    <value>Trainer ID is required.</value>
   </data>
   <data name="Trainer.Unauthorized" xml:space="preserve">
-    <value>ليس لديك الصلاحية لتنفيذ هذا الإجراء.</value>
+    <value>You are not authorized to perform this action.</value>
   </data>
   <data name="User.BirthDay.Required" xml:space="preserve">
-    <value>تاريخ الميلاد غير صالح.</value>
+    <value>Birth date is not valid.</value>
   </data>
   <data name="User.BodyFatPercent.Invalid" xml:space="preserve">
-    <value>نسبة الدهون يجب أن تكون بين 0 و 100.</value>
+    <value>Body fat percentage must be between 0 and 100.</value>
   </data>
   <data name="User.Delete.Failed" xml:space="preserve">
-    <value>حدث خطأ أثناء حذف حساب المستخدم.</value>
+    <value>An error occurred while deleting the user account.</value>
   </data>
   <data name="User.FirstName.Required" xml:space="preserve">
-    <value>الاسم الأول مطلوب.</value>
+    <value>First name is required.</value>
   </data>
   <data name="User.Gender.Invalid" xml:space="preserve">
-    <value>الجنس يجب أن يكون ذكر أو أنثى.</value>
+    <value>Gender must be Male or Female.</value>
   </data>
   <data name="User.Height.Invalid" xml:space="preserve">
-    <value>الطول يجب أن يكون رقماً صحيحاً موجباً.</value>
+    <value>Height must be a positive integer.</value>
   </data>
   <data name="User.Id.Required" xml:space="preserve">
-    <value>معرف المستخدم مطلوب.</value>
+    <value>User ID is required.</value>
   </data>
   <data name="User.LastName.Required" xml:space="preserve">
-    <value>اسم العائلة مطلوب.</value>
+    <value>Last name is required.</value>
   </data>
   <data name="User.MuscleMass.Invalid" xml:space="preserve">
-    <value>الكتلة العضلية يجب أن تكون بين 10 و 200 كجم.</value>
+    <value>Muscle mass must be between 10 and 200 kg.</value>
   </data>
   <data name="User.Name.Required" xml:space="preserve">
-    <value>الاسم مطلوب.</value>
+    <value>Name is required.</value>
   </data>
   <data name="User.NotFound" xml:space="preserve">
-    <value>المستخدم غير موجود.</value>
+    <value>User not found.</value>
   </data>
   <data name="User.Role.Invalid" xml:space="preserve">
-    <value>الدور المحدد للمستخدم غير صالح.</value>
+    <value>Invalid role assigned to user.</value>
   </data>
   <data name="User.Weight.Invalid" xml:space="preserve">
-    <value>الوزن يجب أن يكون بين 20 و 400 كجم.</value>
+    <value>Weight must be between 20 and 400 kg.</value>
   </data>
   <data name="Validation.Compare" xml:space="preserve">
-    <value>{0} و {1} غير متطابقين.</value>
+    <value>{0} and {1} do not match.</value>
   </data>
   <data name="Validation.Email" xml:space="preserve">
-    <value>{0} ليس بريداً إلكترونياً صالحاً.</value>
+    <value>{0} is not a valid email address.</value>
   </data>
   <data name="Validation.InvalidValue" xml:space="preserve">
-    <value>القيمة '{0}' غير صالحة.</value>
+    <value>The value '{0}' is not valid.</value>
   </data>
   <data name="Validation.MinLength" xml:space="preserve">
-    <value>{0} يجب أن يحتوي على {1} أحرف على الأقل.</value>
+    <value>{0} must be at least {1} characters.</value>
   </data>
   <data name="Validation.Phone" xml:space="preserve">
-    <value>{0} ليس رقم هاتف صالح.</value>
+    <value>{0} is not a valid phone number.</value>
   </data>
   <data name="Validation.Range" xml:space="preserve">
-    <value>{0} يجب أن يكون بين {1} و {2}.</value>
+    <value>{0} must be between {1} and {2}.</value>
   </data>
   <data name="Validation.Required" xml:space="preserve">
-    <value>{0} مطلوب.</value>
+    <value>{0} is required.</value>
   </data>
   <data name="Workout.Session.AlreadyCompleted" xml:space="preserve">
-    <value>جلسة التمرين مكتملة بالفعل.</value>
+    <value>Workout session is already completed.</value>
   </data>
   <data name="Workout.Session.Completed" xml:space="preserve">
-    <value>لا يمكن تعديل جلسة تمرين مكتملة.</value>
+    <value>Cannot modify a completed workout session.</value>
   </data>
   <data name="Workout.Session.NotFound" xml:space="preserve">
-    <value>جلسة التمرين غير موجودة.</value>
+    <value>Workout session not found.</value>
   </data>
   <data name="Workout.Session.NotStarted" xml:space="preserve">
-    <value>يجب بدء جلسة التمرين أولاً قبل إنهائها.</value>
+    <value>Session must be started before it can be completed.</value>
   </data>
 </root>

@@ -1,12 +1,18 @@
-﻿using GymAssistant_API.Model.Results;
+using GymAssistant_API.Extensions;
+using GymAssistant_API.Model.Results;
+using GymAssistant_API.Resources;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Localization;
 
 namespace GymAssistant_API.Controllers;
 
 [ApiController]
 public class ApiController : ControllerBase
 {
+    private IStringLocalizer<SharedResources> Localizer =>
+        HttpContext.RequestServices.GetRequiredService<IStringLocalizer<SharedResources>>();
+
     protected ActionResult Problem(List<Error> errors)
     {
         if (errors.Count is 0)
@@ -41,13 +47,13 @@ public class ApiController : ControllerBase
             statusCode = StatusCodes.Status500InternalServerError;
         }
 
-        // Add all errors to model state
+        // Add all errors to model state with localized messages
         foreach (var error in errors)
         {
-            modelStateDictionary.AddModelError(error.Code, error.Description);
+            modelStateDictionary.AddModelError(error.Code, Localizer.Localize(error));
         }
 
-        // Create custom problem details to match your desired format
+        // Create custom problem details to match desired format
         var problemDetails = new ValidationProblemDetails(modelStateDictionary)
         {
             Type = GetRfcUri(statusCode),
@@ -74,17 +80,19 @@ public class ApiController : ControllerBase
         };
     }
 
-    private static string GetDefaultTitle(int statusCode)
+    private string GetDefaultTitle(int statusCode)
     {
-        return statusCode switch
+        var key = statusCode switch
         {
-            400 => "One or more validation errors occurred.",
-            401 => "Unauthorized access.",
-            404 => "Resource not found.",
-            409 => "Conflict occurred.",
-            500 => "An internal server error occurred.",
-            _ => "One or more validation errors occurred."
+            400 => LocalizationKeys.Common.ValidationTitle,
+            401 => LocalizationKeys.Common.UnauthorizedTitle,
+            404 => LocalizationKeys.Common.NotFoundTitle,
+            409 => LocalizationKeys.Common.ConflictTitle,
+            500 => LocalizationKeys.Common.ServerErrorTitle,
+            _ => LocalizationKeys.Common.ValidationTitle
         };
-    }
 
-}
+        var localized = Localizer[key];
+        return localized.ResourceNotFound ? "One or more validation errors occurred." : localized.Value;
+    }
+}

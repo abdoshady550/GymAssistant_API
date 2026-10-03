@@ -1,4 +1,4 @@
-﻿using GymAssistant_API.Model.Entities.User;
+using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Results;
 
 namespace GymAssistant_API.Model.Entities.Chat
@@ -43,16 +43,16 @@ namespace GymAssistant_API.Model.Entities.Chat
                                                 string? attachmentUrl = null)
         {
             if (conversationId == Guid.Empty)
-                return Error.Validation("ConversationId_Required", "Conversation ID is required");
+                return Error.Validation(Resources.LocalizationKeys.Chat.ConversationIdRequired);
 
             if (senderId == Guid.Empty)
-                return Error.Validation("SenderId_Required", "Sender ID is required");
+                return Error.Validation(Resources.LocalizationKeys.Chat.SenderIdRequired);
 
             if (string.IsNullOrWhiteSpace(content) && type == MessageType.Text)
-                return Error.Validation("Content_Required", "Message content is required");
+                return Error.Validation(Resources.LocalizationKeys.Chat.ContentRequired);
 
             if (type != MessageType.Text && string.IsNullOrWhiteSpace(attachmentUrl))
-                return Error.Validation("Attachment_Required", "Attachment URL is required for non-text messages");
+                return Error.Validation(Resources.LocalizationKeys.Chat.AttachmentRequired);
 
             return new ChatMessage(id, conversationId, senderId, content, type, attachmentUrl);
         }
@@ -66,10 +66,10 @@ namespace GymAssistant_API.Model.Entities.Chat
         public Result<Updated> Edit(string newContent)
         {
             if (string.IsNullOrWhiteSpace(newContent))
-                return Error.Validation("Content_Required", "New content is required");
+                return Error.Validation(Resources.LocalizationKeys.Chat.ContentRequired);
 
             if (Type != MessageType.Text)
-                return Error.Validation("Cannot_Edit", "Can only edit text messages");
+                return Error.Validation(Resources.LocalizationKeys.Chat.CannotEdit);
 
             Content = newContent;
             IsEdited = true;

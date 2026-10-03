@@ -1,34 +1,56 @@
-﻿using GymAssistant_API.Model.Entities.Exercise;
 using GymAssistant_API.Model.Results;
+using GymAssistant_API.Resources;
 
 namespace GymAssistant_API.Model.Entities.User
 {
     public static class UserErrors
     {
         public static readonly Error IdRequired =
-            Error.Validation("User.Id.Required", "Employee Id is required.");
+            Error.Validation(LocalizationKeys.User.IdRequired);
 
         public static Error FirstNameRequired =>
-            Error.Validation("User.FirstName.Required", "First name is required.");
+            Error.Validation(LocalizationKeys.User.FirstNameRequired);
 
         public static Error LastNameRequired =>
-            Error.Validation("User.LastName.Required", "Last name is required.");
+            Error.Validation(LocalizationKeys.User.LastNameRequired);
+
         public static Error GenderInvalid =>
-            Error.Validation("GenderInvalid", "Gender must be a Male or Female.");
+            Error.Validation(LocalizationKeys.User.GenderInvalid);
+
         public static Error BirthDayRequired =>
-            Error.Validation("BirthDay.Required", "BirthDay not Valid.");
+            Error.Validation(LocalizationKeys.User.BirthDayRequired);
+
         public static Error HeightInvalid =>
-            Error.Validation("HeightCm.Invalid", "HeightCm must be a positive integer.");
+            Error.Validation(LocalizationKeys.User.HeightInvalid);
+
         public static Error RoleInvalid =>
-            Error.Validation("User.Role.Invalid", "Invalid role assigned to User.");
+            Error.Validation(LocalizationKeys.User.RoleInvalid);
+
         public static Error WeightKgInvalid =>
-            Error.Validation("WeightKg.Invalid", "Weight must be between 20 and 400 kg");
+            Error.Validation(LocalizationKeys.User.WeightInvalid);
+
         public static Error BodyFatPercentInvalid =>
-           Error.Validation("BodyFatPercent_Invalid", "Body fat percentage must be between 0 and 100.");
+            Error.Validation(LocalizationKeys.User.BodyFatPercentInvalid);
+
         public static Error MuscleMassKgInvalid =>
-         Error.Validation("MuscleMassKg_Invalid", "Muscle mass must be between 10 and 200 kg.");
+            Error.Validation(LocalizationKeys.User.MuscleMassKgInvalid);
 
         public static Error NameRequired =>
-            Error.Validation("User.Name.Required", " name is required.");
+            Error.Validation(LocalizationKeys.User.NameRequired);
+
+        public static Error UserNotFound =>
+            Error.NotFound(LocalizationKeys.User.NotFound);
+
+        public static Error DeleteUserFailed =>
+            Error.Failure(LocalizationKeys.User.DeleteFailed);
+
+        public static Error ProfileNotFound =>
+            Error.NotFound(LocalizationKeys.Profile.NotFound);
+
+        public static Error ProfileAlreadyExists =>
+            Error.Conflict(LocalizationKeys.Profile.AlreadyExists);
+
+        public static Error MeasurementNotFound =>
+            Error.NotFound(LocalizationKeys.Profile.MeasurementNotFound);
     }
 }

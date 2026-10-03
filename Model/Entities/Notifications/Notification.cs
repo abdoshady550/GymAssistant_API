@@ -1,4 +1,4 @@
-﻿using GymAssistant_API.Model.Results;
+using GymAssistant_API.Model.Results;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace GymAssistant_API.Model.Entities.Notifications
@@ -38,13 +38,13 @@ namespace GymAssistant_API.Model.Entities.Notifications
                                                  string body, NotificationType? type, string? data = null, string? image = null)
         {
             if (string.IsNullOrWhiteSpace(userId))
-                return Error.Validation("UserId_Required", "User ID is required");
+                return Error.Validation(Resources.LocalizationKeys.User.IdRequired);
 
             if (string.IsNullOrWhiteSpace(title))
-                return Error.Validation("Title_Required", "Title is required");
+                return Error.Validation(Resources.LocalizationKeys.Notification.TitleRequired);
 
             if (string.IsNullOrWhiteSpace(body))
-                return Error.Validation("Body_Required", "Body is required");
+                return Error.Validation(Resources.LocalizationKeys.Notification.BodyRequired);
 
             return new Notification(id, userId, title, body, type, data, image);
         }

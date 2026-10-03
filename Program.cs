@@ -1,4 +1,4 @@
-﻿using GymAssistant_API.Data;
+using GymAssistant_API.Data;
 using GymAssistant_API.Extensions;
 using GymAssistant_API.Handeler.Exercise;
 using GymAssistant_API.Handeler.Exercise.Workout;
@@ -27,10 +27,14 @@ using GymAssistant_API.Repository.Services.Notifications;
 using GymAssistant_API.Repository.Services.Progress;
 using GymAssistant_API.Repository.Services.User;
 using GymAssistant_API.Repository.Services.User.Trainer;
+using GymAssistant_API.OpenApi.Transformers;
+using GymAssistant_API.Resources;
 using MechanicShop.Api.OpenApi.Transformers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
@@ -38,8 +42,18 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddAppLocalization();
 
 builder.Services.AddControllers()
+        .AddDataAnnotationsLocalization(options =>
+        {
+            options.DataAnnotationLocalizerProvider = (type, factory) =>
+                factory.Create(typeof(SharedResources));
+        })
+        .ConfigureApiBehaviorOptions(options =>
+        {
+            options.InvalidModelStateResponseFactory = LocalizedModelStateResponse.Create;
+        })
         .AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.ReferenceHandler = null;
@@ -53,6 +67,9 @@ builder.Services.AddSignalR(options =>
     options.KeepAliveInterval = TimeSpan.FromSeconds(15);
     options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
 });
+builder.Services.AddSingleton<Microsoft.AspNetCore.SignalR.IHubFilter, LocalizationHubFilter>();
+
+builder.Services.AddScoped<ISeedDataLocalizer, SeedDataLocalizer>();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -184,6 +201,7 @@ builder.Services.AddScoped<UserRequestHandler>();    // Handler
 builder.Services.AddScoped<ExternalLoginHandler>();    // Handler
 builder.Services.AddScoped<ChangePasswordHandler>();  // Handler
 builder.Services.AddScoped<NotificationsHandler>();  // Handler
+builder.Services.AddScoped<DeleteUserHandler>();  // Handler
 
 
 builder.Services.AddScoped<IIdentityService, IdentityService>();                      // Service
@@ -211,6 +229,7 @@ builder.Services.AddOpenApi(options =>
     options.AddDocumentTransformer<VersionInfoTransformer>();
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
     options.AddOperationTransformer<BearerSecuritySchemeTransformer>();
+    options.AddOperationTransformer<AcceptLanguageHeaderTransformer>();
 });
 
 
@@ -231,6 +250,7 @@ var app = builder.Build();
 
 await app.InitialiseDatabaseAsync();
 
+app.UseRequestLocalization();
 
 app.MapOpenApi();
 
@@ -255,9 +275,12 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+app.UseMiddleware<UserPreferredLanguageMiddleware>();
+
 app.MapControllers();
 
 app.MapHub<ChatHub>("/chathub");
 
 
 app.Run();
+

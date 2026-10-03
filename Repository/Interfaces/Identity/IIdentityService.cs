@@ -25,4 +25,5 @@ public interface IIdentityService
     Task<Result<AppUserDto>> ExternalLoginAsync(ExternalAuthInfoDto externalInfo);
     Task<Result<SignInResult>> ExternalLoginSignInAsync(string loginProvider, string providerKey);
     Task<Result<IdentityResult>> AddExternalLoginAsync(string userId, ExternalLoginInfo info);
+    Task<Result<Deleted>> DeleteUserAccountAsync(string userId, CancellationToken ct = default);
 }

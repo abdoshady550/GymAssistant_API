@@ -1,54 +1,101 @@
-﻿using GymAssistant_API.Model.Results;
+using GymAssistant_API.Model.Results;
+using GymAssistant_API.Resources;
 
 namespace GymAssistant_API.Model.Entities.Exercise
 {
     public static class ExerciseErrors
     {
         public static Error PersonalRecordValueISInvalid =>
-            Error.Validation("Value.Invalid", "Record value must be a positive number.");
+            Error.Validation(LocalizationKeys.Exercise.ValueInvalid);
 
         public static Error PersonalRecordExerciseIsRequired =>
-           Error.Validation("Exercise.Required", "Either ExerciseId or UserExerciseId must be provided.");
+            Error.Validation(LocalizationKeys.Exercise.Required);
 
         public static Error PersonalRecordExerciseIsConflict =>
-           Error.Validation("Exercise.Conflict", "Only one of ExerciseId or UserExerciseId should be provided.");
+            Error.Validation(LocalizationKeys.Exercise.Conflict);
+
         public static Error GenderInvalid =>
-            Error.Validation("GenderInvalid", "Gender must be a Male or Female.");
+            Error.Validation(LocalizationKeys.User.GenderInvalid);
+
         public static Error BirthDayRequired =>
-           Error.Validation("BirthDay.Required", "BirthDay not Valid.");
+            Error.Validation(LocalizationKeys.User.BirthDayRequired);
+
         public static Error HeightInvalid =>
-            Error.Validation("HeightCm.Invalid", "HeightCm must be a positive integer.");
+            Error.Validation(LocalizationKeys.User.HeightInvalid);
+
         public static Error RoleInvalid =>
-            Error.Validation("User.Role.Invalid", "Invalid role assigned to User.");
+            Error.Validation(LocalizationKeys.User.RoleInvalid);
 
         public static Error SectionIdRequired =>
-            Error.Validation("SectionId.Required", "SectionId is required.");
+            Error.Validation(LocalizationKeys.Section.IdRequired);
+
         public static Error NameRequired =>
-            Error.Validation("Name.Required", "Name is required.");
+            Error.Validation(LocalizationKeys.Exercise.NameRequired);
+
         public static Error DefaultSetsInvalid =>
-            Error.Validation("DefaultSets.Invalid", "DefaultSets must be a positive integer.");
+            Error.Validation(LocalizationKeys.Exercise.DefaultSetsInvalid);
+
         public static Error DefaultRepsInvalid =>
-            Error.Validation("DefaultReps.Invalid", "DefaultReps must be a positive integer.");
+            Error.Validation(LocalizationKeys.Exercise.DefaultRepsInvalid);
 
         public static Error SetNumberInvalid =>
-            Error.Validation("SetNumber.Invalid", "SetNumber must be a positive integer.");
+            Error.Validation(LocalizationKeys.Exercise.SetNumberInvalid);
+
         public static Error RepsInvalid =>
-            Error.Validation("Reps.Invalid", "Reps must be a positive integer.");
+            Error.Validation(LocalizationKeys.Exercise.RepsInvalid);
+
         public static Error WeightKgInvalid =>
-            Error.Validation("WeightKg.Invalid", "WeightKg must be a non-negative number.");
+            Error.Validation(LocalizationKeys.Exercise.WeightKgInvalid);
 
         public static Error ClientProfileIdRequired =>
-            Error.Validation("ClientProfileId.Required", "ClientProfileId is required.");
+            Error.Validation(LocalizationKeys.Profile.IdRequired);
+
         public static Error DateRequired =>
-            Error.Validation("Date.Required", "Date is required.");
+            Error.Validation(LocalizationKeys.Exercise.DateRequired);
+
         public static Error CreatedByTrainerIdInvalid =>
-            Error.Validation("CreatedByTrainerId.Invalid", "CreatedByTrainerId must be a valid GUID if provided.");
+            Error.Validation(LocalizationKeys.Exercise.CreatedByTrainerIdInvalid);
 
         public static Error WorkoutExerciseIdRequired =>
-            Error.Validation("WorkoutExerciseId.Required", "WorkoutExerciseId is required.");
+            Error.Validation(LocalizationKeys.Exercise.WorkoutExerciseIdRequired);
+
         public static Error ExerciseIdRequired =>
-            Error.Validation("ExerciseId.Required", "ExerciseId is required.");
+            Error.Validation(LocalizationKeys.Exercise.IdRequired);
+
         public static Error RestTimeSecondsInvalid =>
-            Error.Validation("RestTimeSeconds.Invalid", "RestTimeSeconds must be a non-negative integer if provided.");
+            Error.Validation(LocalizationKeys.Exercise.RestTimeSecondsInvalid);
+
+        public static Error NotFound =>
+            Error.NotFound(LocalizationKeys.Exercise.NotFound);
+
+        public static Error CustomExerciseNotFound =>
+            Error.NotFound(LocalizationKeys.Exercise.CustomExerciseNotFound);
+
+        public static Error SectionNotFound =>
+            Error.NotFound(LocalizationKeys.Section.NotFound);
+
+        public static Error SectionGroupNotFound =>
+            Error.NotFound(LocalizationKeys.Section.GroupNotFound);
+
+        public static Error InUse =>
+            Error.Validation(LocalizationKeys.Exercise.InUse);
+
+        public static Error AlreadyInGroup =>
+            Error.Conflict(LocalizationKeys.Exercise.AlreadyInGroup);
+
+        public static Error SessionNotFound =>
+            Error.NotFound(LocalizationKeys.Workout.SessionNotFound);
+
+        public static Error SessionAlreadyCompleted =>
+            Error.Validation(LocalizationKeys.Workout.SessionAlreadyCompleted);
+
+        public static Error SessionCompleted =>
+            Error.Validation(LocalizationKeys.Workout.SessionCompleted);
+
+        public static Error SessionNotStarted =>
+            Error.Validation(LocalizationKeys.Workout.SessionNotStarted);
+
+        public static Error SetNotFound =>
+            Error.NotFound(LocalizationKeys.Exercise.SetNotFound);
     }
 }

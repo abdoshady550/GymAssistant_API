@@ -1,4 +1,4 @@
-﻿using GymAssistant_API.Data;
+using GymAssistant_API.Data;
 using GymAssistant_API.Extensions;
 using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Identity.Dtos;
@@ -7,6 +7,7 @@ using GymAssistant_API.Repository.Interfaces.Identity;
 using GymAssistant_API.Repository.Interfaces.Notifications;
 using GymAssistant_API.Repository.Interfaces.User.Trainer;
 using GymAssistant_API.Req_Res.Response.Trainer;
+using GymAssistant_API.Resources;
 using Microsoft.EntityFrameworkCore;
 
 namespace GymAssistant_API.Repository.Services.User.Trainer
@@ -37,7 +38,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             if (trainerProfile == null)
             {
-                return Error.Validation("Trainer_NotFound", "Trainer profile not found or user is not a trainer.");
+                return Error.Validation(Resources.LocalizationKeys.Trainer.NotFound);
             }
 
             // Verify trainee exists
@@ -46,7 +47,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             if (traineeProfile == null)
             {
-                return Error.NotFound("Trainee_NotFound", "Trainee not found.");
+                return Error.NotFound(Resources.LocalizationKeys.Trainer.TraineeNotFound);
             }
 
             // Check if relationship already exists
@@ -110,7 +111,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             if (trainerProfile == null)
             {
-                return Error.Validation("Trainer_NotFound", "Trainer profile not found or user is not a trainer.");
+                return Error.Validation(Resources.LocalizationKeys.Trainer.NotFound);
             }
 
             var query = _context.TrainerRequests
@@ -145,7 +146,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             if (trainerProfile == null)
             {
-                return Error.Validation("Trainer_NotFound", "Trainer profile not found or user is not a trainer.");
+                return Error.Validation(Resources.LocalizationKeys.Trainer.NotFound);
             }
 
             var request = await _context.TrainerRequests
@@ -180,7 +181,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             if (trainerProfile == null)
             {
-                return Error.NotFound("Trainer_NotFound", "Trainer profile not found.");
+                return TrainerRequestErrors.TrainerNotFound;
             }
 
             var query = _context.UserRequests
@@ -215,7 +216,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             if (trainerProfile == null)
             {
-                return Error.NotFound("Trainer_NotFound", "Trainer profile not found.");
+                return TrainerRequestErrors.TrainerNotFound;
             }
 
             var request = await _context.UserRequests
@@ -261,7 +262,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             if (trainerProfile == null)
             {
-                return Error.NotFound("Trainee_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
 
             var request = await _context.UserRequests
@@ -299,7 +300,7 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
 
             if (userProfile == null)
             {
-                return Error.NotFound("User_NotFound", "User profile not found.");
+                return UserErrors.ProfileNotFound;
             }
 
             var request = await _context.TrainerRequests
@@ -323,12 +324,12 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
           CancellationToken ct = default)
         {
             if (pageSize <= 0 || pageNumber <= 0)
-                return Error.Validation("Invalid_Pagination", "Invalid pagination parameters.");
+                return Error.Validation(LocalizationKeys.Common.InvalidPagination, "Invalid pagination parameters.");
             // الحصول على الـ current user profile
             var currentUserProfile = await _context.ClientProfiles
                 .FirstOrDefaultAsync(cp => cp.AppUserId == currentUserId, ct);
             if (currentUserProfile == null)
-                return Error.NotFound("User_not_found", "Current user not found");
+                return UserErrors.UserNotFound;
 
             var query = _context.ClientProfiles
                 .AsNoTracking()
@@ -381,14 +382,14 @@ namespace GymAssistant_API.Repository.Services.User.Trainer
          CancellationToken ct = default)
         {
             if (pageSize <= 0 || pageNumber <= 0)
-                return Error.Validation("Invalid_Pagination", "Invalid pagination parameters.");
+                return Error.Validation(LocalizationKeys.Common.InvalidPagination, "Invalid pagination parameters.");
 
             // الحصول على الـ current user profile
             var currentUserProfile = await _context.ClientProfiles
                 .FirstOrDefaultAsync(cp => cp.AppUserId == userId, ct);
 
             if (currentUserProfile == null)
-                return Error.NotFound("User_not_found", "Current user not found");
+                return UserErrors.UserNotFound;
 
             var query = _context.ClientProfiles
                 .AsNoTracking()

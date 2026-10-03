@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using GymAssistant_API.Resources;
 
 namespace GymAssistant_API.Model.Entities.Notifications.Dtos.Req
 {
@@ -6,9 +7,15 @@ namespace GymAssistant_API.Model.Entities.Notifications.Dtos.Req
     /// Request to send push notification
     /// </summary>
     public record SendPushNotificationRequest(
-        [Required] string UserId,
-        [Required] string Title,
-        [Required] string Body,
+        [Display(Name = LocalizationKeys.Fields.Target)]
+        [Required(ErrorMessage = LocalizationKeys.Validation.Required)] string UserId,
+
+        [Display(Name = LocalizationKeys.Fields.Name)]
+        [Required(ErrorMessage = LocalizationKeys.Validation.Required)] string Title,
+
+        [Display(Name = LocalizationKeys.Fields.Name)]
+        [Required(ErrorMessage = LocalizationKeys.Validation.Required)] string Body,
+
         NotificationType Type = NotificationType.General,
         Dictionary<string, string>? Data = null,
         IFormFile? Image = null

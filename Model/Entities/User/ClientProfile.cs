@@ -1,4 +1,4 @@
-﻿using GymAssistant_API.Model.Entities.Exercise;
+using GymAssistant_API.Model.Entities.Exercise;
 using GymAssistant_API.Model.Results;
 using System.Text.RegularExpressions;
 
@@ -102,8 +102,7 @@ namespace GymAssistant_API.Model.Entities.User
             if (!string.IsNullOrWhiteSpace(phoneNumber))
                 if (!Regex.IsMatch(phoneNumber, @"^(?:\+20|0)?1[0125][0-9]{8}$"))
                 {
-                    return Error.Validation("Invalid_PhoneNumber", "Phone number format is not valid.");
-
+                    return Error.Validation(Resources.LocalizationKeys.Auth.InvalidPhoneNumber);
                 }
             {
                 AppUser.PhoneNumber = phoneNumber;

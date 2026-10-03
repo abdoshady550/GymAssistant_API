@@ -1,19 +1,19 @@
 using GymAssistant_API.Model.Results;
-
+using GymAssistant_API.Resources;
 
 namespace GymAssistant_API.Model.Identity;
 
 public static class RefreshTokenErrors
 {
     public static readonly Error IdRequired =
-        Error.Validation("RefreshToken_Id_Required", "Refresh token ID is required.");
+        Error.Validation(LocalizationKeys.RefreshToken.IdRequired);
 
     public static readonly Error TokenRequired =
-        Error.Validation("RefreshToken_Token_Required", "Token value is required.");
+        Error.Validation(LocalizationKeys.RefreshToken.TokenRequired);
 
     public static readonly Error UserIdRequired =
-        Error.Validation("RefreshToken_UserId_Required", "User ID is required.");
+        Error.Validation(LocalizationKeys.RefreshToken.UserIdRequired);
 
     public static readonly Error ExpiryInvalid =
-        Error.Validation("RefreshToken_Expiry_Invalid", "Expiry must be in the future.");
+        Error.Validation(LocalizationKeys.RefreshToken.ExpiryInvalid);
 }

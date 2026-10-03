@@ -1,9 +1,10 @@
-﻿using GymAssistant_API.Data;
+using GymAssistant_API.Data;
 using GymAssistant_API.Model.Entities.User;
 using GymAssistant_API.Model.Identity.Dtos;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Identity;
 using GymAssistant_API.Req_Res.Reqeust.User;
+using GymAssistant_API.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,7 @@ public class IdentityService(AppDbContext context,
                              IAuthorizationService authorizationService,
                              IEmailService emailService,
                              IConfiguration configuration,
+                             IWebHostEnvironment environment,
                              ILogger<IdentityService> logger) : IIdentityService
 {
     private readonly AppDbContext _context = context;
@@ -27,6 +29,7 @@ public class IdentityService(AppDbContext context,
     private readonly IAuthorizationService _authorizationService = authorizationService;
     private readonly IEmailService _emailService = emailService;
     private readonly IConfiguration _configuration = configuration;
+    private readonly IWebHostEnvironment _environment = environment;
     private readonly ILogger<IdentityService> _logger = logger;
 
 
@@ -59,17 +62,17 @@ public class IdentityService(AppDbContext context,
 
         if (user is null)
         {
-            return Error.NotFound("User_Not_Found", $"User with email {UtilityService.MaskEmail(email)} not found");
+            return Error.NotFound(LocalizationKeys.Auth.UserNotFound, $"User with email {UtilityService.MaskEmail(email)} not found");
         }
 
         if (!user.EmailConfirmed)
         {
-            return Error.Conflict("Email_Not_Confirmed", $"email '{UtilityService.MaskEmail(email)}' not confirmed");
+            return Error.Conflict(LocalizationKeys.Auth.EmailNotConfirmed, $"email '{UtilityService.MaskEmail(email)}' not confirmed");
         }
 
         if (!await _userManager.CheckPasswordAsync(user, password))
         {
-            return Error.Conflict("Invalid_Login_Attempt", "Email / Password are incorrect");
+            return Error.Conflict(LocalizationKeys.Auth.InvalidCredentials, "Email / Password are incorrect");
         }
 
         return new AppUserDto(user.Id, user.Email!, await _userManager.GetRolesAsync(user));
@@ -99,27 +102,27 @@ public class IdentityService(AppDbContext context,
             if (user == null)
             {
                 _logger.LogWarning("User not found: {UserId}", userId);
-                return Error.NotFound("User_Not_Found", $"User with ID {userId} not found");
+                return UserErrors.UserNotFound;
             }
             var IsAuthenticate = await AuthenticateAsync(user.Email!, password);
             if (IsAuthenticate.IsError)
             {
-                return Error.Conflict("Invalid_Current_Password", "The provided current password is incorrect");
+                return Error.Conflict(LocalizationKeys.Auth.InvalidCurrentPassword, "The provided current password is incorrect");
             }
             // Check password confirmation
             if (string.IsNullOrWhiteSpace(newPassword) || string.IsNullOrWhiteSpace(confirmPassword))
             {
-                return Error.Validation("Invalid_Passwords", "New password and confirmation are required");
+                return Error.Validation(LocalizationKeys.Validation.Required, "New password and confirmation are required");
             }
 
 
             if (newPassword != confirmPassword)
             {
-                return Error.Conflict("Passwords_Not_Match", "Passwords do not match");
+                return Error.Conflict(LocalizationKeys.Auth.PasswordsDoNotMatch, "Passwords do not match");
             }
             if (password == newPassword)
             {
-                return Error.Conflict("Same_Password", "The new password must be different from the current password");
+                return Error.Conflict(LocalizationKeys.Auth.SamePassword, "The new password must be different from the current password");
             }
 
             _logger.LogInformation("Starting password reset process for user: {UserId}", user.Id);
@@ -130,7 +133,7 @@ public class IdentityService(AppDbContext context,
             if (!result.Succeeded)
             {
                 var errors = result.Errors
-                    .Select(e => Error.Validation(e.Code, e.Description))
+                    .Select(e => Error.Validation($"{LocalizationKeys.Identity.Prefix}{e.Code}", e.Description))
                     .ToList();
 
                 _logger.LogError("Failed to change password for user: {ID}, {Errors}", user.Id, errors);
@@ -143,7 +146,7 @@ public class IdentityService(AppDbContext context,
         {
             _logger.LogError(ex, "Unexpected exception during password change for userId: {UserId}. Exception: {Exception}",
                 userId ?? "NULL", ex.ToString());
-            return Error.Failure("Change_Password_Failed", "An unexpected error occurred while changing the password");
+            return Error.Failure(LocalizationKeys.Auth.ChangePasswordFailed, "An unexpected error occurred while changing the password");
 
         }
     }
@@ -152,13 +155,13 @@ public class IdentityService(AppDbContext context,
         var user = await _userManager.FindByIdAsync(id);
         if (user == null)
         {
-            return Error.NotFound("User_Not_Found", $"User with ID {id} not found");
+            return UserErrors.UserNotFound;
         }
         var removeResult = await _userManager.RemovePasswordAsync(user);
         if (!removeResult.Succeeded)
         {
             var errors = removeResult.Errors.Select(e =>
-              Error.Validation(e.Code, e.Description)).ToList();
+              Error.Validation($"{LocalizationKeys.Identity.Prefix}{e.Code}", e.Description)).ToList();
 
             _logger.LogError("Failed to remove password for user: {ID}, {Errors}", user.Id, errors);
             return errors;
@@ -169,7 +172,7 @@ public class IdentityService(AppDbContext context,
         if (!addResult.Succeeded)
         {
             var errors = addResult.Errors.Select(e =>
-              Error.Validation(e.Code, e.Description)).ToList();
+              Error.Validation($"{LocalizationKeys.Identity.Prefix}{e.Code}", e.Description)).ToList();
 
             _logger.LogError("Failed to add new password for user: {ID}, {Errors}", user.Id, errors);
             return errors;
@@ -188,7 +191,7 @@ public class IdentityService(AppDbContext context,
             if (user == null)
             {
                 _logger.LogWarning("Password reset requested for non-existent email: {Email}", email);
-                return Error.NotFound("Invalid_Email ", "Email not exist ");
+                return Error.NotFound(LocalizationKeys.Auth.InvalidEmail, "Email not exist ");
             }
             // Invalidate any existing tokens for this email
             var existingTokens = await _context.PasswordResetTokens
@@ -225,7 +228,7 @@ public class IdentityService(AppDbContext context,
         {
             _logger.LogError(ex, "Unexpected exception during password reset for email: {Email}. Exception: {Exception}",
                 email ?? "NULL", ex.ToString());
-            return Error.NotFound("Not_Exist", "Password reset requested for non-existent email");
+            return Error.NotFound(LocalizationKeys.Auth.InvalidEmail, "Password reset requested for non-existent email");
         }
     }
     private string GenerateSecureToken()
@@ -246,13 +249,13 @@ public class IdentityService(AppDbContext context,
             if (dto == null)
             {
                 _logger.LogError("ResetPasswordDto is null");
-                return Error.Validation("Invalid_Request", "Request data is missing");
+                return Error.Validation(LocalizationKeys.Common.InvalidRequest, "Request data is missing");
             }
 
             if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Token))
             {
                 _logger.LogError("Email or Token is null/empty. Email: {Email}, Token: {Token}", dto.Email, dto.Token);
-                return Error.Validation("Invalid_Request", "Email and token are required");
+                return Error.Validation(LocalizationKeys.Common.InvalidRequest, "Email and token are required");
             }
 
             _logger.LogInformation("Searching for token in database...");
@@ -275,11 +278,11 @@ public class IdentityService(AppDbContext context,
                 if (usedToken != null && usedToken.IsUsed)
                 {
                     _logger.LogWarning("Token already used for email: {Email}", dto.Email);
-                    return Error.Conflict("Token_Used", "This reset link has already been used");
+                    return Error.Conflict(LocalizationKeys.Auth.TokenUsed, "This reset link has already been used");
                 }
 
                 _logger.LogWarning("Token not found for email: {Email}", dto.Email);
-                return Error.NotFound("Invalid_Token", "Invalid token or email");
+                return Error.NotFound(LocalizationKeys.Auth.InvalidToken, "Invalid token or email");
             }
 
             // Check if token is expired (with explicit null checks)
@@ -289,7 +292,7 @@ public class IdentityService(AppDbContext context,
                     dto.Email, resetToken.ExpiryDate);
                 resetToken.IsUsed = true;
                 await _context.SaveChangesAsync();
-                return Error.Conflict("Token_Expired", "Token has expired");
+                return Error.Conflict(LocalizationKeys.Auth.TokenExpired, "Token has expired");
             }
 
             _logger.LogInformation("Looking for user with email: {Email}", dto.Email);
@@ -299,7 +302,7 @@ public class IdentityService(AppDbContext context,
             if (user == null)
             {
                 _logger.LogWarning("User not found for email: {Email}", dto.Email);
-                return Error.NotFound("User_Not_Found", "User not found");
+                return UserErrors.UserNotFound;
             }
 
             _logger.LogInformation("User found: {UserId}", user.Id);
@@ -307,12 +310,12 @@ public class IdentityService(AppDbContext context,
             // Check password confirmation
             if (string.IsNullOrWhiteSpace(dto.NewPassword) || string.IsNullOrWhiteSpace(dto.ConfirmPassword))
             {
-                return Error.Validation("Invalid_Passwords", "New password and confirmation are required");
+                return Error.Validation(LocalizationKeys.Validation.Required, "New password and confirmation are required");
             }
 
             if (dto.NewPassword != dto.ConfirmPassword)
             {
-                return Error.Conflict("Passwords_Not_Match", "Passwords do not match");
+                return Error.Conflict(LocalizationKeys.Auth.PasswordsDoNotMatch, "Passwords do not match");
             }
 
             _logger.LogInformation("Starting password reset process for user: {UserId}", user.Id);
@@ -322,7 +325,7 @@ public class IdentityService(AppDbContext context,
             if (!removeResult.Succeeded)
             {
                 var errors = removeResult.Errors.Select(e =>
-                  Error.Validation(e.Code, e.Description)).ToList();
+                  Error.Validation($"{LocalizationKeys.Identity.Prefix}{e.Code}", e.Description)).ToList();
 
 
                 _logger.LogError("Failed to remove password for {Email}: {Errors}", dto.Email, errors);
@@ -335,7 +338,7 @@ public class IdentityService(AppDbContext context,
             if (!addResult.Succeeded)
             {
                 var errors = addResult.Errors.Select(e =>
-                  Error.Validation(e.Code, e.Description)).ToList();
+                  Error.Validation($"{LocalizationKeys.Identity.Prefix}{e.Code}", e.Description)).ToList();
 
                 _logger.LogError("Failed to add new password for {Email}: {Errors}", dto.Email, errors);
                 return errors;
@@ -362,7 +365,7 @@ public class IdentityService(AppDbContext context,
         {
             _logger.LogError(ex, "Unexpected exception during password reset for email: {Email}. Exception: {Exception}",
                 dto?.Email ?? "NULL", ex.ToString());
-            return Error.Failure("Reset_Failed", "An unexpected error occurred while resetting the password");
+            return Error.Failure(LocalizationKeys.Auth.ResetFailed, "An unexpected error occurred while resetting the password");
         }
 
 
@@ -376,7 +379,7 @@ public class IdentityService(AppDbContext context,
         if (info == null)
         {
             _logger.LogWarning("Failed to get external login info");
-            return Error.NotFound("External_Login_Failed", "Failed to get external login info");
+            return Error.NotFound(LocalizationKeys.Auth.ExternalLoginFailed, "Failed to get external login info");
         }
 
         return info;
@@ -411,7 +414,7 @@ public class IdentityService(AppDbContext context,
                         string.Join(", ", createResult.Errors.Select(e => e.Description)));
 
                     var errors = createResult.Errors.Select(e =>
-                        Error.Validation(e.Code, e.Description)).ToList();
+                        Error.Validation($"{LocalizationKeys.Identity.Prefix}{e.Code}", e.Description)).ToList();
                     return errors;
                 }
 
@@ -497,7 +500,7 @@ public class IdentityService(AppDbContext context,
         {
             _logger.LogError(ex, "Error during external login for email: {Email}, provider: {Provider}",
                 externalInfo.Email, externalInfo.Provider);
-            return Error.Failure("External_Login_Failed", "An error occurred during external login");
+            return Error.Failure(LocalizationKeys.Auth.ExternalLoginFailed, "An error occurred during external login");
         }
     }
     public async Task<Result<SignInResult>> ExternalLoginSignInAsync(string loginProvider, string providerKey)
@@ -528,7 +531,7 @@ public class IdentityService(AppDbContext context,
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during external sign-in for provider: {Provider}", loginProvider);
-            return Error.Failure("External_SignIn_Failed", "An error occurred during external sign-in");
+            return Error.Failure(LocalizationKeys.Auth.ExternalSignInFailed, "An error occurred during external sign-in");
         }
     }
     public async Task<Result<IdentityResult>> AddExternalLoginAsync(string userId, ExternalLoginInfo info)
@@ -540,7 +543,7 @@ public class IdentityService(AppDbContext context,
             if (user == null)
             {
                 _logger.LogWarning("User not found: {UserId}", userId);
-                return Error.NotFound("User_Not_Found", "User not found");
+                return UserErrors.UserNotFound;
             }
 
             _logger.LogInformation("Adding external login for user {UserId}, provider: {Provider}",
@@ -564,7 +567,7 @@ public class IdentityService(AppDbContext context,
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error adding external login for user: {UserId}", userId);
-            return Error.Failure("Add_External_Login_Failed", "An error occurred while adding external login");
+            return Error.Failure(LocalizationKeys.Auth.AddExternalLoginFailed, "An error occurred while adding external login");
         }
     }
 
@@ -572,4 +575,187 @@ public class IdentityService(AppDbContext context,
 
     #endregion
 
+    public async Task<Result<Deleted>> DeleteUserAccountAsync(string userId, CancellationToken ct = default)
+    {
+        try
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                _logger.LogWarning("Account deletion attempted for non-existent user: {UserId}", userId);
+                return UserErrors.UserNotFound;
+            }
+
+            var profile = await _context.ClientProfiles
+                .Include(p => p.CustomExercises)
+                .FirstOrDefaultAsync(p => p.AppUserId == userId, ct);
+
+            var filesToDelete = new List<string>();
+
+            using var transaction = await _context.Database.BeginTransactionAsync(ct);
+            try
+            {
+                if (profile != null)
+                {
+                    var profileId = profile.Id;
+
+                    // 1. Collect images to delete from disk
+                    if (!string.IsNullOrEmpty(profile.Image))
+                    {
+                        var profileImgPath = Path.Combine(_environment.WebRootPath, profile.Image.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+                        filesToDelete.Add(profileImgPath);
+                    }
+
+                    foreach (var customEx in profile.CustomExercises)
+                    {
+                        if (!string.IsNullOrEmpty(customEx.ImageUrl))
+                        {
+                            var exImgPath = Path.Combine(_environment.WebRootPath, customEx.ImageUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+                            filesToDelete.Add(exImgPath);
+                        }
+                    }
+
+                    // 2. Chat Conversations and Messages
+                    var chatConversations = await _context.ChatConversations
+                        .Where(c => c.TrainerId == profileId || c.TraineeId == profileId)
+                        .Include(c => c.Messages)
+                        .ToListAsync(ct);
+                    _context.ChatConversations.RemoveRange(chatConversations);
+
+                    // 3. Trainer Requests (both sent and received)
+                    var trainerRequests = await _context.TrainerRequests
+                        .Where(tr => tr.TrainerId == profileId || tr.TraineeId == profileId)
+                        .ToListAsync(ct);
+                    _context.TrainerRequests.RemoveRange(trainerRequests);
+
+                    // 4. User Requests (both sent and received)
+                    var userRequests = await _context.UserRequests
+                        .Where(ur => ur.TrainerId == profileId || ur.TraineeId == profileId)
+                        .ToListAsync(ct);
+                    _context.UserRequests.RemoveRange(userRequests);
+
+                    // 5. Trainer-Trainee relationships
+                    var trainerTrainees = await _context.TrainerTrainees
+                        .Where(tt => tt.TrainerId == profileId || tt.TraineeId == profileId)
+                        .ToListAsync(ct);
+                    _context.TrainerTrainees.RemoveRange(trainerTrainees);
+
+                    // 6. Workout sessions created by this user as trainer for other trainees
+                    var workoutsCreatedByTrainer = await _context.WorkoutSessions
+                        .Where(ws => ws.CreatedByTrainerId == profileId)
+                        .ToListAsync(ct);
+                    foreach (var ws in workoutsCreatedByTrainer)
+                    {
+                        _context.Entry(ws).Property(x => x.CreatedByTrainerId).CurrentValue = null;
+                    }
+
+                    // 7. Workout sessions of this user (including exercises and sets)
+                    var userWorkouts = await _context.WorkoutSessions
+                        .Where(ws => ws.ClientProfileId == profileId)
+                        .Include(ws => ws.WorkoutExercises)
+                            .ThenInclude(we => we.Sets)
+                        .ToListAsync(ct);
+                    _context.WorkoutSessions.RemoveRange(userWorkouts);
+
+                    // 8. Personal records of this user
+                    var personalRecords = await _context.PersonalRecords
+                        .Where(pr => pr.ClientProfileId == profileId)
+                        .ToListAsync(ct);
+                    _context.PersonalRecords.RemoveRange(personalRecords);
+
+                    // 9. SectionGroups created by this user
+                    var sectionGroups = await _context.SectionGroups
+                        .Where(sg => sg.ClientProfileId == profileId)
+                        .ToListAsync(ct);
+                    _context.SectionGroups.RemoveRange(sectionGroups);
+
+                    // 10. Custom exercises of this user
+                    var customExercises = await _context.UserExercises
+                        .Where(ue => ue.ClientProfileId == profileId)
+                        .ToListAsync(ct);
+                    _context.UserExercises.RemoveRange(customExercises);
+
+                    // 11. Body measurements of this user
+                    var measurements = await _context.BodyMeasurements
+                        .Where(bm => bm.ClientProfileId == profileId)
+                        .ToListAsync(ct);
+                    _context.BodyMeasurements.RemoveRange(measurements);
+
+                    // 12. Remove ClientProfile
+                    _context.ClientProfiles.Remove(profile);
+                }
+
+                // 13. Device tokens
+                var deviceTokens = await _context.DeviceTokens
+                    .Where(dt => dt.UserId == userId)
+                    .ToListAsync(ct);
+                _context.DeviceTokens.RemoveRange(deviceTokens);
+
+                // 14. Notifications
+                var notifications = await _context.Notifications
+                    .Where(n => n.UserId == userId)
+                    .ToListAsync(ct);
+                _context.Notifications.RemoveRange(notifications);
+
+                // 15. Refresh tokens
+                var refreshTokens = await _context.RefreshTokens
+                    .Where(rt => rt.UserId == userId)
+                    .ToListAsync(ct);
+                _context.RefreshTokens.RemoveRange(refreshTokens);
+
+                // 16. Password reset tokens
+                if (!string.IsNullOrEmpty(user.Email))
+                {
+                    var resetTokens = await _context.PasswordResetTokens
+                        .Where(prt => prt.Email == user.Email)
+                        .ToListAsync(ct);
+                    _context.PasswordResetTokens.RemoveRange(resetTokens);
+                }
+
+                await _context.SaveChangesAsync(ct);
+
+                // 17. Delete Identity AppUser
+                var deleteResult = await _userManager.DeleteAsync(user);
+                if (!deleteResult.Succeeded)
+                {
+                    await transaction.RollbackAsync(ct);
+                    var errors = deleteResult.Errors.Select(e => Error.Validation($"{LocalizationKeys.Identity.Prefix}{e.Code}", e.Description)).ToList();
+                    _logger.LogError("Failed to delete AppUser {UserId}: {Errors}", userId, errors);
+                    return errors;
+                }
+
+                await transaction.CommitAsync(ct);
+
+                // 18. Safely delete physical files after successful commit
+                foreach (var filePath in filesToDelete)
+                {
+                    try
+                    {
+                        if (File.Exists(filePath))
+                        {
+                            File.Delete(filePath);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to delete physical file {FilePath} for user {UserId}", filePath, userId);
+                    }
+                }
+
+                _logger.LogInformation("Successfully deleted user account {UserId}", userId);
+                return Result.Deleted;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync(ct);
+                _logger.LogError(ex, "Transaction rolled back while deleting user account {UserId}", userId);
+                return UserErrors.DeleteUserFailed;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error deleting user account {UserId}", userId);
+            return UserErrors.DeleteUserFailed;
+        }
+    }
 }

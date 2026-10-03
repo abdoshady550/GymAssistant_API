@@ -1,4 +1,4 @@
-﻿using GymAssistant_API.Model.Identity.Dtos;
+using GymAssistant_API.Model.Identity.Dtos;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -22,9 +22,9 @@ namespace GymAssistant_API.Handeler.Identity
 
             if (result.IsError)
             {
-                _logger.LogError("User with Email { Email }{ErrorDetails}", request.Email, result.TopError.Description);
+                _logger.LogError("User with Email {Email} {ErrorDetails}", request.Email, result.TopError.Description);
 
-                return Error.NotFound("Invalid_email", result.TopError.Description ?? "Email not found");
+                return result.Errors;
             }
             return result.Value;
         }

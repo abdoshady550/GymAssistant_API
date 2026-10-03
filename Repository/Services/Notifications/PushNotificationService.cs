@@ -1,4 +1,4 @@
-﻿using FirebaseAdmin;
+using FirebaseAdmin;
 using FirebaseAdmin.Messaging;
 using Google.Apis.Auth.OAuth2;
 using GymAssistant_API.Data;
@@ -109,7 +109,7 @@ namespace GymAssistant_API.Repository.Services.Notifications
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error registering device token for user {UserId}", userId);
-                return Error.Failure("DeviceToken_Registration_Failed", "Failed to register device token");
+                return Error.Failure(Resources.LocalizationKeys.Notification.DeviceTokenRegistrationFailed);
             }
         }
 
@@ -124,7 +124,7 @@ namespace GymAssistant_API.Repository.Services.Notifications
                     .FirstOrDefaultAsync(dt => dt.UserId == userId && dt.Token == token, ct);
 
                 if (deviceToken == null)
-                    return Error.NotFound("DeviceToken_NotFound", "Device token not found");
+                    return Error.NotFound(Resources.LocalizationKeys.Notification.DeviceTokenNotFound);
 
                 deviceToken.Deactivate();
                 await _context.SaveChangesAsync(ct);
@@ -135,7 +135,7 @@ namespace GymAssistant_API.Repository.Services.Notifications
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error unregistering device token for user {UserId}", userId);
-                return Error.Failure("DeviceToken_Unregistration_Failed", "Failed to unregister device token");
+                return Error.Failure(Resources.LocalizationKeys.Notification.DeviceTokenUnregistrationFailed);
             }
         }
 
@@ -243,7 +243,7 @@ namespace GymAssistant_API.Repository.Services.Notifications
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error sending notification to user {UserId}", userId);
-                return Error.Failure("Notification_Send_Failed", "Failed to send notification");
+                return Error.Failure(Resources.LocalizationKeys.Notification.SendFailed);
             }
         }
 
@@ -289,7 +289,7 @@ namespace GymAssistant_API.Repository.Services.Notifications
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error sending bulk notification");
-                return Error.Failure("BulkNotification_Send_Failed", "Failed to send bulk notification");
+                return Error.Failure(Resources.LocalizationKeys.Notification.BulkSendFailed);
             }
         }
 
@@ -429,7 +429,7 @@ namespace GymAssistant_API.Repository.Services.Notifications
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting notifications for user {UserId}", userId);
-                return Error.Failure("Notifications_Retrieval_Failed", "Failed to retrieve notifications");
+                return Error.Failure(Resources.LocalizationKeys.Notification.RetrievalFailed);
             }
         }
 
@@ -444,7 +444,7 @@ namespace GymAssistant_API.Repository.Services.Notifications
                     .FirstOrDefaultAsync(n => n.Id == notificationId && n.UserId == userId, ct);
 
                 if (notification == null)
-                    return Error.NotFound("Notification_NotFound", "Notification not found");
+                    return Error.NotFound(Resources.LocalizationKeys.Notification.NotFound);
 
                 notification.MarkAsRead();
                 await _context.SaveChangesAsync(ct);
@@ -454,7 +454,7 @@ namespace GymAssistant_API.Repository.Services.Notifications
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error marking notification as read: {NotificationId}", notificationId);
-                return Error.Failure("Notification_Update_Failed", "Failed to update notification");
+                return Error.Failure(Resources.LocalizationKeys.Notification.UpdateFailed);
             }
         }
 
@@ -483,7 +483,7 @@ namespace GymAssistant_API.Repository.Services.Notifications
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error marking all notifications as read for user {UserId}", userId);
-                return Error.Failure("Notifications_Update_Failed", "Failed to update notifications");
+                return Error.Failure(Resources.LocalizationKeys.Notification.UpdateFailed);
             }
         }
 
@@ -498,7 +498,7 @@ namespace GymAssistant_API.Repository.Services.Notifications
                     .FirstOrDefaultAsync(n => n.Id == notificationId && n.UserId == userId, ct);
 
                 if (notification == null)
-                    return Error.NotFound("Notification_NotFound", "Notification not found");
+                    return Error.NotFound(Resources.LocalizationKeys.Notification.NotFound);
 
                 _context.Notifications.Remove(notification);
                 await _context.SaveChangesAsync(ct);
@@ -508,7 +508,7 @@ namespace GymAssistant_API.Repository.Services.Notifications
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting notification: {NotificationId}", notificationId);
-                return Error.Failure("Notification_Delete_Failed", "Failed to delete notification");
+                return Error.Failure(Resources.LocalizationKeys.Notification.DeleteFailed);
             }
         }
 
@@ -526,7 +526,7 @@ namespace GymAssistant_API.Repository.Services.Notifications
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting unread count for user {UserId}", userId);
-                return Error.Failure("UnreadCount_Retrieval_Failed", "Failed to get unread count");
+                return Error.Failure(Resources.LocalizationKeys.Notification.UnreadCountFailed);
             }
         }
 
@@ -540,12 +540,12 @@ namespace GymAssistant_API.Repository.Services.Notifications
 
                 if (string.IsNullOrWhiteSpace(deviceToken))
                 {
-                    return Error.Validation("Invalid_Token", "Device token cannot be empty");
+                    return Error.Validation(Resources.LocalizationKeys.Notification.DeviceTokenRequired);
                 }
 
                 if (string.IsNullOrWhiteSpace(topic))
                 {
-                    return Error.Validation("Invalid_Topic", "Topic cannot be empty");
+                    return Error.Validation(Resources.LocalizationKeys.Notification.InvalidTopic);
                 }
 
                 // Subscribe to topic using FCM
@@ -559,9 +559,7 @@ namespace GymAssistant_API.Repository.Services.Notifications
                         response.FailureCount,
                         topic);
 
-                    return Error.Failure(
-                        "Subscription_Failed",
-                        $"Failed to subscribe to topic: {response.Errors[0].Reason}");
+                    return Error.Failure(Resources.LocalizationKeys.Notification.SubscriptionFailed);
                 }
 
                 _logger.LogInformation(
@@ -573,9 +571,7 @@ namespace GymAssistant_API.Repository.Services.Notifications
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error subscribing to topic {Topic}", topic);
-                return Error.Failure(
-                    "Subscription_Error",
-                    "An error occurred while subscribing to topic");
+                return Error.Failure(Resources.LocalizationKeys.Notification.SubscriptionFailed);
             }
         }
 
@@ -588,12 +584,12 @@ namespace GymAssistant_API.Repository.Services.Notifications
             {
                 if (string.IsNullOrWhiteSpace(deviceToken))
                 {
-                    return Error.Validation("Invalid_Token", "Device token cannot be empty");
+                    return Error.Validation(Resources.LocalizationKeys.Notification.DeviceTokenRequired);
                 }
 
                 if (string.IsNullOrWhiteSpace(topic))
                 {
-                    return Error.Validation("Invalid_Topic", "Topic cannot be empty");
+                    return Error.Validation(Resources.LocalizationKeys.Notification.InvalidTopic);
                 }
 
                 var response = await FirebaseMessaging.DefaultInstance
@@ -606,9 +602,7 @@ namespace GymAssistant_API.Repository.Services.Notifications
                         response.FailureCount,
                         topic);
 
-                    return Error.Failure(
-                        "Unsubscription_Failed",
-                        $"Failed to unsubscribe from topic: {response.Errors[0].Reason}");
+                    return Error.Failure(Resources.LocalizationKeys.Notification.UnsubscriptionFailed);
                 }
 
                 _logger.LogInformation(
@@ -620,9 +614,7 @@ namespace GymAssistant_API.Repository.Services.Notifications
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error unsubscribing from topic {Topic}", topic);
-                return Error.Failure(
-                    "Unsubscription_Error",
-                    "An error occurred while unsubscribing from topic");
+                return Error.Failure(Resources.LocalizationKeys.Notification.UnsubscriptionFailed);
             }
         }
 
@@ -638,15 +630,15 @@ namespace GymAssistant_API.Repository.Services.Notifications
             {
                 if (string.IsNullOrWhiteSpace(topic))
                 {
-                    return Error.Validation("Invalid_Topic", "Topic cannot be empty");
+                    return Error.Validation(Resources.LocalizationKeys.Notification.InvalidTopic);
                 }
                 if (string.IsNullOrWhiteSpace(title))
                 {
-                    return Error.Validation("Invalid_Title", "Title cannot be empty");
+                    return Error.Validation(Resources.LocalizationKeys.Notification.InvalidTitle);
                 }
                 if (string.IsNullOrWhiteSpace(body))
                 {
-                    return Error.Validation("Invalid_Body", "Body cannot be empty");
+                    return Error.Validation(Resources.LocalizationKeys.Notification.InvalidBody);
                 }
                 // 🖼️ حفظ الصورة في wwwroot (لو موجودة)
                 string? imageUrl = null;
@@ -711,9 +703,7 @@ namespace GymAssistant_API.Repository.Services.Notifications
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error sending notification to topic {Topic}", topic);
-                return Error.Failure(
-                    "Send_Failed",
-                    "An error occurred while sending notification");
+                return Error.Failure(Resources.LocalizationKeys.Notification.SendFailed);
             }
         }
     }

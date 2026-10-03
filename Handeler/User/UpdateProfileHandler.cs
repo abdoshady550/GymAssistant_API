@@ -1,4 +1,4 @@
-﻿using GymAssistant_API.Data;
+using GymAssistant_API.Data;
 using GymAssistant_API.Model.Results;
 using GymAssistant_API.Repository.Interfaces.User;
 using GymAssistant_API.Req_Res.Reqeust;
@@ -21,7 +21,7 @@ namespace GymAssistant_API.Handeler.User
             if (user == null)
             {
                 _logger.LogError("User not found with ID {UserId}", id);
-                return Error.NotFound("User_NotFound", "User not found.");
+                return Error.NotFound(Resources.LocalizationKeys.User.NotFound);
             }
             var updateProfile = await _context.ClientProfiles
                 .FirstOrDefaultAsync(p => p.AppUserId == user.Id);

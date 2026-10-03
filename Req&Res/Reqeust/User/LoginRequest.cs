@@ -1,14 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using GymAssistant_API.Resources;
 
 namespace GymAssistant_API.Req_Res.Reqeust
 {
     public record LoginRequest(
-    [Required(ErrorMessage = "Email is required")]
-    [EmailAddress(ErrorMessage = "Invalid email format")]
-    string Email,
-    [Required(ErrorMessage = "Password is required")]
-    [MinLength(1, ErrorMessage = "Password cannot be empty")]
-    string Password,
-    string? fcmToken = null);
+        [Display(Name = LocalizationKeys.Fields.Email)]
+        [Required(ErrorMessage = LocalizationKeys.Validation.Required)]
+        [EmailAddress(ErrorMessage = LocalizationKeys.Validation.Email)]
+        string Email,
 
+        [Display(Name = LocalizationKeys.Fields.Password)]
+        [Required(ErrorMessage = LocalizationKeys.Validation.Required)]
+        [MinLength(1, ErrorMessage = LocalizationKeys.Validation.MinLength)]
+        string Password,
+
+        string? fcmToken = null);
 }
