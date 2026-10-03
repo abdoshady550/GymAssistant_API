@@ -367,3 +367,7 @@ FodyWeavers.xsd
 /Firebase/fitrix-adminsdk.json
 /wwwroot/images/notification
 /wwwroot/images/profile
+
+# Local Docker overrides (copy from .env.example)
+.env
+!.env.example

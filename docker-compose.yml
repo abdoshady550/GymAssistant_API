@@ -1,0 +1,72 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: gymassistant-db
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD:-Dev_Pass_123!}
+      MSSQL_PID: Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1'"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: gymassistant-mailpit
+    ports:
+      - "8025:8025"   # web inbox (SMTP on 1025 is internal)
+
+  # One-shot job: the API creates tables but not the database itself
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+    environment:
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD:-Dev_Pass_123!}
+    entrypoint: ["/bin/bash", "-c", "/opt/mssql-tools18/bin/sqlcmd -S db -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q \"IF DB_ID('GymAssistant') IS NULL CREATE DATABASE GymAssistant\""]
+
+  api:
+    build: .
+    container_name: gymassistant-api
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Server=db,1433;Database=GymAssistant;User Id=sa;Password=${DB_PASSWORD:-Dev_Pass_123!};Encrypt=False;TrustServerCertificate=True;MultipleActiveResultSets=True"
+      JWT__Key: ${JWT_KEY:-dev-only-jwt-signing-key-change-me-0123456789}
+      JWT__Issuer: SecureApi
+      JWT__Audience: GymAssistant
+      JWT__ExpiresInMin: "30"
+      EmailSettings__SmtpServer: mailpit
+      EmailSettings__Port: "1025"
+      EmailSettings__SenderEmail: noreply@gym.local
+      EmailSettings__SenderPassword: dev
+      EmailSettings__FrontendUrl: ${FRONTEND_URL:-http://localhost:3000}
+      Authentication__Google__ClientId: dev-placeholder
+      Authentication__Google__ClientSecret: dev-placeholder
+      Authentication__Facebook__AppId: dev-placeholder
+      Authentication__Facebook__AppSecret: dev-placeholder
+      Firebase__CredentialPath: Firebase/fitrix-adminsdk.json
+      Cors__AllowedOrigins__0: http://localhost:3000
+      Cors__AllowedOrigins__1: http://localhost:5173
+      Cors__AllowedOrigins__2: http://localhost:4200
+    volumes:
+      - uploads:/app/wwwroot/images
+      # Optional push notifications (file is gitignored):
+      # - ./Firebase/fitrix-adminsdk.json:/app/Firebase/fitrix-adminsdk.json:ro
+
+volumes:
+  sql-data:
+  uploads:

@@ -1,0 +1,18 @@
+**/bin/
+**/obj/
+tests/
+.git/
+.vs/
+.github/
+docs/
+*.md
+docker-compose*.yml
+Dockerfile
+.env
+.env.*
+# Secrets must never enter the image
+appsettings.json
+appsettings.*.json
+Firebase/*.json
+*.csproj.user
+*.Backup.tmp

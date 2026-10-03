@@ -251,7 +251,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowClient", policy =>
     {
-        policy.WithOrigins("https://fitrixapp.runasp.net")
+        var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+                      is { Length: > 0 } configured ? configured : new[] { "https://fitrixapp.runasp.net" };
+        policy.WithOrigins(origins)
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -282,6 +284,8 @@ app.MapScalarApiReference();
 app.UseHttpsRedirection();
 
 app.UseStaticFiles(); // لازم يكون موجود
+
+app.UseCors("AllowClient");
 
 app.UseAuthentication();
 
